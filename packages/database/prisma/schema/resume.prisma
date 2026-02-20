@@ -1,0 +1,48 @@
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Resume {
+  id         String    @id @default(cuid())
+  userId     String
+  title      String
+  templateId String?
+  sections   Json
+  isPublic   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  // Relations
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template ResumeTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  versions ResumeVersion[]
+
+  @@map("resumes")
+}
+
+model ResumeTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  thumbnail   String?
+  structure   Json
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  resumes Resume[]
+
+  @@map("resume_templates")
+}
+
+model ResumeVersion {
+  id          String   @id @default(cuid())
+  resumeId    String
+  pdfUrl      String
+  generatedAt DateTime @default(now())
+
+  // Relations
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@map("resume_versions")
+}

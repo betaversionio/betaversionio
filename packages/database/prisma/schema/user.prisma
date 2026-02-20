@@ -1,0 +1,110 @@
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum SocialPlatform {
+  GITHUB
+  LINKEDIN
+  TWITTER
+  WEBSITE
+  DEVTO
+  YOUTUBE
+  DRIBBBLE
+  BEHANCE
+}
+
+enum TechCategory {
+  LANGUAGE
+  FRAMEWORK
+  DATABASE
+  DEVOPS
+  TOOL
+  CLOUD
+  MOBILE
+  AI_ML
+  OTHER
+}
+
+enum Proficiency {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String?
+  name          String
+  avatarUrl     String?
+  githubId      String?   @unique
+  refreshToken  String?
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  profile           Profile?
+  socialLinks       SocialLink[]
+  techStack         TechStackItem[]
+  projects          Project[]
+  posts             Post[]
+  comments          Comment[]
+  reactions         Reaction[]
+  resumes           Resume[]
+  ideas             Idea[]
+  ideaApplications  IdeaApplication[]
+  ideaVotes         IdeaVote[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?  @db.VarChar(500)
+  headline  String?  @db.VarChar(200)
+  location  String?
+  website   String?
+  resumeUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model SocialLink {
+  id        String         @id @default(cuid())
+  userId    String
+  platform  SocialPlatform
+  url       String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("social_links")
+}
+
+model TechStackItem {
+  id          String       @id @default(cuid())
+  userId      String
+  name        String
+  category    TechCategory
+  proficiency Proficiency
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tech_stack_items")
+}

@@ -1,0 +1,92 @@
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum CollaboratorRole {
+  OWNER
+  MAINTAINER
+  CONTRIBUTOR
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  LINK
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Project {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  description      String        @db.Text
+  shortDescription String?       @db.VarChar(300)
+  techStack        String[]
+  repoUrl          String?
+  liveUrl          String?
+  thumbnailUrl     String?
+  status           ProjectStatus @default(DRAFT)
+  authorId         String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+
+  // Relations
+  author        User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  collaborators ProjectCollaborator[]
+  media         ProjectMedia[]
+  timeline      ProjectTimeline[]
+  convertedIdea Idea?
+
+  @@map("projects")
+}
+
+model ProjectCollaborator {
+  id        String           @id @default(cuid())
+  projectId String
+  userId    String
+  role      CollaboratorRole @default(CONTRIBUTOR)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_collaborators")
+}
+
+model ProjectMedia {
+  id        String    @id @default(cuid())
+  projectId String
+  type      MediaType
+  url       String
+  caption   String?
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_media")
+}
+
+model ProjectTimeline {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_timelines")
+}

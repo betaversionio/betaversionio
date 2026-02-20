@@ -1,0 +1,34 @@
+{
+  "name": "devcom",
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:generate": "pnpm --filter @devcom/database db:generate",
+    "db:push": "pnpm --filter @devcom/database db:push",
+    "db:migrate": "pnpm --filter @devcom/database db:migrate",
+    "db:seed": "pnpm --filter @devcom/database db:seed",
+    "db:studio": "pnpm --filter @devcom/database db:studio",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "prettier": "^3.5.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "bcrypt",
+      "esbuild",
+      "@nestjs/core",
+      "sharp"
+    ]
+  }
+}

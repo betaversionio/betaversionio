@@ -1,0 +1,19 @@
+{
+  "name": "@devcom/shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@devcom/typescript-config": "workspace:*",
+    "typescript": "^5.7.0"
+  }
+}

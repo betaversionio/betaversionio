@@ -1,0 +1,42 @@
+name: API CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
+      - "packages/database/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, main-runner]
+
+    strategy:
+      matrix:
+        node-version: [23.x]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set up Environment File
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          echo "${{ env.PROD_ENV_FILE }}" | sed 's/\\n/\n/g' > .env
+
+      - name: Build Application
+        run: pnpm turbo build --filter=@devcom/api...
+
+      - name: Start Application
+        run: pm2 delete "devcom-api" || true && pm2 start pnpm --name "devcom-api" -- run --filter @devcom/api start:prod

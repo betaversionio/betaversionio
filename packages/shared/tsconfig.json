@@ -1,0 +1,11 @@
+{
+  "extends": "@devcom/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "declaration": true,
+    "noEmit": false
+  },
+  "include": ["src"]
+}
