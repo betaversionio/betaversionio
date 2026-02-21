@@ -26,7 +26,7 @@ export class FeedService {
       const post = await tx.post.create({
         data: {
           authorId: userId,
-          type: dto.type,
+          type: dto.type as any,
           title: dto.title,
           content: dto.content,
           codeSnippet: dto.codeSnippet?.code,
@@ -244,7 +244,7 @@ export class FeedService {
         postId_userId_type: {
           postId,
           userId,
-          type: dto.type,
+          type: dto.type as any,
         },
       },
     });
@@ -268,7 +268,7 @@ export class FeedService {
         data: {
           postId,
           userId,
-          type: dto.type,
+          type: dto.type as any,
         },
       });
 

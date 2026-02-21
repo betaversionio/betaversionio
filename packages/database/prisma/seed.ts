@@ -56,15 +56,15 @@ async function main() {
       socialLinks: {
         create: [
           {
-            platform: "GITHUB",
+            platform: "Github",
             url: "https://github.com/alice-dev",
           },
           {
-            platform: "LINKEDIN",
+            platform: "Linkedin",
             url: "https://linkedin.com/in/alice-johnson-dev",
           },
           {
-            platform: "TWITTER",
+            platform: "Twitter",
             url: "https://twitter.com/alice_dev",
           },
         ],
@@ -73,33 +73,33 @@ async function main() {
         create: [
           {
             name: "TypeScript",
-            category: "LANGUAGE",
-            proficiency: "EXPERT",
+            category: "Language",
+            proficiency: "Expert",
           },
           {
             name: "React",
-            category: "FRAMEWORK",
-            proficiency: "EXPERT",
+            category: "Framework",
+            proficiency: "Expert",
           },
           {
             name: "Node.js",
-            category: "FRAMEWORK",
-            proficiency: "ADVANCED",
+            category: "Framework",
+            proficiency: "Advanced",
           },
           {
             name: "PostgreSQL",
-            category: "DATABASE",
-            proficiency: "ADVANCED",
+            category: "Database",
+            proficiency: "Advanced",
           },
           {
             name: "Docker",
-            category: "DEVOPS",
-            proficiency: "INTERMEDIATE",
+            category: "Devops",
+            proficiency: "Intermediate",
           },
           {
             name: "AWS",
-            category: "CLOUD",
-            proficiency: "INTERMEDIATE",
+            category: "Cloud",
+            proficiency: "Intermediate",
           },
         ],
       },
@@ -125,15 +125,15 @@ async function main() {
       socialLinks: {
         create: [
           {
-            platform: "GITHUB",
+            platform: "Github",
             url: "https://github.com/bob-codes",
           },
           {
-            platform: "LINKEDIN",
+            platform: "Linkedin",
             url: "https://linkedin.com/in/bob-martinez-eng",
           },
           {
-            platform: "DEVTO",
+            platform: "Devto",
             url: "https://dev.to/bob_codes",
           },
         ],
@@ -142,33 +142,33 @@ async function main() {
         create: [
           {
             name: "Go",
-            category: "LANGUAGE",
-            proficiency: "EXPERT",
+            category: "Language",
+            proficiency: "Expert",
           },
           {
             name: "Python",
-            category: "LANGUAGE",
-            proficiency: "ADVANCED",
+            category: "Language",
+            proficiency: "Advanced",
           },
           {
             name: "Kubernetes",
-            category: "DEVOPS",
-            proficiency: "EXPERT",
+            category: "Devops",
+            proficiency: "Expert",
           },
           {
             name: "MongoDB",
-            category: "DATABASE",
-            proficiency: "ADVANCED",
+            category: "Database",
+            proficiency: "Advanced",
           },
           {
             name: "GCP",
-            category: "CLOUD",
-            proficiency: "ADVANCED",
+            category: "Cloud",
+            proficiency: "Advanced",
           },
           {
             name: "TensorFlow",
-            category: "AI_ML",
-            proficiency: "BEGINNER",
+            category: "AiMl",
+            proficiency: "Beginner",
           },
         ],
       },
@@ -191,30 +191,30 @@ async function main() {
       repoUrl: "https://github.com/alice-dev/devcom-cli-tools",
       liveUrl: "https://www.npmjs.com/package/devcom-cli",
       thumbnailUrl: "https://picsum.photos/seed/devcom-cli/800/600",
-      status: "ACTIVE",
+      status: "Active",
       authorId: alice.id,
       collaborators: {
         create: [
           {
             userId: alice.id,
-            role: "OWNER",
+            role: "Owner",
           },
           {
             userId: bob.id,
-            role: "CONTRIBUTOR",
+            role: "Contributor",
           },
         ],
       },
       media: {
         create: [
           {
-            type: "IMAGE",
+            type: "Image",
             url: "https://picsum.photos/seed/devcom-cli-1/1200/800",
             caption: "CLI tool in action - scaffolding a new project",
             order: 0,
           },
           {
-            type: "IMAGE",
+            type: "Image",
             url: "https://picsum.photos/seed/devcom-cli-2/1200/800",
             caption: "Code health checker output",
             order: 1,
@@ -255,30 +255,30 @@ async function main() {
       repoUrl: "https://github.com/bob-codes/clouddash",
       liveUrl: "https://clouddash-demo.bobmartinez.io",
       thumbnailUrl: "https://picsum.photos/seed/clouddash/800/600",
-      status: "ACTIVE",
+      status: "Active",
       authorId: bob.id,
       collaborators: {
         create: [
           {
             userId: bob.id,
-            role: "OWNER",
+            role: "Owner",
           },
           {
             userId: alice.id,
-            role: "MAINTAINER",
+            role: "Maintainer",
           },
         ],
       },
       media: {
         create: [
           {
-            type: "IMAGE",
+            type: "Image",
             url: "https://picsum.photos/seed/clouddash-1/1200/800",
             caption: "Main dashboard showing real-time metrics",
             order: 0,
           },
           {
-            type: "VIDEO",
+            type: "Video",
             url: "https://www.youtube.com/watch?v=example",
             caption: "Demo walkthrough of CloudDash features",
             order: 1,
@@ -449,7 +449,7 @@ async function main() {
   const postAlice = await prisma.post.create({
     data: {
       authorId: alice.id,
-      type: "SNIPPET",
+      type: "Snippet",
       title: "TypeScript Tip: Branded Types for Type Safety",
       content:
         "Here is a pattern I use all the time to prevent mixing up string IDs in large codebases. Branded types create nominal typing in TypeScript's structural type system, ensuring you can't accidentally pass a UserId where a PostId is expected.",
@@ -492,7 +492,7 @@ getUser(userId); // OK
   const postBob = await prisma.post.create({
     data: {
       authorId: bob.id,
-      type: "ARTICLE",
+      type: "Article",
       title: "Why I Switched from Microservices to a Modular Monolith",
       content:
         "After running 15+ microservices in production for two years, we made the bold decision to consolidate into a modular monolith. Here is what we learned.\n\n## The Problem\n\nOur team of 6 engineers was spending more time on infrastructure and inter-service communication than on actual features. Debugging distributed transactions was a nightmare, and our deployment pipeline had become a complex web of dependencies.\n\n## The Solution\n\nWe adopted a modular monolith architecture using Go with clear module boundaries. Each module has its own internal package structure, and communication happens through well-defined interfaces rather than HTTP/gRPC calls.\n\n## Key Benefits\n\n1. **Simplified debugging** - One process, one log stream, easy stack traces\n2. **Faster development** - No need to spin up 15 services locally\n3. **Reduced infrastructure costs** - 60% reduction in cloud spend\n4. **Easier refactoring** - The compiler catches breaking changes across modules\n\n## When Microservices Still Make Sense\n\nThis is not an anti-microservices post. If you have a large org with many teams, different scaling requirements per service, or polyglot needs, microservices are still the right choice. But for small-to-medium teams, a modular monolith gives you most of the benefits with far less operational overhead.\n\nHappy to discuss our migration strategy in the comments!",
@@ -560,10 +560,10 @@ getUser(userId); // OK
   // Reactions
   await prisma.reaction.createMany({
     data: [
-      { postId: postAlice.id, userId: bob.id, type: "LIKE" },
-      { postId: postAlice.id, userId: bob.id, type: "INSIGHTFUL" },
-      { postId: postBob.id, userId: alice.id, type: "LIKE" },
-      { postId: postBob.id, userId: alice.id, type: "CELEBRATE" },
+      { postId: postAlice.id, userId: bob.id, type: "Like" },
+      { postId: postAlice.id, userId: bob.id, type: "Insightful" },
+      { postId: postBob.id, userId: alice.id, type: "Like" },
+      { postId: postBob.id, userId: alice.id, type: "Celebrate" },
     ],
   });
 
@@ -577,7 +577,7 @@ getUser(userId); // OK
       title: "Real-time Collaborative Code Editor for Technical Interviews",
       description:
         "Building an open-source alternative to CoderPad/HackerRank for technical interviews. The editor would support real-time collaboration with features like:\n\n- Multi-cursor editing (like Google Docs)\n- Built-in video/audio chat\n- Code execution in sandboxed containers (supporting 10+ languages)\n- Interview templates with timer and scoring rubrics\n- Recording and playback of interview sessions\n- Integration with ATS systems\n\nThe goal is to provide a free, self-hostable solution that companies can run on their own infrastructure for privacy-sensitive interviews.",
-      stage: "SEEKING_TEAM",
+      stage: "SeekingTeam",
       techStack: ["TypeScript", "React", "Node.js", "WebRTC", "Docker", "Redis"],
       votesCount: 8,
       isOpen: true,
@@ -587,24 +587,24 @@ getUser(userId); // OK
             title: "Frontend Engineer",
             description:
               "Build the collaborative editor UI using React and Yjs for CRDT-based real-time editing. Experience with Monaco Editor or CodeMirror is a plus.",
-            commitment: "PART_TIME",
-            compensation: "VOLUNTEER",
+            commitment: "PartTime",
+            compensation: "Volunteer",
             isFilled: false,
           },
           {
             title: "Backend Engineer",
             description:
               "Design and implement the WebSocket server for real-time sync, code execution sandbox using Docker containers, and REST API for session management.",
-            commitment: "PART_TIME",
-            compensation: "VOLUNTEER",
+            commitment: "PartTime",
+            compensation: "Volunteer",
             isFilled: false,
           },
           {
             title: "DevOps Engineer",
             description:
               "Set up CI/CD pipeline, container orchestration for code execution sandboxes, and create Helm charts for self-hosted deployments.",
-            commitment: "FLEXIBLE",
-            compensation: "VOLUNTEER",
+            commitment: "Flexible",
+            compensation: "Volunteer",
             isFilled: false,
           },
         ],
@@ -618,7 +618,7 @@ getUser(userId); // OK
       title: "Developer Productivity Metrics Dashboard",
       description:
         "An open-source dashboard that aggregates developer productivity metrics from multiple sources:\n\n- GitHub/GitLab: PR cycle time, review turnaround, commit frequency\n- Jira/Linear: Sprint velocity, bug fix rate, story points completed\n- CI/CD: Build times, deployment frequency, failure rates\n- Custom metrics via API\n\nUnlike existing tools, this focuses on team health rather than individual surveillance. Metrics are anonymized by default and the focus is on identifying bottlenecks in processes, not ranking developers.\n\nInspired by the DORA metrics framework but with a more holistic approach.",
-      stage: "PLANNING",
+      stage: "Planning",
       techStack: ["Go", "React", "PostgreSQL", "GraphQL", "Docker"],
       votesCount: 15,
       isOpen: true,
@@ -628,16 +628,16 @@ getUser(userId); // OK
             title: "Full-Stack Developer",
             description:
               "Work on both the Go backend API and the React frontend dashboard. Will help define the GraphQL schema and implement data aggregation pipelines.",
-            commitment: "PART_TIME",
-            compensation: "EQUITY",
+            commitment: "PartTime",
+            compensation: "Equity",
             isFilled: false,
           },
           {
             title: "Data Engineer",
             description:
               "Build ETL pipelines to ingest data from various developer tools (GitHub API, Jira API, CI/CD webhooks). Design the data warehouse schema for efficient metric queries.",
-            commitment: "FLEXIBLE",
-            compensation: "EQUITY",
+            commitment: "Flexible",
+            compensation: "Equity",
             isFilled: false,
           },
         ],
@@ -666,7 +666,7 @@ getUser(userId); // OK
       message:
         "I have extensive experience building WebSocket-based real-time systems in Go and Node.js. I have also worked with Docker container orchestration for sandboxed execution environments at my current company. Would love to contribute to this project!",
       portfolioUrl: "https://bobmartinez.io/projects",
-      status: "PENDING",
+      status: "Pending",
     },
   });
 

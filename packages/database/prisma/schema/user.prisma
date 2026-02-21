@@ -1,33 +1,33 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum SocialPlatform {
-  GITHUB
-  LINKEDIN
-  TWITTER
-  WEBSITE
-  DEVTO
-  YOUTUBE
-  DRIBBBLE
-  BEHANCE
+  Github
+  Linkedin
+  Twitter
+  Website
+  Devto
+  Youtube
+  Dribbble
+  Behance
 }
 
 enum TechCategory {
-  LANGUAGE
-  FRAMEWORK
-  DATABASE
-  DEVOPS
-  TOOL
-  CLOUD
-  MOBILE
-  AI_ML
-  OTHER
+  Language
+  Framework
+  Database
+  Devops
+  Tool
+  Cloud
+  Mobile
+  AiMl
+  Other
 }
 
 enum Proficiency {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-  EXPERT
+  Beginner
+  Intermediate
+  Advanced
+  Expert
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────

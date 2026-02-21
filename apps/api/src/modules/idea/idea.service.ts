@@ -26,7 +26,7 @@ export class IdeaService {
           authorId: userId,
           title: dto.title,
           description: dto.description,
-          stage: dto.stage,
+          stage: dto.stage as any,
           techStack: dto.techStack,
         },
       });
@@ -38,8 +38,8 @@ export class IdeaService {
             ideaId: idea.id,
             title: role.title,
             description: role.description,
-            commitment: role.commitment,
-            compensation: role.compensation,
+            commitment: role.commitment as any,
+            compensation: role.compensation as any,
           })),
         });
       }
@@ -211,7 +211,7 @@ export class IdeaService {
           ...(dto.description !== undefined && {
             description: dto.description,
           }),
-          ...(dto.stage !== undefined && { stage: dto.stage }),
+          ...(dto.stage !== undefined && { stage: dto.stage as any }),
           ...(dto.techStack !== undefined && { techStack: dto.techStack }),
         },
       });
@@ -230,8 +230,8 @@ export class IdeaService {
               ideaId: id,
               title: role.title,
               description: role.description,
-              commitment: role.commitment,
-              compensation: role.compensation,
+              commitment: role.commitment as any,
+              compensation: role.compensation as any,
             })),
           });
         }
@@ -430,7 +430,7 @@ export class IdeaService {
           slug,
           description: idea.description,
           techStack: idea.techStack,
-          status: "DRAFT",
+          status: "Draft",
           authorId: userId,
         },
         include: {

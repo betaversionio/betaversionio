@@ -1,32 +1,32 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum IdeaStage {
-  CONCEPT
-  PLANNING
-  SEEKING_TEAM
-  IN_PROGRESS
-  LAUNCHED
+  Concept
+  Planning
+  SeekingTeam
+  InProgress
+  Launched
 }
 
 enum Commitment {
-  FULL_TIME
-  PART_TIME
-  FLEXIBLE
-  ONE_TIME
+  FullTime
+  PartTime
+  Flexible
+  OneTime
 }
 
 enum Compensation {
-  PAID
-  EQUITY
-  VOLUNTEER
-  NEGOTIABLE
+  Paid
+  Equity
+  Volunteer
+  Negotiable
 }
 
 enum ApplicationStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
+  Pending
+  Accepted
+  Rejected
+  Withdrawn
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ model Idea {
   authorId           String
   title              String
   description        String    @db.Text
-  stage              IdeaStage @default(CONCEPT)
+  stage              IdeaStage @default(Concept)
   techStack          String[]
   votesCount         Int       @default(0)
   isOpen             Boolean   @default(true)
@@ -79,7 +79,7 @@ model IdeaApplication {
   roleId       String
   message      String            @db.Text
   portfolioUrl String?
-  status       ApplicationStatus @default(PENDING)
+  status       ApplicationStatus @default(Pending)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 

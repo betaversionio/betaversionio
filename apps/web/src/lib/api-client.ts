@@ -13,6 +13,8 @@ export function getAccessToken(): string | null {
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
+  /** Query parameters to append to the URL */
+  params?: Record<string, string | number | boolean | undefined>;
   /** Skip the automatic 401 → refresh → redirect cycle */
   skipAuthRefresh?: boolean;
 }
@@ -51,7 +53,7 @@ async function request<T>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { body, headers: customHeaders, skipAuthRefresh, ...rest } = options;
+  const { body, params, headers: customHeaders, skipAuthRefresh, ...rest } = options;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -72,7 +74,18 @@ async function request<T>(
     config.body = JSON.stringify(body);
   }
 
-  let res = await fetch(`${API_URL}${endpoint}`, config);
+  // Build URL with query params
+  let url = `${API_URL}${endpoint}`;
+  if (params) {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined) searchParams.append(key, String(value));
+    }
+    const qs = searchParams.toString();
+    if (qs) url += `?${qs}`;
+  }
+
+  let res = await fetch(url, config);
 
   // If unauthorized, attempt a token refresh and retry once
   if (res.status === 401 && !skipAuthRefresh) {
@@ -88,7 +101,7 @@ async function request<T>(
       if (body !== undefined) {
         retryConfig.body = JSON.stringify(body);
       }
-      res = await fetch(`${API_URL}${endpoint}`, retryConfig);
+      res = await fetch(url, retryConfig);
     }
   }
 
@@ -105,7 +118,14 @@ async function request<T>(
     return undefined as T;
   }
 
-  return res.json() as Promise<T>;
+  const json = await res.json();
+
+  // Backend wraps all responses in { success, data } — unwrap automatically
+  if (json && typeof json === "object" && "success" in json && "data" in json) {
+    return json.data as T;
+  }
+
+  return json as T;
 }
 
 export const apiClient = {

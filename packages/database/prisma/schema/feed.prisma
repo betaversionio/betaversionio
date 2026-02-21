@@ -1,19 +1,19 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum PostType {
-  TEXT
-  ARTICLE
-  SNIPPET
-  MILESTONE
-  LINK
+  Text
+  Article
+  Snippet
+  Milestone
+  Link
 }
 
 enum ReactionType {
-  LIKE
-  CELEBRATE
-  INSIGHTFUL
-  CURIOUS
-  SUPPORT
+  Like
+  Celebrate
+  Insightful
+  Curious
+  Support
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ enum ReactionType {
 model Post {
   id            String    @id @default(cuid())
   authorId      String
-  type          PostType  @default(TEXT)
+  type          PostType  @default(Text)
   title         String?
   content       String    @db.Text
   codeSnippet   String?   @db.Text

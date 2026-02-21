@@ -12,7 +12,8 @@ import { useLogin } from "@/features/auth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { LogoWithText } from "@/components/shared/logo-with-text";
 import { siteConfig } from "@/config/site";
@@ -102,8 +103,8 @@ function LoginForm() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+        <Field>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
@@ -111,14 +112,12 @@ function LoginForm() {
             autoComplete="email"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+          <FieldError>{errors.email?.message}</FieldError>
+        </Field>
 
-        <div className="space-y-2">
+        <Field>
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
             <Link
               href="/forgot-password"
               className="text-xs text-muted-foreground hover:text-foreground"
@@ -126,19 +125,14 @@ function LoginForm() {
               Forgot password?
             </Link>
           </div>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             placeholder="Enter your password"
             autoComplete="current-password"
             {...register("password")}
           />
-          {errors.password && (
-            <p className="text-sm text-destructive">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+          <FieldError>{errors.password?.message}</FieldError>
+        </Field>
 
         <Button
           type="submit"

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useAuth } from "@/providers/auth-provider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { useAuth } from '@/providers/auth-provider';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,22 +11,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "./theme-toggle";
-import { useSidebar } from "./sidebar-context";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Menu01Icon,
-  UserIcon,
-  Logout01Icon,
-} from "@hugeicons/core-free-icons";
+} from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { useSidebar } from './sidebar/sidebar-context';
+import { HambergerMenu, User, Logout } from 'iconsax-react';
 
 function getInitials(name: string | null | undefined): string {
-  if (!name) return "U";
+  if (!name) return 'U';
   return name
-    .split(" ")
+    .split(' ')
     .map((n) => n[0])
-    .join("")
+    .join('')
     .toUpperCase()
     .slice(0, 2);
 }
@@ -36,7 +31,7 @@ export function DashboardHeader() {
   const { setMobileOpen } = useSidebar();
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b px-6">
+    <header className="absolute inset-x-0 top-0 z-10 flex h-14 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
       <Button
         variant="ghost"
         size="icon"
@@ -44,7 +39,7 @@ export function DashboardHeader() {
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >
-        <HugeiconsIcon icon={Menu01Icon} size={20} />
+        <HambergerMenu size={20} color="currentColor" />
       </Button>
       <div className="hidden md:block" />
 
@@ -60,7 +55,7 @@ export function DashboardHeader() {
               <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={user?.avatarUrl ?? undefined}
-                  alt={user?.name ?? user?.username ?? "User"}
+                  alt={user?.name ?? user?.username ?? 'User'}
                 />
                 <AvatarFallback className="text-xs">
                   {getInitials(user?.name)}
@@ -72,7 +67,7 @@ export function DashboardHeader() {
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">
-                  {user?.name ?? user?.username ?? "User"}
+                  {user?.name ?? user?.username ?? 'User'}
                 </p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
@@ -80,7 +75,7 @@ export function DashboardHeader() {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href={`/u/${user?.username}`}>
-                <HugeiconsIcon icon={UserIcon} size={16} className="mr-2" />
+                <User size={16} color="currentColor" className="mr-2" />
                 Profile
               </Link>
             </DropdownMenuItem>
@@ -89,7 +84,7 @@ export function DashboardHeader() {
               onClick={() => logout()}
               className="text-destructive focus:text-destructive"
             >
-              <HugeiconsIcon icon={Logout01Icon} size={16} className="mr-2" />
+              <Logout size={16} color="currentColor" className="mr-2" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

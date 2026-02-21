@@ -11,11 +11,6 @@ interface User {
   avatarUrl: string | null;
 }
 
-interface ApiWrapped<T> {
-  success: boolean;
-  data: T;
-}
-
 interface AuthData {
   user: User;
   tokens: { accessToken: string; refreshToken: string };
@@ -33,12 +28,8 @@ export const authKeys = {
 export function useMe() {
   return useQuery({
     queryKey: authKeys.me(),
-    queryFn: async () => {
-      const res = await apiClient.get<ApiWrapped<User>>("/auth/me", {
-        skipAuthRefresh: true,
-      });
-      return res.data;
-    },
+    queryFn: () =>
+      apiClient.get<User>("/auth/me", { skipAuthRefresh: true }),
     enabled: !!getAccessToken(),
     retry: false,
     staleTime: 5 * 60 * 1000,
@@ -51,13 +42,8 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { email: string; password: string }) => {
-      const res = await apiClient.post<ApiWrapped<AuthData>>(
-        "/auth/login",
-        input,
-      );
-      return res.data;
-    },
+    mutationFn: (input: { email: string; password: string }) =>
+      apiClient.post<AuthData>("/auth/login", input),
     onSuccess: (data) => {
       setAccessToken(data.tokens.accessToken);
       queryClient.setQueryData(authKeys.me(), data.user);
@@ -69,18 +55,12 @@ export function useRegister() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       email: string;
       password: string;
       username: string;
       name: string;
-    }) => {
-      const res = await apiClient.post<ApiWrapped<AuthData>>(
-        "/auth/register",
-        input,
-      );
-      return res.data;
-    },
+    }) => apiClient.post<AuthData>("/auth/register", input),
     onSuccess: (data) => {
       setAccessToken(data.tokens.accessToken);
       queryClient.setQueryData(authKeys.me(), data.user);

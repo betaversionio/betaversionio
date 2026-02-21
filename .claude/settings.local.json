@@ -23,7 +23,9 @@
       "WebSearch",
       "WebFetch(domain:ui.aceternity.com)",
       "WebFetch(domain:efferd.com)",
-      "WebFetch(domain:hugeicons.com)"
+      "WebFetch(domain:hugeicons.com)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)"
     ]
   }
 }

@@ -40,24 +40,24 @@ function getInitials(name: string | null | undefined): string {
 }
 
 const socialIcons: Record<string, React.ElementType> = {
-  GITHUB: Github,
-  LINKEDIN: Linkedin,
-  TWITTER: Twitter,
-  WEBSITE: Globe,
+  Github: Github,
+  Linkedin: Linkedin,
+  Twitter: Twitter,
+  Website: Globe,
 };
 
 const proficiencyColors: Record<string, string> = {
-  BEGINNER: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-  INTERMEDIATE: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  ADVANCED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  EXPERT: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  Beginner: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+  Intermediate: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  Advanced: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  Expert: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
 };
 
 const statusColors: Record<string, string> = {
-  DRAFT: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  ACTIVE: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  COMPLETED: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  ARCHIVED: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+  Draft: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  Completed: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  Archived: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
 };
 
 export default function PublicProfilePage({

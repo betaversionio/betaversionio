@@ -3,14 +3,14 @@ import { z } from "zod";
 // ─── SocialPlatform ──────────────────────────────────────────────────────────
 
 export enum SocialPlatform {
-  GITHUB = "GITHUB",
-  LINKEDIN = "LINKEDIN",
-  TWITTER = "TWITTER",
-  WEBSITE = "WEBSITE",
-  DEVTO = "DEVTO",
-  YOUTUBE = "YOUTUBE",
-  DRIBBBLE = "DRIBBBLE",
-  BEHANCE = "BEHANCE",
+  Github = "Github",
+  Linkedin = "Linkedin",
+  Twitter = "Twitter",
+  Website = "Website",
+  Devto = "Devto",
+  Youtube = "Youtube",
+  Dribbble = "Dribbble",
+  Behance = "Behance",
 }
 
 export const SocialPlatformSchema = z.nativeEnum(SocialPlatform);
@@ -18,15 +18,15 @@ export const SocialPlatformSchema = z.nativeEnum(SocialPlatform);
 // ─── TechCategory ────────────────────────────────────────────────────────────
 
 export enum TechCategory {
-  LANGUAGE = "LANGUAGE",
-  FRAMEWORK = "FRAMEWORK",
-  DATABASE = "DATABASE",
-  DEVOPS = "DEVOPS",
-  TOOL = "TOOL",
-  CLOUD = "CLOUD",
-  MOBILE = "MOBILE",
-  AI_ML = "AI_ML",
-  OTHER = "OTHER",
+  Language = "Language",
+  Framework = "Framework",
+  Database = "Database",
+  Devops = "Devops",
+  Tool = "Tool",
+  Cloud = "Cloud",
+  Mobile = "Mobile",
+  AiMl = "AiMl",
+  Other = "Other",
 }
 
 export const TechCategorySchema = z.nativeEnum(TechCategory);
@@ -34,10 +34,10 @@ export const TechCategorySchema = z.nativeEnum(TechCategory);
 // ─── Proficiency ─────────────────────────────────────────────────────────────
 
 export enum Proficiency {
-  BEGINNER = "BEGINNER",
-  INTERMEDIATE = "INTERMEDIATE",
-  ADVANCED = "ADVANCED",
-  EXPERT = "EXPERT",
+  Beginner = "Beginner",
+  Intermediate = "Intermediate",
+  Advanced = "Advanced",
+  Expert = "Expert",
 }
 
 export const ProficiencySchema = z.nativeEnum(Proficiency);
@@ -45,10 +45,10 @@ export const ProficiencySchema = z.nativeEnum(Proficiency);
 // ─── ProjectStatus ───────────────────────────────────────────────────────────
 
 export enum ProjectStatus {
-  DRAFT = "DRAFT",
-  ACTIVE = "ACTIVE",
-  COMPLETED = "COMPLETED",
-  ARCHIVED = "ARCHIVED",
+  Draft = "Draft",
+  Active = "Active",
+  Completed = "Completed",
+  Archived = "Archived",
 }
 
 export const ProjectStatusSchema = z.nativeEnum(ProjectStatus);
@@ -56,9 +56,9 @@ export const ProjectStatusSchema = z.nativeEnum(ProjectStatus);
 // ─── CollaboratorRole ────────────────────────────────────────────────────────
 
 export enum CollaboratorRole {
-  OWNER = "OWNER",
-  MAINTAINER = "MAINTAINER",
-  CONTRIBUTOR = "CONTRIBUTOR",
+  Owner = "Owner",
+  Maintainer = "Maintainer",
+  Contributor = "Contributor",
 }
 
 export const CollaboratorRoleSchema = z.nativeEnum(CollaboratorRole);
@@ -66,10 +66,10 @@ export const CollaboratorRoleSchema = z.nativeEnum(CollaboratorRole);
 // ─── MediaType ───────────────────────────────────────────────────────────────
 
 export enum MediaType {
-  IMAGE = "IMAGE",
-  VIDEO = "VIDEO",
-  DOCUMENT = "DOCUMENT",
-  LINK = "LINK",
+  Image = "Image",
+  Video = "Video",
+  Document = "Document",
+  Link = "Link",
 }
 
 export const MediaTypeSchema = z.nativeEnum(MediaType);
@@ -77,11 +77,11 @@ export const MediaTypeSchema = z.nativeEnum(MediaType);
 // ─── PostType ────────────────────────────────────────────────────────────────
 
 export enum PostType {
-  TEXT = "TEXT",
-  ARTICLE = "ARTICLE",
-  SNIPPET = "SNIPPET",
-  MILESTONE = "MILESTONE",
-  LINK = "LINK",
+  Text = "Text",
+  Article = "Article",
+  Snippet = "Snippet",
+  Milestone = "Milestone",
+  Link = "Link",
 }
 
 export const PostTypeSchema = z.nativeEnum(PostType);
@@ -89,11 +89,11 @@ export const PostTypeSchema = z.nativeEnum(PostType);
 // ─── ReactionType ────────────────────────────────────────────────────────────
 
 export enum ReactionType {
-  LIKE = "LIKE",
-  CELEBRATE = "CELEBRATE",
-  INSIGHTFUL = "INSIGHTFUL",
-  CURIOUS = "CURIOUS",
-  SUPPORT = "SUPPORT",
+  Like = "Like",
+  Celebrate = "Celebrate",
+  Insightful = "Insightful",
+  Curious = "Curious",
+  Support = "Support",
 }
 
 export const ReactionTypeSchema = z.nativeEnum(ReactionType);
@@ -101,11 +101,11 @@ export const ReactionTypeSchema = z.nativeEnum(ReactionType);
 // ─── IdeaStage ───────────────────────────────────────────────────────────────
 
 export enum IdeaStage {
-  CONCEPT = "CONCEPT",
-  PLANNING = "PLANNING",
-  SEEKING_TEAM = "SEEKING_TEAM",
-  IN_PROGRESS = "IN_PROGRESS",
-  LAUNCHED = "LAUNCHED",
+  Concept = "Concept",
+  Planning = "Planning",
+  SeekingTeam = "SeekingTeam",
+  InProgress = "InProgress",
+  Launched = "Launched",
 }
 
 export const IdeaStageSchema = z.nativeEnum(IdeaStage);
@@ -113,10 +113,10 @@ export const IdeaStageSchema = z.nativeEnum(IdeaStage);
 // ─── Commitment ──────────────────────────────────────────────────────────────
 
 export enum Commitment {
-  FULL_TIME = "FULL_TIME",
-  PART_TIME = "PART_TIME",
-  FLEXIBLE = "FLEXIBLE",
-  ONE_TIME = "ONE_TIME",
+  FullTime = "FullTime",
+  PartTime = "PartTime",
+  Flexible = "Flexible",
+  OneTime = "OneTime",
 }
 
 export const CommitmentSchema = z.nativeEnum(Commitment);
@@ -124,10 +124,10 @@ export const CommitmentSchema = z.nativeEnum(Commitment);
 // ─── Compensation ────────────────────────────────────────────────────────────
 
 export enum Compensation {
-  PAID = "PAID",
-  EQUITY = "EQUITY",
-  VOLUNTEER = "VOLUNTEER",
-  NEGOTIABLE = "NEGOTIABLE",
+  Paid = "Paid",
+  Equity = "Equity",
+  Volunteer = "Volunteer",
+  Negotiable = "Negotiable",
 }
 
 export const CompensationSchema = z.nativeEnum(Compensation);
@@ -135,10 +135,10 @@ export const CompensationSchema = z.nativeEnum(Compensation);
 // ─── ApplicationStatus ───────────────────────────────────────────────────────
 
 export enum ApplicationStatus {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
-  WITHDRAWN = "WITHDRAWN",
+  Pending = "Pending",
+  Accepted = "Accepted",
+  Rejected = "Rejected",
+  Withdrawn = "Withdrawn",
 }
 
 export const ApplicationStatusSchema = z.nativeEnum(ApplicationStatus);

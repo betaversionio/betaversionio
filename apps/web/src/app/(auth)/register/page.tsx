@@ -11,7 +11,8 @@ import { useAuth } from "@/providers/auth-provider";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { LogoWithText } from "@/components/shared/logo-with-text";
 import { siteConfig } from "@/config/site";
@@ -102,8 +103,8 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+        <Field>
+          <FieldLabel htmlFor="name">Name</FieldLabel>
           <Input
             id="name"
             type="text"
@@ -111,13 +112,11 @@ export default function RegisterPage() {
             autoComplete="name"
             {...register("name")}
           />
-          {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
-          )}
-        </div>
+          <FieldError>{errors.name?.message}</FieldError>
+        </Field>
 
-        <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
+        <Field>
+          <FieldLabel htmlFor="username">Username</FieldLabel>
           <Input
             id="username"
             type="text"
@@ -125,15 +124,11 @@ export default function RegisterPage() {
             autoComplete="username"
             {...register("username")}
           />
-          {errors.username && (
-            <p className="text-sm text-destructive">
-              {errors.username.message}
-            </p>
-          )}
-        </div>
+          <FieldError>{errors.username?.message}</FieldError>
+        </Field>
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+        <Field>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
@@ -141,26 +136,19 @@ export default function RegisterPage() {
             autoComplete="email"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+          <FieldError>{errors.email?.message}</FieldError>
+        </Field>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
+        <Field>
+          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <PasswordInput
             id="password"
-            type="password"
             placeholder="Min. 8 characters"
             autoComplete="new-password"
             {...register("password")}
           />
-          {errors.password && (
-            <p className="text-sm text-destructive">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+          <FieldError>{errors.password?.message}</FieldError>
+        </Field>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? (

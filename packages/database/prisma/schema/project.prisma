@@ -1,23 +1,23 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum ProjectStatus {
-  DRAFT
-  ACTIVE
-  COMPLETED
-  ARCHIVED
+  Draft
+  Active
+  Completed
+  Archived
 }
 
 enum CollaboratorRole {
-  OWNER
-  MAINTAINER
-  CONTRIBUTOR
+  Owner
+  Maintainer
+  Contributor
 }
 
 enum MediaType {
-  IMAGE
-  VIDEO
-  DOCUMENT
-  LINK
+  Image
+  Video
+  Document
+  Link
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ model Project {
   repoUrl          String?
   liveUrl          String?
   thumbnailUrl     String?
-  status           ProjectStatus @default(DRAFT)
+  status           ProjectStatus @default(Draft)
   authorId         String
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -52,7 +52,7 @@ model ProjectCollaborator {
   id        String           @id @default(cuid())
   projectId String
   userId    String
-  role      CollaboratorRole @default(CONTRIBUTOR)
+  role      CollaboratorRole @default(Contributor)
   createdAt DateTime         @default(now())
 
   // Relations

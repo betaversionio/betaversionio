@@ -33,7 +33,8 @@ interface Post {
   hashtags: string[];
   author: PostAuthor;
   reactions: Reaction[];
-  commentCount: number;
+  likesCount: number;
+  commentsCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -69,12 +70,12 @@ export function useFeed() {
   return useInfiniteQuery({
     queryKey: feedKeys.lists(),
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
-      apiClient.get<CursorPaginatedPosts>("/feed", {
+      apiClient.get<CursorPaginatedPosts>("/posts/feed", {
         params: {
           cursor: pageParam,
           limit: 20,
         },
-      } as never),
+      }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.meta.hasMore ? lastPage.meta.nextCursor ?? undefined : undefined,
@@ -84,7 +85,7 @@ export function useFeed() {
 export function usePost(id: string) {
   return useQuery({
     queryKey: feedKeys.detail(id),
-    queryFn: () => apiClient.get<PostDetail>(`/feed/${id}`),
+    queryFn: () => apiClient.get<PostDetail>(`/posts/${id}`),
     enabled: !!id,
   });
 }
@@ -94,7 +95,7 @@ export function useCreatePost() {
 
   return useMutation({
     mutationFn: (data: CreatePostInput) =>
-      apiClient.post<Post>("/feed", data),
+      apiClient.post<Post>("/posts", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: feedKeys.lists() });
     },
@@ -106,7 +107,7 @@ export function useToggleReaction(postId: string) {
 
   return useMutation({
     mutationFn: (data: ToggleReactionInput) =>
-      apiClient.post<{ toggled: boolean }>(`/feed/${postId}/reactions`, data),
+      apiClient.post<{ toggled: boolean }>(`/posts/${postId}/reactions`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: feedKeys.lists() });
       queryClient.invalidateQueries({ queryKey: feedKeys.detail(postId) });
@@ -119,7 +120,7 @@ export function useCreateComment(postId: string) {
 
   return useMutation({
     mutationFn: (data: CreateCommentInput) =>
-      apiClient.post<Comment>(`/feed/${postId}/comments`, data),
+      apiClient.post<Comment>(`/posts/${postId}/comments`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: feedKeys.detail(postId) });
       queryClient.invalidateQueries({ queryKey: feedKeys.lists() });

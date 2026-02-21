@@ -24,7 +24,7 @@ export {
   useToggleReaction,
   useCreateComment,
   feedKeys,
-} from "./use-feed-queries";
+} from "@/features/feed";
 export {
   useIdeas,
   useIdea,
