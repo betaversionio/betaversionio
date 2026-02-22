@@ -98,8 +98,9 @@ const platform = [
 const company = [
   { title: 'About', href: '#' },
   { title: 'Blog', href: '#' },
-  { title: 'Privacy Policy', href: '#' },
-  { title: 'Terms of Service', href: '#' },
+  { title: 'Privacy Policy', href: '/privacy' },
+  { title: 'Terms of Service', href: '/terms' },
+  { title: 'Cookie Policy', href: '/cookies' },
 ];
 
 const socialLinks = [
