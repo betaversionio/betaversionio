@@ -3,7 +3,6 @@ import {
   Document,
   Element4,
   Home2,
-  Lamp,
   Kanban,
   Setting2,
   User,
@@ -38,12 +37,6 @@ export const navGroups: NavGroup[] = [
     items: [
       { icon: Kanban, label: 'Projects', href: '/projects' },
       { icon: Document, label: 'Resume', href: '/resume' },
-    ],
-  },
-  {
-    title: 'Community',
-    items: [
-      { icon: Lamp, label: 'Ideas', href: '/ideas' },
     ],
   },
   {

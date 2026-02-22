@@ -10,7 +10,6 @@ import { UserModule } from "./modules/user/user.module";
 import { ProjectModule } from "./modules/project/project.module";
 import { ResumeModule } from "./modules/resume/resume.module";
 import { FeedModule } from "./modules/feed/feed.module";
-import { IdeaModule } from "./modules/idea/idea.module";
 import { StorageModule } from "./modules/storage/storage.module";
 
 @Module({
@@ -25,7 +24,6 @@ import { StorageModule } from "./modules/storage/storage.module";
     ProjectModule,
     ResumeModule,
     FeedModule,
-    IdeaModule,
     StorageModule,
   ],
   providers: [

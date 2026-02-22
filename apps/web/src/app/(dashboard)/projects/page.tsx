@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, FolderKanban, Loader2 } from "lucide-react";
+import { Plus, FolderKanban, Loader2, ArrowUp, MessageSquare } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   DRAFT: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -75,9 +75,18 @@ export default function MyProjectsPage() {
               <Card className="h-full transition-shadow hover:shadow-md">
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <CardTitle className="line-clamp-1 text-lg">
-                      {project.title}
-                    </CardTitle>
+                    <div className="flex items-center gap-2.5">
+                      {project.logo && (
+                        <img
+                          src={project.logo}
+                          alt=""
+                          className="h-8 w-8 rounded-md object-cover"
+                        />
+                      )}
+                      <CardTitle className="line-clamp-1 text-lg">
+                        {project.title}
+                      </CardTitle>
+                    </div>
                     <Badge
                       variant="secondary"
                       className={statusColors[project.status] ?? ""}
@@ -85,24 +94,36 @@ export default function MyProjectsPage() {
                       {project.status}
                     </Badge>
                   </div>
-                  {project.shortDescription && (
+                  {project.tagline && (
                     <CardDescription className="line-clamp-2">
-                      {project.shortDescription}
+                      {project.tagline}
                     </CardDescription>
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.techStack.slice(0, 5).map((tech) => (
-                      <Badge key={tech} variant="outline" className="text-xs">
-                        {tech}
-                      </Badge>
-                    ))}
-                    {project.techStack.length > 5 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{project.techStack.length - 5}
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1.5">
+                      {project.techStack.slice(0, 4).map((tech) => (
+                        <Badge key={tech} variant="outline" className="text-xs">
+                          {tech}
+                        </Badge>
+                      ))}
+                      {project.techStack.length > 4 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{project.techStack.length - 4}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <ArrowUp className="h-3.5 w-3.5" />
+                        {project.upvotesCount}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        {project.commentsCount}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

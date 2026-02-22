@@ -11,7 +11,6 @@ import {
 import { StorageService } from "./storage.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
-import { FILE } from "@devcom/shared";
 
 interface PresignedUrlBody {
   fileName: string;
@@ -43,12 +42,9 @@ export class StorageController {
     const timestamp = Date.now();
     const key = `${folder}/${userId}/${timestamp}-${sanitizedName}`;
 
-    const maxSize = FILE.MAX_SIZE_MB * 1024 * 1024; // Convert MB to bytes
-
     const url = await this.storageService.getPresignedUploadUrl(
       key,
       contentType,
-      maxSize,
     );
 
     return {
@@ -60,9 +56,10 @@ export class StorageController {
 
   /**
    * Delete a file from storage by its key.
-   * The key is passed as a wildcard path parameter to support nested paths.
+   * The key is passed as a wildcard path parameter to support nested paths
+   * like "projects/logos/userId/file.jpg".
    */
-  @Delete(":key")
+  @Delete("*key")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteFile(@Param("key") key: string) {
     await this.storageService.deleteFile(key);

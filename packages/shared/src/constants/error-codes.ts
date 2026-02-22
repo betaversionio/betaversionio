@@ -22,10 +22,6 @@ export const RESUME_NOT_FOUND = "RESUME_NOT_FOUND" as const;
 
 export const POST_NOT_FOUND = "POST_NOT_FOUND" as const;
 
-// ─── Idea Error Codes ────────────────────────────────────────────────────────
-
-export const IDEA_NOT_FOUND = "IDEA_NOT_FOUND" as const;
-
 // ─── Storage Error Codes ─────────────────────────────────────────────────────
 
 export const STORAGE_UPLOAD_FAILED = "STORAGE_UPLOAD_FAILED" as const;
@@ -47,7 +43,6 @@ export const ERROR_CODES = {
   PROJECT_NOT_FOUND,
   RESUME_NOT_FOUND,
   POST_NOT_FOUND,
-  IDEA_NOT_FOUND,
   STORAGE_UPLOAD_FAILED,
   VALIDATION_ERROR,
   INTERNAL_ERROR,

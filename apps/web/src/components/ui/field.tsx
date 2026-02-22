@@ -46,7 +46,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-group"
       className={cn(
-        'group/field-group @container/field-group flex w-full flex-col gap-7 data-[slot=checkbox-group]:gap-2 [&>[data-slot=field-group]]:gap-4',
+        'group/field-group @container/field-group flex w-full flex-col gap-5 data-[slot=checkbox-group]:gap-2 [&>[data-slot=field-group]]:gap-4',
         className,
       )}
       {...props}
@@ -205,7 +205,7 @@ function FieldError({
     }
 
     return (
-      <ul className="ml-4 flex list-disc flex-col gap-1">
+      <ul className="ml-4 flex list-disc flex-col gap-1 text-destructive">
         {errors.map(
           (error, index) =>
             error?.message && <li key={index}>{error.message}</li>,

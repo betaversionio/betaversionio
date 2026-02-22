@@ -56,9 +56,9 @@ model User {
   comments          Comment[]
   reactions         Reaction[]
   resumes           Resume[]
-  ideas             Idea[]
-  ideaApplications  IdeaApplication[]
-  ideaVotes         IdeaVote[]
+  projectMakers     ProjectMaker[]
+  projectComments   ProjectComment[]
+  projectVotes      ProjectVote[]
 
   @@map("users")
 }

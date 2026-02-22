@@ -7,8 +7,8 @@ import {
   CodeFolderIcon,
   File01Icon,
   RssIcon,
-  Idea01Icon,
   GithubIcon,
+  ThumbsUpIcon,
 } from '@hugeicons/core-free-icons';
 
 type FeatureType = {
@@ -119,10 +119,10 @@ const features: FeatureType[] = [
       'Code snippets, TILs, project updates, and milestones. A feed built for builders, not buzzwords.',
   },
   {
-    title: 'Idea Board',
-    icon: <HugeiconsIcon icon={Idea01Icon} />,
+    title: 'Project Showcase',
+    icon: <HugeiconsIcon icon={ThumbsUpIcon} />,
     description:
-      'Pitch ideas, find collaborators, vote on concepts, and convert ideas into real team projects.',
+      'Upvote projects, leave threaded comments, add team makers, and showcase your work Product Hunt-style.',
   },
   {
     title: 'GitHub Integration',

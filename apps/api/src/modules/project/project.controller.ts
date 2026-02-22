@@ -18,15 +18,17 @@ import { Public } from "../../common/decorators/public.decorator";
 import {
   createProjectSchema,
   updateProjectSchema,
-  addCollaboratorSchema,
-  addMediaSchema,
+  addMakerSchema,
+  createProjectCommentSchema,
+  toggleProjectVoteSchema,
   PAGINATION,
 } from "@devcom/shared";
 import type {
   CreateProjectInput,
   UpdateProjectInput,
-  AddCollaboratorInput,
-  AddMediaInput,
+  AddMakerInput,
+  CreateProjectCommentInput,
+  ToggleProjectVoteInput,
 } from "@devcom/shared";
 
 @Controller("projects")
@@ -51,20 +53,14 @@ export class ProjectController {
     @Query("limit") limit?: string,
     @Query("search") search?: string,
     @Query("status") status?: string,
-    @Query("techStack") techStack?: string,
+    @Query("tags") tags?: string,
   ) {
     const pageNum = page ? parseInt(page, 10) : PAGINATION.DEFAULT_PAGE;
     const limitNum = limit
       ? Math.min(parseInt(limit, 10), PAGINATION.MAX_LIMIT)
       : PAGINATION.DEFAULT_LIMIT;
 
-    return this.projectService.findAll(
-      pageNum,
-      limitNum,
-      search,
-      status,
-      techStack,
-    );
+    return this.projectService.findAll(pageNum, limitNum, search, status, tags);
   }
 
   @Public()
@@ -92,25 +88,60 @@ export class ProjectController {
     await this.projectService.softDelete(id, userId);
   }
 
-  @Post(":id/collaborators")
+  @Post(":id/makers")
   @HttpCode(HttpStatus.CREATED)
-  async addCollaborator(
+  async addMaker(
     @Param("id") id: string,
     @CurrentUser("id") userId: string,
-    @Body() body: AddCollaboratorInput,
+    @Body() body: AddMakerInput,
   ) {
-    const dto = addCollaboratorSchema.parse(body);
-    return this.projectService.addCollaborator(id, userId, dto);
+    const dto = addMakerSchema.parse(body);
+    return this.projectService.addMaker(id, userId, dto);
   }
 
-  @Post(":id/media")
-  @HttpCode(HttpStatus.CREATED)
-  async addMedia(
+  @Delete(":id/makers/:makerUserId")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeMaker(
+    @Param("id") id: string,
+    @Param("makerUserId") makerUserId: string,
+    @CurrentUser("id") userId: string,
+  ) {
+    await this.projectService.removeMaker(id, userId, makerUserId);
+  }
+
+  @Post(":id/vote")
+  async toggleVote(
     @Param("id") id: string,
     @CurrentUser("id") userId: string,
-    @Body() body: AddMediaInput,
+    @Body() body: ToggleProjectVoteInput,
   ) {
-    const dto = addMediaSchema.parse(body);
-    return this.projectService.addMedia(id, userId, dto);
+    const dto = toggleProjectVoteSchema.parse(body);
+    return this.projectService.toggleVote(id, userId, dto);
+  }
+
+  @Post(":id/comments")
+  @HttpCode(HttpStatus.CREATED)
+  async createComment(
+    @Param("id") id: string,
+    @CurrentUser("id") userId: string,
+    @Body() body: CreateProjectCommentInput,
+  ) {
+    const dto = createProjectCommentSchema.parse(body);
+    return this.projectService.createComment(id, userId, dto);
+  }
+
+  @Public()
+  @Get(":id/comments")
+  async getComments(
+    @Param("id") id: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : PAGINATION.DEFAULT_PAGE;
+    const limitNum = limit
+      ? Math.min(parseInt(limit, 10), PAGINATION.MAX_LIMIT)
+      : PAGINATION.DEFAULT_LIMIT;
+
+    return this.projectService.getComments(id, pageNum, limitNum);
   }
 }

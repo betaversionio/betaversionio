@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchUsers } from "@/hooks/queries/use-user-queries";
 import { useProjects } from "@/hooks/queries/use-project-queries";
-import { useIdeas } from "@/hooks/queries/use-idea-queries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,7 +20,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Loader2, Users, FolderKanban, Lightbulb } from "lucide-react";
+import { Search, Loader2, Users, FolderKanban } from "lucide-react";
 
 function getInitials(name: string | null | undefined): string {
   if (!name) return "?";
@@ -32,14 +31,6 @@ function getInitials(name: string | null | undefined): string {
     .toUpperCase()
     .slice(0, 2);
 }
-
-const stageColors: Record<string, string> = {
-  CONCEPT: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  PLANNING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  SEEKING_TEAM: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  IN_PROGRESS: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  LAUNCHED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-};
 
 const statusColors: Record<string, string> = {
   DRAFT: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -62,11 +53,6 @@ export default function ExplorePage() {
     isLoading: projectsLoading,
   } = useProjects({ search: searchQuery || undefined });
 
-  const {
-    data: ideasData,
-    isLoading: ideasLoading,
-  } = useIdeas({ search: searchQuery || undefined });
-
   return (
     <div className="container space-y-6 px-4 py-8 md:py-12">
       <div className="mx-auto max-w-2xl text-center">
@@ -74,7 +60,7 @@ export default function ExplorePage() {
           Explore
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Discover developers, projects, and ideas from the community
+          Discover developers and projects from the community
         </p>
       </div>
 
@@ -83,7 +69,7 @@ export default function ExplorePage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search developers, projects, ideas..."
+            placeholder="Search developers, projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -102,10 +88,6 @@ export default function ExplorePage() {
             <TabsTrigger value="projects" className="gap-2">
               <FolderKanban className="h-4 w-4" />
               Projects
-            </TabsTrigger>
-            <TabsTrigger value="ideas" className="gap-2">
-              <Lightbulb className="h-4 w-4" />
-              Ideas
             </TabsTrigger>
           </TabsList>
         </div>
@@ -180,9 +162,9 @@ export default function ExplorePage() {
                           {project.status}
                         </Badge>
                       </div>
-                      {project.shortDescription && (
+                      {project.tagline && (
                         <CardDescription className="line-clamp-2">
-                          {project.shortDescription}
+                          {project.tagline}
                         </CardDescription>
                       )}
                     </CardHeader>
@@ -221,70 +203,6 @@ export default function ExplorePage() {
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        {/* Ideas Tab */}
-        <TabsContent value="ideas">
-          {ideasLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : !ideasData?.items?.length ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              No ideas found
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {ideasData.items.map((idea) => (
-                <Card key={idea.id} className="transition-shadow hover:shadow-md">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="line-clamp-1 text-base">
-                        {idea.title}
-                      </CardTitle>
-                      <Badge
-                        variant="secondary"
-                        className={stageColors[idea.stage] ?? ""}
-                      >
-                        {idea.stage.replace(/_/g, " ")}
-                      </Badge>
-                    </div>
-                    <CardDescription className="line-clamp-2">
-                      {idea.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1">
-                        {idea.techStack.slice(0, 3).map((tech) => (
-                          <Badge
-                            key={tech}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold">
-                          {idea.voteCount} votes
-                        </span>
-                        <Avatar className="h-5 w-5">
-                          <AvatarImage
-                            src={idea.author.avatarUrl ?? undefined}
-                          />
-                          <AvatarFallback className="text-[10px]">
-                            {getInitials(idea.author.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           )}

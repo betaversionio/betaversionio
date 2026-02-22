@@ -8,6 +8,11 @@ export {
   useProject,
   useCreateProject,
   useUpdateProject,
+  useToggleProjectVote,
+  useProjectComments,
+  useCreateProjectComment,
+  useAddMaker,
+  useRemoveMaker,
   projectKeys,
 } from "./use-project-queries";
 export {
@@ -25,12 +30,3 @@ export {
   useCreateComment,
   feedKeys,
 } from "@/features/feed";
-export {
-  useIdeas,
-  useIdea,
-  useCreateIdea,
-  useUpdateIdea,
-  useToggleVote,
-  useApplyToIdea,
-  ideaKeys,
-} from "./use-idea-queries";

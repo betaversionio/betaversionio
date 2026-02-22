@@ -56,6 +56,7 @@ export function MarkdownEditor({
   }, []);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         codeBlock: false,

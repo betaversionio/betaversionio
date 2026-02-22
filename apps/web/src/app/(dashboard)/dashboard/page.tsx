@@ -12,7 +12,6 @@ import {
   FolderKanban,
   Eye,
   Rss,
-  Lightbulb,
   TrendingUp,
 } from "lucide-react";
 
@@ -34,12 +33,6 @@ const stats = [
     value: "12",
     description: "Published posts",
     icon: Rss,
-  },
-  {
-    title: "Ideas",
-    value: "3",
-    description: "Shared ideas",
-    icon: Lightbulb,
   },
 ];
 

@@ -7,86 +7,103 @@ enum ProjectStatus {
   Archived
 }
 
-enum CollaboratorRole {
-  Owner
-  Maintainer
-  Contributor
+enum ProjectPhase {
+  Idea
+  Development
+  Beta
+  Production
+  Maintenance
+  Sunset
 }
 
-enum MediaType {
-  Image
-  Video
-  Document
-  Link
+enum ProductionType {
+  Hobby
+  Startup
+  Enterprise
+  OpenSource
+  Research
+  Freelance
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model Project {
-  id               String        @id @default(cuid())
-  title            String
-  slug             String        @unique
-  description      String        @db.Text
-  shortDescription String?       @db.VarChar(300)
-  techStack        String[]
-  repoUrl          String?
-  liveUrl          String?
-  thumbnailUrl     String?
-  status           ProjectStatus @default(Draft)
-  authorId         String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  deletedAt        DateTime?
+  id              String         @id @default(cuid())
+  title           String
+  slug            String         @unique
+  logo            String?
+  tagline         String?        @db.VarChar(300)
+  description     String         @db.Text
+  links           String[]
+  isOpenSource    Boolean        @default(false)
+  images          String[]
+  techStack       String[]
+  tags            String[]
+  status          ProjectStatus  @default(Draft)
+  phase           ProjectPhase   @default(Idea)
+  productionType  ProductionType @default(Hobby)
+  upvotesCount    Int            @default(0)
+  downvotesCount  Int            @default(0)
+  commentsCount   Int            @default(0)
+  authorId        String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
 
   // Relations
-  author        User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  collaborators ProjectCollaborator[]
-  media         ProjectMedia[]
-  timeline      ProjectTimeline[]
-  convertedIdea Idea?
+  author   User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  makers   ProjectMaker[]
+  comments ProjectComment[]
+  votes    ProjectVote[]
 
   @@map("projects")
 }
 
-model ProjectCollaborator {
-  id        String           @id @default(cuid())
+model ProjectMaker {
+  id        String   @id @default(cuid())
   projectId String
   userId    String
-  role      CollaboratorRole @default(Contributor)
-  createdAt DateTime         @default(now())
+  role      String
+  createdAt DateTime @default(now())
 
   // Relations
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userId])
-  @@map("project_collaborators")
+  @@map("project_makers")
 }
 
-model ProjectMedia {
+model ProjectComment {
   id        String    @id @default(cuid())
   projectId String
-  type      MediaType
-  url       String
-  caption   String?
-  order     Int       @default(0)
+  authorId  String
+  content   String    @db.Text
+  parentId  String?
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   // Relations
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author  User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  ProjectComment?  @relation("ProjectCommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies ProjectComment[] @relation("ProjectCommentThread")
 
-  @@map("project_media")
+  @@map("project_comments")
 }
 
-model ProjectTimeline {
-  id          String   @id @default(cuid())
-  projectId   String
-  title       String
-  description String?
-  date        DateTime
-  createdAt   DateTime @default(now())
+model ProjectVote {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  value     Int // 1 = upvote, -1 = downvote
+  createdAt DateTime @default(now())
 
   // Relations
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("project_timelines")
+  @@unique([projectId, userId])
+  @@map("project_votes")
 }

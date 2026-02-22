@@ -26,13 +26,11 @@ import {
   Logout01Icon,
   CompassIcon,
   RssIcon,
-  Idea01Icon,
 } from '@hugeicons/core-free-icons';
 
 const navLinks = [
   { href: '/explore', label: 'Explore', icon: CompassIcon },
   { href: '/feed', label: 'Feed', icon: RssIcon },
-  { href: '/ideas', label: 'Ideas', icon: Idea01Icon },
 ];
 
 export function Header() {

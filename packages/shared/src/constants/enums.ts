@@ -53,27 +53,6 @@ export enum ProjectStatus {
 
 export const ProjectStatusSchema = z.nativeEnum(ProjectStatus);
 
-// ─── CollaboratorRole ────────────────────────────────────────────────────────
-
-export enum CollaboratorRole {
-  Owner = "Owner",
-  Maintainer = "Maintainer",
-  Contributor = "Contributor",
-}
-
-export const CollaboratorRoleSchema = z.nativeEnum(CollaboratorRole);
-
-// ─── MediaType ───────────────────────────────────────────────────────────────
-
-export enum MediaType {
-  Image = "Image",
-  Video = "Video",
-  Document = "Document",
-  Link = "Link",
-}
-
-export const MediaTypeSchema = z.nativeEnum(MediaType);
-
 // ─── PostType ────────────────────────────────────────────────────────────────
 
 export enum PostType {
@@ -98,47 +77,28 @@ export enum ReactionType {
 
 export const ReactionTypeSchema = z.nativeEnum(ReactionType);
 
-// ─── IdeaStage ───────────────────────────────────────────────────────────────
+// ─── ProjectPhase ───────────────────────────────────────────────────────────
 
-export enum IdeaStage {
-  Concept = "Concept",
-  Planning = "Planning",
-  SeekingTeam = "SeekingTeam",
-  InProgress = "InProgress",
-  Launched = "Launched",
+export enum ProjectPhase {
+  Idea = "Idea",
+  Development = "Development",
+  Beta = "Beta",
+  Production = "Production",
+  Maintenance = "Maintenance",
+  Sunset = "Sunset",
 }
 
-export const IdeaStageSchema = z.nativeEnum(IdeaStage);
+export const ProjectPhaseSchema = z.nativeEnum(ProjectPhase);
 
-// ─── Commitment ──────────────────────────────────────────────────────────────
+// ─── ProductionType ─────────────────────────────────────────────────────────
 
-export enum Commitment {
-  FullTime = "FullTime",
-  PartTime = "PartTime",
-  Flexible = "Flexible",
-  OneTime = "OneTime",
+export enum ProductionType {
+  Hobby = "Hobby",
+  Startup = "Startup",
+  Enterprise = "Enterprise",
+  OpenSource = "OpenSource",
+  Research = "Research",
+  Freelance = "Freelance",
 }
 
-export const CommitmentSchema = z.nativeEnum(Commitment);
-
-// ─── Compensation ────────────────────────────────────────────────────────────
-
-export enum Compensation {
-  Paid = "Paid",
-  Equity = "Equity",
-  Volunteer = "Volunteer",
-  Negotiable = "Negotiable",
-}
-
-export const CompensationSchema = z.nativeEnum(Compensation);
-
-// ─── ApplicationStatus ───────────────────────────────────────────────────────
-
-export enum ApplicationStatus {
-  Pending = "Pending",
-  Accepted = "Accepted",
-  Rejected = "Rejected",
-  Withdrawn = "Withdrawn",
-}
-
-export const ApplicationStatusSchema = z.nativeEnum(ApplicationStatus);
+export const ProductionTypeSchema = z.nativeEnum(ProductionType);

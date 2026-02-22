@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Query,
-  UsePipes,
 } from "@nestjs/common";
 import {
   updateProfileSchema,
@@ -35,28 +34,25 @@ export class UserController {
   }
 
   @Patch("me/profile")
-  @UsePipes(new ZodValidationPipe(updateProfileSchema))
   async updateProfile(
     @CurrentUser("id") userId: string,
-    @Body() dto: UpdateProfileInput,
+    @Body(new ZodValidationPipe(updateProfileSchema)) dto: UpdateProfileInput,
   ) {
     return this.userService.updateProfile(userId, dto);
   }
 
   @Patch("me/social-links")
-  @UsePipes(new ZodValidationPipe(updateSocialLinksSchema))
   async updateSocialLinks(
     @CurrentUser("id") userId: string,
-    @Body() dto: UpdateSocialLinksInput,
+    @Body(new ZodValidationPipe(updateSocialLinksSchema)) dto: UpdateSocialLinksInput,
   ) {
     return this.userService.updateSocialLinks(userId, dto);
   }
 
   @Patch("me/tech-stack")
-  @UsePipes(new ZodValidationPipe(updateTechStackSchema))
   async updateTechStack(
     @CurrentUser("id") userId: string,
-    @Body() dto: UpdateTechStackInput,
+    @Body(new ZodValidationPipe(updateTechStackSchema)) dto: UpdateTechStackInput,
   ) {
     return this.userService.updateTechStack(userId, dto);
   }

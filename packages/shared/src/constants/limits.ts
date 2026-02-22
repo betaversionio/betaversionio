@@ -19,10 +19,6 @@ export const POST_CONTENT = {
   MAX: 10000,
 } as const;
 
-export const IDEA_DESCRIPTION = {
-  MAX: 5000,
-} as const;
-
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_LIMIT: 20,
@@ -45,6 +41,14 @@ export const FILE = {
   ALLOWED_DOC_TYPES: ["application/pdf"] as const,
 } as const;
 
+export const PROJECT_TAGLINE = {
+  MAX: 300,
+} as const;
+
+export const PROJECT_COMMENT = {
+  MAX: 2000,
+} as const;
+
 export const RESUME_TITLE = {
   MAX: 100,
 } as const;
@@ -54,8 +58,9 @@ export const LIMITS = {
   BIO,
   PROJECT_TITLE,
   PROJECT_DESCRIPTION,
+  PROJECT_TAGLINE,
+  PROJECT_COMMENT,
   POST_CONTENT,
-  IDEA_DESCRIPTION,
   PAGINATION,
   FEED,
   FILE,

@@ -91,7 +91,7 @@ export function Footer() {
 const platform = [
   { title: 'Explore', href: '/explore' },
   { title: 'Feed', href: '/feed' },
-  { title: 'Ideas', href: '/ideas' },
+  { title: 'Projects', href: '/projects' },
   { title: 'Resume Builder', href: '/resume' },
 ];
 

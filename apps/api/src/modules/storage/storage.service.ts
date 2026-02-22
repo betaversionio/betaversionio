@@ -42,19 +42,16 @@ export class StorageService {
    *
    * @param key - The storage key (path) for the file
    * @param contentType - The MIME type of the file
-   * @param maxSize - The maximum file size in bytes
    * @returns The presigned upload URL
    */
   async getPresignedUploadUrl(
     key: string,
     contentType: string,
-    maxSize: number,
   ): Promise<string> {
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
       ContentType: contentType,
-      ContentLength: maxSize,
     });
 
     const url = await getSignedUrl(this.s3Client, command, {

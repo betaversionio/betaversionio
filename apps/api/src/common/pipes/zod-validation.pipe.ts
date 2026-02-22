@@ -3,26 +3,25 @@ import {
   Injectable,
   BadRequestException,
 } from "@nestjs/common";
-import { ZodSchema, ZodError } from "zod";
+import { z } from "zod";
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
-  constructor(private schema: ZodSchema) {}
+  constructor(private schema: z.ZodType) {}
 
   transform(value: unknown) {
-    try {
-      return this.schema.parse(value);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        throw new BadRequestException({
-          message: "Validation failed",
-          errors: error.errors.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
-        });
-      }
-      throw new BadRequestException("Validation failed");
+    const result = this.schema.safeParse(value);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: "Validation failed",
+        errors: result.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
     }
+
+    return result.data;
   }
 }

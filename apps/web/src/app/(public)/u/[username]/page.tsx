@@ -1,23 +1,19 @@
-"use client";
+'use client';
 
-import { use } from "react";
-import Link from "next/link";
-import { useUserProfile } from "@/hooks/queries/use-user-queries";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { use } from 'react';
+import Link from 'next/link';
+import { useUserProfile } from '@/hooks/queries/use-user-queries';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+} from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import {
   MapPin,
   Globe,
@@ -27,14 +23,14 @@ import {
   ExternalLink,
   Loader2,
   FolderKanban,
-} from "lucide-react";
+} from 'lucide-react';
 
 function getInitials(name: string | null | undefined): string {
-  if (!name) return "?";
+  if (!name) return '?';
   return name
-    .split(" ")
+    .split(' ')
     .map((n) => n[0])
-    .join("")
+    .join('')
     .toUpperCase()
     .slice(0, 2);
 }
@@ -47,17 +43,19 @@ const socialIcons: Record<string, React.ElementType> = {
 };
 
 const proficiencyColors: Record<string, string> = {
-  Beginner: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-  Intermediate: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  Advanced: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  Expert: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  Beginner: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+  Intermediate: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  Advanced:
+    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  Expert: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
 };
 
 const statusColors: Record<string, string> = {
-  Draft: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  Completed: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  Archived: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+  Draft:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  Active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  Completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  Archived: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
 };
 
 export default function PublicProfilePage({
@@ -91,7 +89,7 @@ export default function PublicProfilePage({
   }
 
   return (
-    <div className="container px-4 py-8 md:py-12">
+    <div className="container px-4 pb-8 md:pb-12 pt-20">
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Profile Header */}
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
@@ -103,17 +101,11 @@ export default function PublicProfilePage({
           </Avatar>
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-3xl font-bold">{profile.name}</h1>
-            <p className="text-lg text-muted-foreground">
-              @{profile.username}
-            </p>
+            <p className="text-lg text-muted-foreground">@{profile.username}</p>
             {profile.headline && (
-              <p className="mt-2 text-muted-foreground">
-                {profile.headline}
-              </p>
+              <p className="mt-2 text-muted-foreground">{profile.headline}</p>
             )}
-            {profile.bio && (
-              <p className="mt-3 text-sm">{profile.bio}</p>
-            )}
+            {profile.bio && <p className="mt-3 text-sm">{profile.bio}</p>}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground md:justify-start">
               {profile.location && (
                 <span className="flex items-center gap-1">
@@ -129,7 +121,7 @@ export default function PublicProfilePage({
                   className="flex items-center gap-1 hover:text-foreground"
                 >
                   <Globe className="h-4 w-4" />
-                  {profile.website.replace(/^https?:\/\//, "")}
+                  {profile.website.replace(/^https?:\/\//, '')}
                 </a>
               )}
             </div>
@@ -173,11 +165,11 @@ export default function PublicProfilePage({
                 <Badge
                   key={tech.name}
                   variant="secondary"
-                  className={proficiencyColors[tech.proficiency] ?? ""}
+                  className={proficiencyColors[tech.proficiency] ?? ''}
                 >
                   {tech.name}
                   <span className="ml-1 text-[10px] opacity-70">
-                    {tech.category.replace(/_/g, " ")}
+                    {tech.category.replace(/_/g, ' ')}
                   </span>
                 </Badge>
               ))}
@@ -205,7 +197,7 @@ export default function PublicProfilePage({
                       </div>
                       <Badge
                         variant="secondary"
-                        className={statusColors[project.status] ?? ""}
+                        className={statusColors[project.status] ?? ''}
                       >
                         {project.status}
                       </Badge>
@@ -219,11 +211,7 @@ export default function PublicProfilePage({
                   <CardContent>
                     <div className="flex flex-wrap gap-1">
                       {project.techStack.slice(0, 5).map((tech) => (
-                        <Badge
-                          key={tech}
-                          variant="outline"
-                          className="text-xs"
-                        >
+                        <Badge key={tech} variant="outline" className="text-xs">
                           {tech}
                         </Badge>
                       ))}

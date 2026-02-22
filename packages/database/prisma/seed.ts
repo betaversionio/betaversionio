@@ -14,10 +14,6 @@ async function main() {
   console.log("Seeding database...");
 
   // ─── Clean up existing data ───────────────────────────────────────────────
-  await prisma.ideaVote.deleteMany();
-  await prisma.ideaApplication.deleteMany();
-  await prisma.ideaRole.deleteMany();
-  await prisma.idea.deleteMany();
   await prisma.postHashtag.deleteMany();
   await prisma.hashtag.deleteMany();
   await prisma.reaction.deleteMany();
@@ -26,9 +22,9 @@ async function main() {
   await prisma.resumeVersion.deleteMany();
   await prisma.resume.deleteMany();
   await prisma.resumeTemplate.deleteMany();
-  await prisma.projectTimeline.deleteMany();
-  await prisma.projectMedia.deleteMany();
-  await prisma.projectCollaborator.deleteMany();
+  await prisma.projectVote.deleteMany();
+  await prisma.projectComment.deleteMany();
+  await prisma.projectMaker.deleteMany();
   await prisma.project.deleteMany();
   await prisma.techStackItem.deleteMany();
   await prisma.socialLink.deleteMany();
@@ -185,59 +181,27 @@ async function main() {
       slug: "devcom-cli-tools",
       description:
         "A suite of CLI tools for developers to streamline their workflow. Includes scaffolding generators, code formatters, and project health checkers. Built with TypeScript and published as npm packages.",
-      shortDescription:
-        "CLI tools suite for developer workflow automation",
+      tagline: "CLI tools suite for developer workflow automation",
       techStack: ["TypeScript", "Node.js", "Commander.js", "Vitest"],
-      repoUrl: "https://github.com/alice-dev/devcom-cli-tools",
-      liveUrl: "https://www.npmjs.com/package/devcom-cli",
-      thumbnailUrl: "https://picsum.photos/seed/devcom-cli/800/600",
+      tags: ["cli", "developer-tools", "automation"],
+      links: [
+        "https://github.com/alice-dev/devcom-cli-tools",
+        "https://www.npmjs.com/package/devcom-cli",
+      ],
+      images: [
+        "https://picsum.photos/seed/devcom-cli-1/1200/800",
+        "https://picsum.photos/seed/devcom-cli-2/1200/800",
+      ],
+      isOpenSource: true,
       status: "Active",
+      phase: "Production",
+      productionType: "OpenSource",
+      upvotesCount: 12,
       authorId: alice.id,
-      collaborators: {
+      makers: {
         create: [
-          {
-            userId: alice.id,
-            role: "Owner",
-          },
-          {
-            userId: bob.id,
-            role: "Contributor",
-          },
-        ],
-      },
-      media: {
-        create: [
-          {
-            type: "Image",
-            url: "https://picsum.photos/seed/devcom-cli-1/1200/800",
-            caption: "CLI tool in action - scaffolding a new project",
-            order: 0,
-          },
-          {
-            type: "Image",
-            url: "https://picsum.photos/seed/devcom-cli-2/1200/800",
-            caption: "Code health checker output",
-            order: 1,
-          },
-        ],
-      },
-      timeline: {
-        create: [
-          {
-            title: "Project Kickoff",
-            description: "Initial project setup with TypeScript and monorepo structure.",
-            date: new Date("2025-01-15"),
-          },
-          {
-            title: "v1.0 Release",
-            description: "First stable release with scaffolding and formatting commands.",
-            date: new Date("2025-03-01"),
-          },
-          {
-            title: "Added Health Checker",
-            description: "New command to analyze project health and suggest improvements.",
-            date: new Date("2025-04-10"),
-          },
+          { userId: alice.id, role: "Creator" },
+          { userId: bob.id, role: "Contributor" },
         ],
       },
     },
@@ -249,54 +213,26 @@ async function main() {
       slug: "clouddash-infra-monitor",
       description:
         "Real-time infrastructure monitoring dashboard built with Go microservices and a React frontend. Supports AWS, GCP, and Azure. Features include cost tracking, uptime monitoring, and alerting via Slack and email.",
-      shortDescription:
-        "Real-time cloud infrastructure monitoring dashboard",
+      tagline: "Real-time cloud infrastructure monitoring dashboard",
       techStack: ["Go", "React", "PostgreSQL", "Redis", "Docker", "Kubernetes"],
-      repoUrl: "https://github.com/bob-codes/clouddash",
-      liveUrl: "https://clouddash-demo.bobmartinez.io",
-      thumbnailUrl: "https://picsum.photos/seed/clouddash/800/600",
+      tags: ["monitoring", "cloud", "infrastructure", "devops"],
+      links: [
+        "https://github.com/bob-codes/clouddash",
+        "https://clouddash-demo.bobmartinez.io",
+      ],
+      images: [
+        "https://picsum.photos/seed/clouddash-1/1200/800",
+      ],
+      isOpenSource: true,
       status: "Active",
+      phase: "Beta",
+      productionType: "Startup",
+      upvotesCount: 34,
       authorId: bob.id,
-      collaborators: {
+      makers: {
         create: [
-          {
-            userId: bob.id,
-            role: "Owner",
-          },
-          {
-            userId: alice.id,
-            role: "Maintainer",
-          },
-        ],
-      },
-      media: {
-        create: [
-          {
-            type: "Image",
-            url: "https://picsum.photos/seed/clouddash-1/1200/800",
-            caption: "Main dashboard showing real-time metrics",
-            order: 0,
-          },
-          {
-            type: "Video",
-            url: "https://www.youtube.com/watch?v=example",
-            caption: "Demo walkthrough of CloudDash features",
-            order: 1,
-          },
-        ],
-      },
-      timeline: {
-        create: [
-          {
-            title: "Proof of Concept",
-            description: "Initial PoC with AWS monitoring support.",
-            date: new Date("2024-11-01"),
-          },
-          {
-            title: "Multi-cloud Support",
-            description: "Added GCP and Azure monitoring capabilities.",
-            date: new Date("2025-02-15"),
-          },
+          { userId: bob.id, role: "Creator" },
+          { userId: alice.id, role: "Frontend Lead" },
         ],
       },
     },
@@ -569,110 +505,14 @@ getUser(userId); // OK
 
   console.log(`Created posts: "${postAlice.title}", "${postBob.title}" with comments and reactions`);
 
-  // ─── Ideas ────────────────────────────────────────────────────────────────
+  // ─── Project Votes ───────────────────────────────────────────────────────
 
-  const ideaCollabTool = await prisma.idea.create({
-    data: {
-      authorId: alice.id,
-      title: "Real-time Collaborative Code Editor for Technical Interviews",
-      description:
-        "Building an open-source alternative to CoderPad/HackerRank for technical interviews. The editor would support real-time collaboration with features like:\n\n- Multi-cursor editing (like Google Docs)\n- Built-in video/audio chat\n- Code execution in sandboxed containers (supporting 10+ languages)\n- Interview templates with timer and scoring rubrics\n- Recording and playback of interview sessions\n- Integration with ATS systems\n\nThe goal is to provide a free, self-hostable solution that companies can run on their own infrastructure for privacy-sensitive interviews.",
-      stage: "SeekingTeam",
-      techStack: ["TypeScript", "React", "Node.js", "WebRTC", "Docker", "Redis"],
-      votesCount: 8,
-      isOpen: true,
-      roles: {
-        create: [
-          {
-            title: "Frontend Engineer",
-            description:
-              "Build the collaborative editor UI using React and Yjs for CRDT-based real-time editing. Experience with Monaco Editor or CodeMirror is a plus.",
-            commitment: "PartTime",
-            compensation: "Volunteer",
-            isFilled: false,
-          },
-          {
-            title: "Backend Engineer",
-            description:
-              "Design and implement the WebSocket server for real-time sync, code execution sandbox using Docker containers, and REST API for session management.",
-            commitment: "PartTime",
-            compensation: "Volunteer",
-            isFilled: false,
-          },
-          {
-            title: "DevOps Engineer",
-            description:
-              "Set up CI/CD pipeline, container orchestration for code execution sandboxes, and create Helm charts for self-hosted deployments.",
-            commitment: "Flexible",
-            compensation: "Volunteer",
-            isFilled: false,
-          },
-        ],
-      },
-    },
-  });
-
-  const ideaDevMetrics = await prisma.idea.create({
-    data: {
-      authorId: bob.id,
-      title: "Developer Productivity Metrics Dashboard",
-      description:
-        "An open-source dashboard that aggregates developer productivity metrics from multiple sources:\n\n- GitHub/GitLab: PR cycle time, review turnaround, commit frequency\n- Jira/Linear: Sprint velocity, bug fix rate, story points completed\n- CI/CD: Build times, deployment frequency, failure rates\n- Custom metrics via API\n\nUnlike existing tools, this focuses on team health rather than individual surveillance. Metrics are anonymized by default and the focus is on identifying bottlenecks in processes, not ranking developers.\n\nInspired by the DORA metrics framework but with a more holistic approach.",
-      stage: "Planning",
-      techStack: ["Go", "React", "PostgreSQL", "GraphQL", "Docker"],
-      votesCount: 15,
-      isOpen: true,
-      roles: {
-        create: [
-          {
-            title: "Full-Stack Developer",
-            description:
-              "Work on both the Go backend API and the React frontend dashboard. Will help define the GraphQL schema and implement data aggregation pipelines.",
-            commitment: "PartTime",
-            compensation: "Equity",
-            isFilled: false,
-          },
-          {
-            title: "Data Engineer",
-            description:
-              "Build ETL pipelines to ingest data from various developer tools (GitHub API, Jira API, CI/CD webhooks). Design the data warehouse schema for efficient metric queries.",
-            commitment: "Flexible",
-            compensation: "Equity",
-            isFilled: false,
-          },
-        ],
-      },
-    },
-  });
-
-  // Idea votes
-  await prisma.ideaVote.createMany({
+  await prisma.projectVote.createMany({
     data: [
-      { ideaId: ideaCollabTool.id, userId: bob.id },
-      { ideaId: ideaDevMetrics.id, userId: alice.id },
+      { projectId: projectDevtools.id, userId: bob.id, value: 1 },
+      { projectId: projectCloudDash.id, userId: alice.id, value: 1 },
     ],
   });
-
-  // Idea application
-  await prisma.ideaApplication.create({
-    data: {
-      ideaId: ideaCollabTool.id,
-      userId: bob.id,
-      roleId: (
-        await prisma.ideaRole.findFirst({
-          where: { ideaId: ideaCollabTool.id, title: "Backend Engineer" },
-        })
-      )!.id,
-      message:
-        "I have extensive experience building WebSocket-based real-time systems in Go and Node.js. I have also worked with Docker container orchestration for sandboxed execution environments at my current company. Would love to contribute to this project!",
-      portfolioUrl: "https://bobmartinez.io/projects",
-      status: "Pending",
-    },
-  });
-
-  console.log(
-    `Created ideas: "${ideaCollabTool.title}", "${ideaDevMetrics.title}" with roles and applications`
-  );
 
   console.log("\nSeeding completed successfully!");
 }
