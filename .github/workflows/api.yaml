@@ -8,6 +8,7 @@ on:
       - "apps/api/**"
       - "packages/database/**"
       - "packages/shared/**"
+      - "packages/config/typescript/**"
       - "pnpm-lock.yaml"
 
 permissions:
@@ -25,9 +26,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/api
+            packages/database
+            packages/shared
+            packages/config/typescript
+            pnpm-workspace.yaml
+            pnpm-lock.yaml
+            package.json
+            turbo.json
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --filter=@devcom/api...
 
       - name: Set up Environment File
         env:
