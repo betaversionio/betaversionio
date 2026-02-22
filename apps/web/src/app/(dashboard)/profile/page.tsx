@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   updateProfileSchema,
   updateSocialLinksSchema,
@@ -10,37 +10,37 @@ import {
   SocialPlatform,
   TechCategory,
   Proficiency,
-} from "@devcom/shared";
+} from '@devcom/shared';
 import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
   UpdateTechStackInput,
-} from "@devcom/shared";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { useAuth } from "@/providers/auth-provider";
-import { useToast } from "@/hooks/use-toast";
-import { authKeys } from "@/hooks/queries";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from '@devcom/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/providers/auth-provider';
+import { useToast } from '@/hooks/use-toast';
+import { authKeys } from '@/hooks/queries';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, Plus, Trash2, Upload } from "lucide-react";
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
 
 export default function EditProfilePage() {
   const { user } = useAuth();
@@ -51,26 +51,30 @@ export default function EditProfilePage() {
   const profileForm = useForm<UpdateProfileInput>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      name: user?.name ?? "",
-      bio: "",
-      headline: "",
-      location: "",
-      website: "",
+      name: user?.name ?? '',
+      bio: '',
+      headline: '',
+      location: '',
+      website: '',
     },
   });
 
   const profileMutation = useMutation({
     mutationFn: (data: UpdateProfileInput) =>
-      apiClient.patch("/users/me/profile", data),
+      apiClient.patch('/users/me/profile', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
-      toast({ title: "Profile updated", description: "Your profile has been saved." });
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile has been saved.',
+      });
     },
     onError: (error) => {
       toast({
-        title: "Update failed",
-        description: error instanceof Error ? error.message : "Failed to update profile.",
-        variant: "destructive",
+        title: 'Update failed',
+        description:
+          error instanceof Error ? error.message : 'Failed to update profile.',
+        variant: 'destructive',
       });
     },
   });
@@ -79,7 +83,7 @@ export default function EditProfilePage() {
   const socialForm = useForm<UpdateSocialLinksInput>({
     resolver: zodResolver(updateSocialLinksSchema),
     defaultValues: {
-      links: [{ platform: SocialPlatform.GITHUB, url: "" }],
+      links: [{ platform: SocialPlatform.Github, url: '' }],
     },
   });
 
@@ -89,20 +93,23 @@ export default function EditProfilePage() {
     remove: removeSocial,
   } = useFieldArray({
     control: socialForm.control,
-    name: "links",
+    name: 'links',
   });
 
   const socialMutation = useMutation({
     mutationFn: (data: UpdateSocialLinksInput) =>
-      apiClient.patch("/users/me/social-links", data),
+      apiClient.patch('/users/me/social-links', data),
     onSuccess: () => {
-      toast({ title: "Social links updated" });
+      toast({ title: 'Social links updated' });
     },
     onError: (error) => {
       toast({
-        title: "Update failed",
-        description: error instanceof Error ? error.message : "Failed to update social links.",
-        variant: "destructive",
+        title: 'Update failed',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to update social links.',
+        variant: 'destructive',
       });
     },
   });
@@ -112,7 +119,11 @@ export default function EditProfilePage() {
     resolver: zodResolver(updateTechStackSchema),
     defaultValues: {
       items: [
-        { name: "", category: TechCategory.LANGUAGE, proficiency: Proficiency.INTERMEDIATE },
+        {
+          name: '',
+          category: TechCategory.Language,
+          proficiency: Proficiency.Intermediate,
+        },
       ],
     },
   });
@@ -123,20 +134,23 @@ export default function EditProfilePage() {
     remove: removeTech,
   } = useFieldArray({
     control: techForm.control,
-    name: "items",
+    name: 'items',
   });
 
   const techMutation = useMutation({
     mutationFn: (data: UpdateTechStackInput) =>
-      apiClient.patch("/users/me/tech-stack", data),
+      apiClient.patch('/users/me/tech-stack', data),
     onSuccess: () => {
-      toast({ title: "Tech stack updated" });
+      toast({ title: 'Tech stack updated' });
     },
     onError: (error) => {
       toast({
-        title: "Update failed",
-        description: error instanceof Error ? error.message : "Failed to update tech stack.",
-        variant: "destructive",
+        title: 'Update failed',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to update tech stack.',
+        variant: 'destructive',
       });
     },
   });
@@ -176,9 +190,7 @@ export default function EditProfilePage() {
               <Input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                onChange={(e) =>
-                  setAvatarFile(e.target.files?.[0] ?? null)
-                }
+                onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)}
                 className="max-w-xs"
               />
               <p className="mt-1 text-xs text-muted-foreground">
@@ -199,19 +211,20 @@ export default function EditProfilePage() {
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
           <CardDescription>
-            Basic information about you that will be visible on your public profile
+            Basic information about you that will be visible on your public
+            profile
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form
             onSubmit={profileForm.handleSubmit((data) =>
-              profileMutation.mutate(data)
+              profileMutation.mutate(data),
             )}
             className="space-y-4"
           >
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" {...profileForm.register("name")} />
+              <Input id="name" {...profileForm.register('name')} />
               {profileForm.formState.errors.name && (
                 <p className="text-sm text-destructive">
                   {profileForm.formState.errors.name.message}
@@ -224,7 +237,7 @@ export default function EditProfilePage() {
               <Input
                 id="headline"
                 placeholder="Full-stack developer passionate about open source"
-                {...profileForm.register("headline")}
+                {...profileForm.register('headline')}
               />
               {profileForm.formState.errors.headline && (
                 <p className="text-sm text-destructive">
@@ -239,7 +252,7 @@ export default function EditProfilePage() {
                 id="bio"
                 placeholder="Tell the world about yourself..."
                 rows={4}
-                {...profileForm.register("bio")}
+                {...profileForm.register('bio')}
               />
               {profileForm.formState.errors.bio && (
                 <p className="text-sm text-destructive">
@@ -254,7 +267,7 @@ export default function EditProfilePage() {
                 <Input
                   id="location"
                   placeholder="San Francisco, CA"
-                  {...profileForm.register("location")}
+                  {...profileForm.register('location')}
                 />
               </div>
               <div className="space-y-2">
@@ -262,7 +275,7 @@ export default function EditProfilePage() {
                 <Input
                   id="website"
                   placeholder="https://yoursite.com"
-                  {...profileForm.register("website")}
+                  {...profileForm.register('website')}
                 />
               </div>
             </div>
@@ -274,7 +287,7 @@ export default function EditProfilePage() {
                   Saving...
                 </>
               ) : (
-                "Save Profile"
+                'Save Profile'
               )}
             </Button>
           </form>
@@ -294,7 +307,7 @@ export default function EditProfilePage() {
         <CardContent>
           <form
             onSubmit={socialForm.handleSubmit((data) =>
-              socialMutation.mutate(data)
+              socialMutation.mutate(data),
             )}
             className="space-y-4"
           >
@@ -346,7 +359,7 @@ export default function EditProfilePage() {
               variant="outline"
               size="sm"
               onClick={() =>
-                appendSocial({ platform: SocialPlatform.GITHUB, url: "" })
+                appendSocial({ platform: SocialPlatform.Github, url: '' })
               }
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -361,7 +374,7 @@ export default function EditProfilePage() {
                     Saving...
                   </>
                 ) : (
-                  "Save Social Links"
+                  'Save Social Links'
                 )}
               </Button>
             </div>
@@ -375,14 +388,12 @@ export default function EditProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle>Tech Stack</CardTitle>
-          <CardDescription>
-            List the technologies you work with
-          </CardDescription>
+          <CardDescription>List the technologies you work with</CardDescription>
         </CardHeader>
         <CardContent>
           <form
             onSubmit={techForm.handleSubmit((data) =>
-              techMutation.mutate(data)
+              techMutation.mutate(data),
             )}
             className="space-y-4"
           >
@@ -412,7 +423,7 @@ export default function EditProfilePage() {
                     <SelectContent>
                       {Object.values(TechCategory).map((cat) => (
                         <SelectItem key={cat} value={cat}>
-                          {cat.replace("_", " ")}
+                          {cat.replace('_', ' ')}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -458,9 +469,9 @@ export default function EditProfilePage() {
               size="sm"
               onClick={() =>
                 appendTech({
-                  name: "",
-                  category: TechCategory.LANGUAGE,
-                  proficiency: Proficiency.INTERMEDIATE,
+                  name: '',
+                  category: TechCategory.Language,
+                  proficiency: Proficiency.Intermediate,
                 })
               }
             >
@@ -476,7 +487,7 @@ export default function EditProfilePage() {
                     Saving...
                   </>
                 ) : (
-                  "Save Tech Stack"
+                  'Save Tech Stack'
                 )}
               </Button>
             </div>

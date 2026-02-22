@@ -11,7 +11,7 @@ import {
   HttpStatus,
   NotFoundException,
 } from "@nestjs/common";
-import { Response } from "express";
+import type { Response } from "express";
 import { ResumeService } from "./resume.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";

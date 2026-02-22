@@ -5,6 +5,7 @@ import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { AuthProvider } from '@/providers/auth-provider';
+import { GoogleProvider } from '@/providers/google-oauth-provider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -65,7 +66,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <GoogleProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </GoogleProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

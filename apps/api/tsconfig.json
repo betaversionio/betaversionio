@@ -2,7 +2,6 @@
   "extends": "@devcom/typescript-config/nest.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "baseUrl": "./",
     "declaration": false,
     "declarationMap": false,
     "rootDir": "./src",

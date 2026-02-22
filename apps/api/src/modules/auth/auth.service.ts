@@ -12,14 +12,6 @@ import type { RegisterInput } from "@devcom/shared";
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserService } from "../user/user.service";
 
-interface GithubProfile {
-  githubId: string;
-  username: string;
-  name: string;
-  email: string | null;
-  avatarUrl: string | null;
-}
-
 @Injectable()
 export class AuthService {
   private readonly BCRYPT_ROUNDS = 10;
@@ -174,31 +166,168 @@ export class AuthService {
 
   // ── GitHub Login ──────────────────────────────────────────────────────────
 
-  async githubLogin(githubProfile: GithubProfile) {
+  async githubLogin(code: string) {
+    // Exchange the authorization code for an access token
+    const tokenRes = await fetch(
+      "https://github.com/login/oauth/access_token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          client_id: this.configService.getOrThrow<string>("GITHUB_CLIENT_ID"),
+          client_secret: this.configService.getOrThrow<string>("GITHUB_CLIENT_SECRET"),
+          code,
+        }),
+      },
+    );
+
+    const tokenData = (await tokenRes.json()) as {
+      access_token?: string;
+      error?: string;
+    };
+
+    if (!tokenData.access_token) {
+      throw new UnauthorizedException("Invalid GitHub code");
+    }
+
+    // Fetch GitHub user profile
+    const [profileRes, emailsRes] = await Promise.all([
+      fetch("https://api.github.com/user", {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      }),
+      fetch("https://api.github.com/user/emails", {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      }),
+    ]);
+
+    if (!profileRes.ok) {
+      throw new UnauthorizedException("Failed to fetch GitHub profile");
+    }
+
+    const profile = (await profileRes.json()) as {
+      id: number;
+      login: string;
+      name: string | null;
+      avatar_url: string | null;
+    };
+
+    const emails = emailsRes.ok
+      ? ((await emailsRes.json()) as { email: string; primary: boolean }[])
+      : [];
+
+    const githubId = String(profile.id);
+    const primaryEmail =
+      emails.find((e) => e.primary)?.email || emails[0]?.email || null;
+    const username = profile.login || `gh-${githubId}`;
+    const name = profile.name || profile.login || `GitHub User ${githubId}`;
+    const avatarUrl = profile.avatar_url || null;
+
     // Try to find an existing user by GitHub ID
-    let user = await this.userService.findByGithubId(githubProfile.githubId);
+    let user = await this.userService.findByGithubId(githubId);
 
-    if (!user) {
-      // Try to find by email if available
-      if (githubProfile.email) {
-        user = await this.userService.findByEmail(githubProfile.email);
+    if (!user && primaryEmail) {
+      user = await this.userService.findByEmail(primaryEmail);
 
-        if (user) {
-          // Link GitHub ID to existing account
-          user = await this.prisma.user.update({
-            where: { id: user.id },
-            data: {
-              githubId: githubProfile.githubId,
-              avatarUrl: user.avatarUrl || githubProfile.avatarUrl,
-            },
-          });
-        }
+      if (user) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            githubId,
+            avatarUrl: user.avatarUrl || avatarUrl,
+          },
+        });
       }
     }
 
     if (!user) {
-      // Ensure unique username
-      let username = githubProfile.username;
+      let finalUsername = username;
+      const existingUsername = await this.prisma.user.findUnique({
+        where: { username: finalUsername },
+      });
+
+      if (existingUsername) {
+        finalUsername = `${finalUsername}-${Date.now().toString(36)}`;
+      }
+
+      user = await this.prisma.user.create({
+        data: {
+          email: primaryEmail || `${githubId}@github.devcom`,
+          username: finalUsername,
+          name,
+          githubId,
+          avatarUrl,
+          emailVerified: !!primaryEmail,
+          profile: {
+            create: {},
+          },
+        },
+      });
+    }
+
+    const tokens = await this.generateTokens(user.id, user.email);
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
+      },
+      tokens,
+    };
+  }
+
+  // ── Google Login ─────────────────────────────────────────────────────────
+
+  async googleLogin(accessToken: string) {
+    // Fetch user info from Google using the access token
+    const res = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+
+    if (!res.ok) {
+      throw new UnauthorizedException("Invalid Google token");
+    }
+
+    const payload = (await res.json()) as {
+      sub: string;
+      email?: string;
+      name?: string;
+      picture?: string;
+    };
+
+    const googleId = payload.sub;
+    const email = payload.email || null;
+    const name = payload.name || "Google User";
+    const avatarUrl = payload.picture || null;
+
+    // Try to find an existing user by Google ID
+    let user = await this.userService.findByGoogleId(googleId);
+
+    if (!user && email) {
+      user = await this.userService.findByEmail(email);
+
+      if (user) {
+        // Link Google ID to existing account
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            googleId,
+            avatarUrl: user.avatarUrl || avatarUrl,
+          },
+        });
+      }
+    }
+
+    if (!user) {
+      let username = email
+        ? email.split("@")[0]!
+        : `google-${googleId}`;
+
       const existingUsername = await this.prisma.user.findUnique({
         where: { username },
       });
@@ -207,15 +336,14 @@ export class AuthService {
         username = `${username}-${Date.now().toString(36)}`;
       }
 
-      // Create new user from GitHub profile
       user = await this.prisma.user.create({
         data: {
-          email: githubProfile.email || `${githubProfile.githubId}@github.devcom`,
+          email: email || `${googleId}@google.devcom`,
           username,
-          name: githubProfile.name,
-          githubId: githubProfile.githubId,
-          avatarUrl: githubProfile.avatarUrl,
-          emailVerified: !!githubProfile.email,
+          name,
+          googleId,
+          avatarUrl,
+          emailVerified: !!email,
           profile: {
             create: {},
           },
@@ -223,7 +351,6 @@ export class AuthService {
       });
     }
 
-    // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email);
 
     return {
@@ -245,14 +372,14 @@ export class AuthService {
         { sub: userId, email } as Record<string, unknown>,
         {
           secret: this.configService.getOrThrow<string>("JWT_SECRET"),
-          expiresIn: (this.configService.get<string>("JWT_ACCESS_EXPIRATION") || "15m") as any,
+          expiresIn: (this.configService.get<string>("JWT_ACCESS_EXPIRATION") || "7d") as any,
         },
       ),
       this.jwtService.signAsync(
         { sub: userId, email } as Record<string, unknown>,
         {
           secret: this.configService.getOrThrow<string>("JWT_REFRESH_SECRET"),
-          expiresIn: (this.configService.get<string>("JWT_REFRESH_EXPIRATION") || "7d") as any,
+          expiresIn: (this.configService.get<string>("JWT_REFRESH_EXPIRATION") || "15d") as any,
         },
       ),
     ]);

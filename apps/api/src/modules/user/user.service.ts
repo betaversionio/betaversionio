@@ -3,6 +3,8 @@ import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
   UpdateTechStackInput,
+  SocialLinkInput,
+  TechStackItemInput,
 } from "@devcom/shared";
 import { PAGINATION } from "@devcom/shared";
 
@@ -60,6 +62,12 @@ export class UserService {
   async findByGithubId(githubId: string) {
     return this.prisma.user.findUnique({
       where: { githubId },
+    });
+  }
+
+  async findByGoogleId(googleId: string) {
+    return this.prisma.user.findUnique({
+      where: { googleId },
     });
   }
 
@@ -144,7 +152,7 @@ export class UserService {
 
       if (dto.links.length > 0) {
         await tx.socialLink.createMany({
-          data: dto.links.map((link) => ({
+          data: dto.links.map((link: SocialLinkInput) => ({
             userId,
             platform: link.platform,
             url: link.url,
@@ -168,7 +176,7 @@ export class UserService {
 
       if (dto.items.length > 0) {
         await tx.techStackItem.createMany({
-          data: dto.items.map((item) => ({
+          data: dto.items.map((item: TechStackItemInput) => ({
             userId,
             name: item.name,
             category: item.category,

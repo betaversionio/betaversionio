@@ -34,7 +34,7 @@ export class IdeaService {
       // Create roles if provided
       if (dto.roles && dto.roles.length > 0) {
         await tx.ideaRole.createMany({
-          data: dto.roles.map((role) => ({
+          data: dto.roles.map((role: CreateIdeaInput["roles"][number]) => ({
             ideaId: idea.id,
             title: role.title,
             description: role.description,
@@ -226,7 +226,7 @@ export class IdeaService {
         // Create new roles
         if (dto.roles.length > 0) {
           await tx.ideaRole.createMany({
-            data: dto.roles.map((role) => ({
+            data: dto.roles.map((role: CreateIdeaInput["roles"][number]) => ({
               ideaId: id,
               title: role.title,
               description: role.description,

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient, setAccessToken, getAccessToken } from "@/lib/api-client";
+import { apiClient, hasAccessTokenCookie } from "@/lib/api-client";
 
 // ── Types ──
 
@@ -30,7 +30,7 @@ export function useMe() {
     queryKey: authKeys.me(),
     queryFn: () =>
       apiClient.get<User>("/auth/me", { skipAuthRefresh: true }),
-    enabled: !!getAccessToken(),
+    enabled: hasAccessTokenCookie(),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
@@ -45,7 +45,6 @@ export function useLogin() {
     mutationFn: (input: { email: string; password: string }) =>
       apiClient.post<AuthData>("/auth/login", input),
     onSuccess: (data) => {
-      setAccessToken(data.tokens.accessToken);
       queryClient.setQueryData(authKeys.me(), data.user);
     },
   });
@@ -62,7 +61,30 @@ export function useRegister() {
       name: string;
     }) => apiClient.post<AuthData>("/auth/register", input),
     onSuccess: (data) => {
-      setAccessToken(data.tokens.accessToken);
+      queryClient.setQueryData(authKeys.me(), data.user);
+    },
+  });
+}
+
+export function useGithubAuth() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (code: string) =>
+      apiClient.post<AuthData>("/auth/github", { code }),
+    onSuccess: (data) => {
+      queryClient.setQueryData(authKeys.me(), data.user);
+    },
+  });
+}
+
+export function useGoogleAuth() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (googleAccessToken: string) =>
+      apiClient.post<AuthData>("/auth/google", { accessToken: googleAccessToken }),
+    onSuccess: (data) => {
       queryClient.setQueryData(authKeys.me(), data.user);
     },
   });
@@ -76,7 +98,6 @@ export function useLogout() {
       await apiClient.post("/auth/logout");
     },
     onSettled: () => {
-      setAccessToken(null);
       queryClient.setQueryData(authKeys.me(), null);
       queryClient.removeQueries();
     },

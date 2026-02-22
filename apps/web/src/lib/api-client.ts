@@ -1,22 +1,14 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 
-let accessToken: string | null = null;
 let isRefreshing = false;
 
-export function setAccessToken(token: string | null) {
-  accessToken = token;
-}
-
-export function getAccessToken(): string | null {
-  return accessToken;
-}
-
-interface RequestOptions extends Omit<RequestInit, "body"> {
-  body?: unknown;
-  /** Query parameters to append to the URL */
-  params?: Record<string, string | number | boolean | undefined>;
-  /** Skip the automatic 401 → refresh → redirect cycle */
-  skipAuthRefresh?: boolean;
+/**
+ * Check whether the browser has an access_token cookie
+ * (set by the backend, non-httpOnly so JS can see it).
+ */
+export function hasAccessTokenCookie(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.split('; ').some((c) => c.startsWith('access_token='));
 }
 
 export async function refreshAccessToken(): Promise<boolean> {
@@ -25,23 +17,11 @@ export async function refreshAccessToken(): Promise<boolean> {
 
   try {
     const res = await fetch(`${API_URL}/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
+      method: 'POST',
+      credentials: 'include',
     });
 
-    if (!res.ok) {
-      return false;
-    }
-
-    const json = await res.json();
-    // Backend wraps responses: { success, data: { user, tokens: { accessToken, refreshToken } } }
-    const token = json?.data?.tokens?.accessToken;
-    if (token) {
-      setAccessToken(token);
-      return true;
-    }
-
-    return false;
+    return res.ok;
   } catch {
     return false;
   } finally {
@@ -49,25 +29,35 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  body?: unknown;
+  /** Query parameters to append to the URL */
+  params?: Record<string, string | number | boolean | undefined>;
+  /** Skip the automatic 401 → refresh → retry cycle */
+  skipAuthRefresh?: boolean;
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { body, params, headers: customHeaders, skipAuthRefresh, ...rest } = options;
+  const {
+    body,
+    params,
+    headers: customHeaders,
+    skipAuthRefresh,
+    ...rest
+  } = options;
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     ...((customHeaders as Record<string, string>) ?? {}),
   };
-
-  if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
-  }
 
   const config: RequestInit = {
     ...rest,
     headers,
-    credentials: "include",
+    credentials: 'include',
   };
 
   if (body !== undefined) {
@@ -92,16 +82,8 @@ async function request<T>(
     const refreshed = await refreshAccessToken();
 
     if (refreshed) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-      const retryConfig: RequestInit = {
-        ...rest,
-        headers,
-        credentials: "include",
-      };
-      if (body !== undefined) {
-        retryConfig.body = JSON.stringify(body);
-      }
-      res = await fetch(url, retryConfig);
+      // Cookies are updated by the refresh response — just retry
+      res = await fetch(url, config);
     }
   }
 
@@ -121,7 +103,7 @@ async function request<T>(
   const json = await res.json();
 
   // Backend wraps all responses in { success, data } — unwrap automatically
-  if (json && typeof json === "object" && "success" in json && "data" in json) {
+  if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
     return json.data as T;
   }
 
@@ -130,18 +112,26 @@ async function request<T>(
 
 export const apiClient = {
   get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
-    return request<T>(endpoint, { ...options, method: "GET" });
+    return request<T>(endpoint, { ...options, method: 'GET' });
   },
 
-  post<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return request<T>(endpoint, { ...options, method: "POST", body });
+  post<T>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return request<T>(endpoint, { ...options, method: 'POST', body });
   },
 
-  patch<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return request<T>(endpoint, { ...options, method: "PATCH", body });
+  patch<T>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return request<T>(endpoint, { ...options, method: 'PATCH', body });
   },
 
   delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
-    return request<T>(endpoint, { ...options, method: "DELETE" });
+    return request<T>(endpoint, { ...options, method: 'DELETE' });
   },
 };

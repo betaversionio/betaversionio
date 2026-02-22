@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import { Suspense } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@devcom/shared";
-import type { LoginInput } from "@devcom/shared";
-import { useAuth } from "@/providers/auth-provider";
-import { useLogin } from "@/features/auth";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Separator } from "@/components/ui/separator";
-import { LogoWithText } from "@/components/shared/logo-with-text";
-import { siteConfig } from "@/config/site";
-import { GoogleIcon, GithubIcon } from "@/features/auth";
-import { Loader2 } from "lucide-react";
+import { Suspense } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '@devcom/shared';
+import type { LoginInput } from '@devcom/shared';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useAuth } from '@/providers/auth-provider';
+import { useLogin } from '@/features/auth';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Field, FieldLabel, FieldError } from '@/components/ui/field';
+import { Separator } from '@/components/ui/separator';
+import { LogoWithText } from '@/components/shared/logo-with-text';
+import { siteConfig } from '@/config/site';
+import { GoogleIcon, GithubIcon } from '@/features/auth';
+import { Loader2 } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -27,7 +28,42 @@ function LoginForm() {
   const loginMutation = useLogin();
   const { toast } = useToast();
 
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
+  async function handleGithubLogin() {
+    try {
+      await loginWithGithub();
+      router.push(callbackUrl);
+    } catch {
+      toast({
+        title: 'Login failed',
+        description: 'GitHub authentication failed. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await loginWithGoogle(tokenResponse.access_token);
+        router.push(callbackUrl);
+      } catch {
+        toast({
+          title: 'Login failed',
+          description: 'Google authentication failed. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: 'Login failed',
+        description: 'Google authentication failed. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const {
     register,
@@ -36,8 +72,8 @@ function LoginForm() {
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -48,12 +84,12 @@ function LoginForm() {
         onSuccess: () => router.push(callbackUrl),
         onError: (error) => {
           toast({
-            title: "Login failed",
+            title: 'Login failed',
             description:
               error instanceof Error
                 ? error.message
-                : "Invalid email or password. Please try again.",
-            variant: "destructive",
+                : 'Invalid email or password. Please try again.',
+            variant: 'destructive',
           });
         },
       },
@@ -61,7 +97,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden">
       <LogoWithText />
       <div className="flex flex-col space-y-1">
         <h1 className="text-2xl font-bold tracking-wide">Welcome back</h1>
@@ -74,7 +110,7 @@ function LoginForm() {
         <Button
           className="w-full"
           variant="outline"
-          onClick={loginWithGoogle}
+          onClick={() => googleLogin()}
           type="button"
         >
           <GoogleIcon />
@@ -83,7 +119,7 @@ function LoginForm() {
         <Button
           className="w-full"
           variant="outline"
-          onClick={loginWithGithub}
+          onClick={handleGithubLogin}
           type="button"
         >
           <GithubIcon />
@@ -110,7 +146,7 @@ function LoginForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            {...register("email")}
+            {...register('email')}
           />
           <FieldError>{errors.email?.message}</FieldError>
         </Field>
@@ -129,7 +165,7 @@ function LoginForm() {
             id="password"
             placeholder="Enter your password"
             autoComplete="current-password"
-            {...register("password")}
+            {...register('password')}
           />
           <FieldError>{errors.password?.message}</FieldError>
         </Field>
@@ -139,12 +175,12 @@ function LoginForm() {
           className="w-full"
           isLoading={loginMutation.isPending}
         >
-          {loginMutation.isPending ? "Signing in..." : "Sign In"}
+          {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        Don&apos;t have an account?{' '}
         <Link
           href="/register"
           className="font-medium text-foreground underline-offset-4 hover:underline"
@@ -154,18 +190,12 @@ function LoginForm() {
       </p>
 
       <p className="text-sm text-muted-foreground">
-        By clicking continue, you agree to our{" "}
-        <a
-          className="underline underline-offset-4 hover:text-primary"
-          href="#"
-        >
+        By clicking continue, you agree to our{' '}
+        <a className="underline underline-offset-4 hover:text-primary" href="#">
           Terms of Service
-        </a>{" "}
-        and{" "}
-        <a
-          className="underline underline-offset-4 hover:text-primary"
-          href="#"
-        >
+        </a>{' '}
+        and{' '}
+        <a className="underline underline-offset-4 hover:text-primary" href="#">
           Privacy Policy
         </a>
         .

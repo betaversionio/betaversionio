@@ -1,29 +1,69 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema } from "@devcom/shared";
-import type { RegisterInput } from "@devcom/shared";
-import { useAuth } from "@/providers/auth-provider";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Separator } from "@/components/ui/separator";
-import { LogoWithText } from "@/components/shared/logo-with-text";
-import { siteConfig } from "@/config/site";
-import { GoogleIcon, GithubIcon } from "@/features/auth";
-import { Loader2 } from "lucide-react";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registerSchema } from '@devcom/shared';
+import type { RegisterInput } from '@devcom/shared';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useAuth } from '@/providers/auth-provider';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Field, FieldLabel, FieldError } from '@/components/ui/field';
+import { Separator } from '@/components/ui/separator';
+import { LogoWithText } from '@/components/shared/logo-with-text';
+import { siteConfig } from '@/config/site';
+import { GoogleIcon, GithubIcon } from '@/features/auth';
+import { Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register: registerUser, loginWithGithub, loginWithGoogle } = useAuth();
+  const {
+    register: registerUser,
+    loginWithGithub,
+    loginWithGoogle,
+  } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleGithubLogin() {
+    try {
+      await loginWithGithub();
+      router.push('/dashboard');
+    } catch {
+      toast({
+        title: 'Registration failed',
+        description: 'GitHub authentication failed. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await loginWithGoogle(tokenResponse.access_token);
+        router.push('/dashboard');
+      } catch {
+        toast({
+          title: 'Registration failed',
+          description: 'Google authentication failed. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: 'Registration failed',
+        description: 'Google authentication failed. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const {
     register,
@@ -32,10 +72,10 @@ export default function RegisterPage() {
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
-      username: "",
-      email: "",
-      password: "",
+      name: '',
+      username: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -43,15 +83,15 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     try {
       await registerUser(data.email, data.password, data.username, data.name);
-      router.push("/dashboard");
+      router.push('/dashboard');
     } catch (error) {
       toast({
-        title: "Registration failed",
+        title: 'Registration failed',
         description:
           error instanceof Error
             ? error.message
-            : "Something went wrong. Please try again.",
-        variant: "destructive",
+            : 'Something went wrong. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -59,7 +99,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden">
       <LogoWithText />
       <div className="flex flex-col space-y-1">
         <h1 className="text-2xl font-bold tracking-wide">
@@ -74,7 +114,7 @@ export default function RegisterPage() {
         <Button
           className="w-full"
           variant="outline"
-          onClick={loginWithGoogle}
+          onClick={() => googleLogin()}
           type="button"
         >
           <GoogleIcon />
@@ -83,7 +123,7 @@ export default function RegisterPage() {
         <Button
           className="w-full"
           variant="outline"
-          onClick={loginWithGithub}
+          onClick={handleGithubLogin}
           type="button"
         >
           <GithubIcon />
@@ -110,7 +150,7 @@ export default function RegisterPage() {
             type="text"
             placeholder="John Doe"
             autoComplete="name"
-            {...register("name")}
+            {...register('name')}
           />
           <FieldError>{errors.name?.message}</FieldError>
         </Field>
@@ -122,7 +162,7 @@ export default function RegisterPage() {
             type="text"
             placeholder="johndoe"
             autoComplete="username"
-            {...register("username")}
+            {...register('username')}
           />
           <FieldError>{errors.username?.message}</FieldError>
         </Field>
@@ -134,7 +174,7 @@ export default function RegisterPage() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            {...register("email")}
+            {...register('email')}
           />
           <FieldError>{errors.email?.message}</FieldError>
         </Field>
@@ -145,7 +185,7 @@ export default function RegisterPage() {
             id="password"
             placeholder="Min. 8 characters"
             autoComplete="new-password"
-            {...register("password")}
+            {...register('password')}
           />
           <FieldError>{errors.password?.message}</FieldError>
         </Field>
@@ -157,13 +197,13 @@ export default function RegisterPage() {
               Creating account...
             </>
           ) : (
-            "Create Account"
+            'Create Account'
           )}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        Already have an account?{' '}
         <Link
           href="/login"
           className="font-medium text-foreground underline-offset-4 hover:underline"
@@ -173,18 +213,12 @@ export default function RegisterPage() {
       </p>
 
       <p className="text-sm text-muted-foreground">
-        By clicking continue, you agree to our{" "}
-        <a
-          className="underline underline-offset-4 hover:text-primary"
-          href="#"
-        >
+        By clicking continue, you agree to our{' '}
+        <a className="underline underline-offset-4 hover:text-primary" href="#">
           Terms of Service
-        </a>{" "}
-        and{" "}
-        <a
-          className="underline underline-offset-4 hover:text-primary"
-          href="#"
-        >
+        </a>{' '}
+        and{' '}
+        <a className="underline underline-offset-4 hover:text-primary" href="#">
           Privacy Policy
         </a>
         .
