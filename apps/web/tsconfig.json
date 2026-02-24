@@ -1,7 +1,6 @@
 {
   "extends": "@devcom/typescript-config/next.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

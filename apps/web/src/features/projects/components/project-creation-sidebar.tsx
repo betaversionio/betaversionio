@@ -20,6 +20,7 @@ interface ProjectCreationSidebarProps {
   onTabChange: (tab: ProjectFormTab) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  submitLabel?: string;
 }
 
 const tabs = [
@@ -42,7 +43,7 @@ function BackToProjects() {
 
   const link = (
     <Link
-      href="/projects"
+      href="/my-projects"
       className={cn(
         'mt-2 flex h-14 items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground',
         collapsed ? 'justify-center px-3' : 'mb-1 px-4',
@@ -77,6 +78,7 @@ function SidebarContent({
   onTabChange,
   onSubmit,
   isSubmitting,
+  submitLabel = 'Publish Project',
 }: ProjectCreationSidebarProps) {
   const { collapsed } = useSidebar();
 
@@ -149,7 +151,7 @@ function SidebarContent({
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p>{isSubmitting ? 'Publishing...' : 'Publish Project'}</p>
+              <p>{isSubmitting ? 'Saving...' : submitLabel}</p>
             </TooltipContent>
           </Tooltip>
         ) : (
@@ -162,10 +164,10 @@ function SidebarContent({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Publishing...
+                Saving...
               </>
             ) : (
-              'Publish Project'
+              submitLabel
             )}
           </Button>
         )}

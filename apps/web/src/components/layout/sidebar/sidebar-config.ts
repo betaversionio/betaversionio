@@ -35,7 +35,7 @@ export const navGroups: NavGroup[] = [
   {
     title: 'Work',
     items: [
-      { icon: Kanban, label: 'Projects', href: '/projects' },
+      { icon: Kanban, label: 'Projects', href: '/my-projects' },
       { icon: Document, label: 'Resume', href: '/resume' },
     ],
   },

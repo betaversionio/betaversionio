@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
-import { Refresh, Message } from 'iconsax-react';
+import { Message } from 'iconsax-react';
 import { PostComposer, PostCard, FeedSidebar, useFeed } from '@/features/feed';
+import { Loader2 } from 'lucide-react';
 
 export default function FeedPage() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -35,11 +36,7 @@ export default function FeedPage() {
         {/* Feed */}
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Refresh
-              size={24}
-              color="currentColor"
-              className="animate-spin text-muted-foreground"
-            />
+            <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
           </div>
         ) : allPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-16 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.04)]">
@@ -64,11 +61,7 @@ export default function FeedPage() {
 
             <div ref={loadMoreRef} className="py-6 text-center">
               {isFetchingNextPage ? (
-                <Refresh
-                  size={20}
-                  color="currentColor"
-                  className="mx-auto animate-spin text-muted-foreground"
-                />
+                <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
               ) : hasNextPage ? (
                 <p className="text-xs text-muted-foreground/60">
                   Scroll for more

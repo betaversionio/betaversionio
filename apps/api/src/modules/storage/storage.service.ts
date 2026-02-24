@@ -1,18 +1,20 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  PutBucketCorsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 @Injectable()
-export class StorageService {
+export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
   private readonly publicUrl: string;
+  private readonly appOrigin: string;
 
   constructor(private readonly configService: ConfigService) {
     const accountId = this.configService.get<string>("R2_ACCOUNT_ID");
@@ -23,6 +25,9 @@ export class StorageService {
 
     this.bucketName = this.configService.get<string>("R2_BUCKET_NAME")!;
     this.publicUrl = this.configService.get<string>("R2_PUBLIC_URL")!;
+    this.appOrigin =
+      this.configService.get<string>("NEXT_PUBLIC_APP_URL") ||
+      "http://localhost:3000";
 
     this.s3Client = new S3Client({
       region: "auto",
@@ -34,6 +39,35 @@ export class StorageService {
     });
 
     this.logger.log("StorageService initialized with Cloudflare R2");
+  }
+
+  async onModuleInit() {
+    await this.configureBucketCors();
+  }
+
+  private async configureBucketCors() {
+    try {
+      const command = new PutBucketCorsCommand({
+        Bucket: this.bucketName,
+        CORSConfiguration: {
+          CORSRules: [
+            {
+              AllowedOrigins: [this.appOrigin],
+              AllowedMethods: ["PUT"],
+              AllowedHeaders: ["Content-Type"],
+              MaxAgeSeconds: 3600,
+            },
+          ],
+        },
+      });
+
+      await this.s3Client.send(command);
+      this.logger.log(
+        `Bucket CORS configured for origin: ${this.appOrigin}`,
+      );
+    } catch (error) {
+      this.logger.error("Failed to configure bucket CORS", error);
+    }
   }
 
   /**

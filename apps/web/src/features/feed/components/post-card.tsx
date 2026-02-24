@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Markdown } from '@/components/ui/markdown';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import { Heart, Message, Send2, More } from 'iconsax-react';
 import type { PostData } from '../types';
-import { getInitials, timeAgo, formatCount } from '../utils';
+import { timeAgo, formatCount } from '../utils';
 import { reactionConfig, postTypeLabels } from '../config';
 
 function PostComments({
@@ -44,12 +44,12 @@ function PostComments({
         <div className="space-y-3 px-4 pt-3">
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-2.5">
-              <Avatar className="h-7 w-7 shrink-0">
-                <AvatarImage src={comment.author.avatarUrl ?? undefined} />
-                <AvatarFallback className="text-[9px]">
-                  {getInitials(comment.author.name)}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                src={comment.author.avatarUrl}
+                name={comment.author.name}
+                className="h-7 w-7 shrink-0"
+                fallbackClassName="text-[9px]"
+              />
               <div className="min-w-0 flex-1">
                 <div className="rounded-xl bg-muted/50 px-3 py-2">
                   <span className="text-xs font-semibold">
@@ -69,12 +69,12 @@ function PostComments({
       {/* Comment input */}
       <div className="px-4 py-3">
         <div className="flex gap-2.5">
-          <Avatar className="h-8 w-8 shrink-0">
-            <AvatarImage src={user?.avatarUrl ?? undefined} />
-            <AvatarFallback className="text-[10px]">
-              {getInitials(user?.name)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={user?.avatarUrl}
+            name={user?.name}
+            className="h-8 w-8 shrink-0"
+            fallbackClassName="text-[10px]"
+          />
           <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border bg-muted/50 px-3 py-1">
             <input
               type="text"
@@ -131,12 +131,12 @@ export function PostCard({ post }: { post: PostData }) {
     <Card className="rounded-xl">
       {/* Author header */}
       <div className="flex items-start gap-3 px-4 pt-4">
-        <Avatar className="h-10 w-10 shrink-0">
-          <AvatarImage src={post.author.avatarUrl ?? undefined} />
-          <AvatarFallback className="text-xs">
-            {getInitials(post.author.name)}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          src={post.author.avatarUrl}
+          name={post.author.name}
+          className="h-10 w-10 shrink-0"
+          fallbackClassName="text-xs"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold">

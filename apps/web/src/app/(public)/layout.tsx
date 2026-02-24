@@ -1,5 +1,5 @@
 import { Header } from '@/components/shared/header';
-import { Footer } from '@/components/shared/footer';
+import { Footer } from '@/components/layout/footer';
 
 export default function PublicLayout({
   children,
@@ -7,7 +7,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto [scrollbar-gutter:stable]">
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

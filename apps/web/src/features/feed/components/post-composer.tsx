@@ -13,7 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import {
   Select,
   SelectContent,
@@ -24,13 +24,11 @@ import {
 import {
   CloseCircle,
   Hashtag,
-  Refresh,
   Gallery,
   VideoPlay,
   Code1,
   Send2,
 } from 'iconsax-react';
-import { getInitials } from '../utils';
 import { postTypeLabels } from '../config';
 
 const quickActions: {
@@ -141,12 +139,12 @@ export function PostComposer() {
     <Card className="rounded-xl p-4">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex gap-3">
-          <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={user?.avatarUrl ?? undefined} />
-            <AvatarFallback className="text-xs">
-              {getInitials(user?.name)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={user?.avatarUrl}
+            name={user?.name}
+            className="h-10 w-10 shrink-0"
+            fallbackClassName="text-xs"
+          />
 
           <div className="min-w-0 flex-1">
             {!isExpanded ? (
@@ -284,21 +282,14 @@ export function PostComposer() {
                       type="submit"
                       size="sm"
                       className="h-8 rounded-full px-4 text-xs"
-                      disabled={createPost.isPending || !content?.trim()}
+                      disabled={!content?.trim()}
+                      isLoading={createPost.isPending}
                     >
-                      {createPost.isPending ? (
-                        <Refresh
-                          size={14}
-                          color="currentColor"
-                          className="mr-1.5 animate-spin"
-                        />
-                      ) : (
-                        <Send2
-                          size={14}
-                          color="currentColor"
-                          className="mr-1.5"
-                        />
-                      )}
+                      <Send2
+                        size={14}
+                        color="currentColor"
+                        className="mr-1.5"
+                      />
                       Post
                     </Button>
                   </div>

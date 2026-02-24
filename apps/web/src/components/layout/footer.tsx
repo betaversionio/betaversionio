@@ -89,15 +89,14 @@ export function Footer() {
 }
 
 const platform = [
-  { title: 'Explore', href: '/explore' },
   { title: 'Feed', href: '/feed' },
   { title: 'Projects', href: '/projects' },
   { title: 'Resume Builder', href: '/resume' },
 ];
 
 const company = [
-  { title: 'About', href: '#' },
-  { title: 'Blog', href: '#' },
+  { title: 'About', href: '/about' },
+  { title: 'Blog', href: '/blog' },
   { title: 'Privacy Policy', href: '/privacy' },
   { title: 'Terms of Service', href: '/terms' },
   { title: 'Cookie Policy', href: '/cookies' },

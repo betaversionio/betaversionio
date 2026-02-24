@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/providers/auth-provider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,16 +15,6 @@ import {
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { useSidebar } from './sidebar/sidebar-context';
 import { HambergerMenu, User, Logout } from 'iconsax-react';
-
-function getInitials(name: string | null | undefined): string {
-  if (!name) return 'U';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export function DashboardHeader() {
   const { user, logout } = useAuth();
@@ -52,15 +42,12 @@ export function DashboardHeader() {
               variant="ghost"
               className="relative h-8 w-8 rounded-full"
             >
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={user?.avatarUrl ?? undefined}
-                  alt={user?.name ?? user?.username ?? 'User'}
-                />
-                <AvatarFallback className="text-xs">
-                  {getInitials(user?.name)}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                src={user?.avatarUrl}
+                name={user?.name}
+                className="h-8 w-8"
+                fallbackClassName="text-xs"
+              />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">

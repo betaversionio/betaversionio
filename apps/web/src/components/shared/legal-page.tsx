@@ -1,4 +1,5 @@
 import { Markdown } from '@/components/ui/markdown';
+import { HeroSection } from '@/components/ui/hero-section';
 import { siteConfig } from '@/config/site';
 
 interface LegalPageProps {
@@ -23,31 +24,14 @@ export function LegalPage({
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b py-20 md:py-28">
-        {/* Radial spotlight */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--foreground)/0.06),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_top,hsl(var(--foreground)/0.1),transparent_55%)]" />
-        </div>
-
-        {/* Grid background with mask */}
-        <div
-          className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)]"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
-              linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px)
-            `,
-            backgroundSize: '4rem 4rem',
-          }}
-        />
-
-        <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+      <HeroSection>
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
             {title} <span className="text-primary">{highlightedText}</span>
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">{description}</p>
         </div>
-      </section>
+      </HeroSection>
 
       {/* Content */}
       <section className="py-16 md:py-20">

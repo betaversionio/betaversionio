@@ -92,10 +92,19 @@ export class ProjectService {
     search?: string,
     status?: string,
     tags?: string,
+    authorId?: string,
+    phase?: string,
+    productionType?: string,
+    sort?: string,
+    currentUserId?: string,
   ) {
     const where: Record<string, unknown> = {
       deletedAt: null,
     };
+
+    if (authorId) {
+      where.authorId = authorId;
+    }
 
     if (search) {
       where.OR = [
@@ -104,13 +113,45 @@ export class ProjectService {
       ];
     }
 
+    const isOwner = authorId && currentUserId && authorId === currentUserId;
+
     if (status) {
       where.status = status;
+    } else if (isOwner) {
+      // Owner viewing their own projects: show all statuses
+    } else {
+      // Public browsing: exclude Draft and Archived
+      where.status = { notIn: ["Draft", "Archived"] };
     }
 
     if (tags) {
       const tagList = tags.split(",").map((t) => t.trim());
       where.tags = { hasSome: tagList };
+    }
+
+    if (phase) {
+      where.phase = phase;
+    }
+
+    if (productionType) {
+      where.productionType = productionType;
+    }
+
+    // Sorting logic
+    let orderBy: Record<string, string> | Record<string, string>[];
+    switch (sort) {
+      case "likes":
+        orderBy = { upvotesCount: "desc" };
+        break;
+      case "trending":
+        orderBy = [
+          { upvotesCount: "desc" },
+          { commentsCount: "desc" },
+          { createdAt: "desc" },
+        ];
+        break;
+      default:
+        orderBy = { createdAt: "desc" };
     }
 
     const [items, total] = await Promise.all([
@@ -122,7 +163,7 @@ export class ProjectService {
             include: { user: { select: AUTHOR_SELECT } },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy,
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -142,28 +183,15 @@ export class ProjectService {
 
   /**
    * Find a single project by its slug, including makers and threaded comments.
+   * When userId is provided, also checks whether the user has upvoted.
    */
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, userId?: string) {
     const project = await this.prisma.project.findUnique({
       where: { slug },
       include: {
         author: { select: AUTHOR_SELECT },
         makers: {
           include: { user: { select: AUTHOR_SELECT } },
-        },
-        comments: {
-          where: { deletedAt: null, parentId: null },
-          include: {
-            author: { select: AUTHOR_SELECT },
-            replies: {
-              where: { deletedAt: null },
-              include: {
-                author: { select: AUTHOR_SELECT },
-              },
-              orderBy: { createdAt: "asc" },
-            },
-          },
-          orderBy: { createdAt: "asc" },
         },
       },
     });
@@ -172,15 +200,25 @@ export class ProjectService {
       throw new NotFoundException("Project not found");
     }
 
-    return project;
+    const comments = await this.buildCommentTree(project.id);
+
+    let hasVoted = false;
+    if (userId) {
+      const vote = await this.prisma.projectVote.findUnique({
+        where: { projectId_userId: { projectId: project.id, userId } },
+      });
+      hasVoted = vote !== null && vote.value === 1;
+    }
+
+    return { ...project, comments, hasVoted };
   }
 
   /**
    * Update a project. Only the author can update.
    */
-  async update(id: string, userId: string, dto: UpdateProjectInput) {
+  async update(slug: string, userId: string, dto: UpdateProjectInput) {
     const project = await this.prisma.project.findUnique({
-      where: { id },
+      where: { slug },
     });
 
     if (!project || project.deletedAt) {
@@ -202,7 +240,7 @@ export class ProjectService {
     }
 
     return this.prisma.project.update({
-      where: { id },
+      where: { id: project.id },
       data: {
         ...(dto.title !== undefined && { title: dto.title }),
         ...(dto.slug !== undefined && { slug: dto.slug }),
@@ -464,7 +502,7 @@ export class ProjectService {
 
   /**
    * Get comments for a project with offset pagination.
-   * Top-level comments with nested replies.
+   * Top-level comments with fully nested reply trees.
    */
   async getComments(projectId: string, page: number, limit: number) {
     const project = await this.prisma.project.findUnique({
@@ -475,31 +513,16 @@ export class ProjectService {
       throw new NotFoundException("Project not found");
     }
 
-    const where = {
-      projectId,
-      deletedAt: null,
-      parentId: null,
-    };
+    const total = await this.prisma.projectComment.count({
+      where: { projectId, deletedAt: null, parentId: null },
+    });
 
-    const [items, total] = await Promise.all([
-      this.prisma.projectComment.findMany({
-        where,
-        include: {
-          author: { select: AUTHOR_SELECT },
-          replies: {
-            where: { deletedAt: null },
-            include: {
-              author: { select: AUTHOR_SELECT },
-            },
-            orderBy: { createdAt: "asc" as const },
-          },
-        },
-        orderBy: { createdAt: "desc" as const },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      this.prisma.projectComment.count({ where }),
-    ]);
+    const roots = await this.buildCommentTree(projectId);
+    roots.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    const items = roots.slice((page - 1) * limit, page * limit);
 
     return {
       items,
@@ -510,5 +533,40 @@ export class ProjectService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /**
+   * Fetch all comments for a project and build a nested tree.
+   */
+  private async buildCommentTree(projectId: string) {
+    const allComments = await this.prisma.projectComment.findMany({
+      where: { projectId, deletedAt: null },
+      include: {
+        author: { select: AUTHOR_SELECT },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    type CommentNode = (typeof allComments)[number] & {
+      replies: CommentNode[];
+    };
+
+    const map = new Map<string, CommentNode>();
+    const roots: CommentNode[] = [];
+
+    for (const c of allComments) {
+      map.set(c.id, { ...c, replies: [] });
+    }
+
+    for (const c of allComments) {
+      const node = map.get(c.id)!;
+      if (c.parentId && map.has(c.parentId)) {
+        map.get(c.parentId)!.replies.push(node);
+      } else if (!c.parentId) {
+        roots.push(node);
+      }
+    }
+
+    return roots;
   }
 }

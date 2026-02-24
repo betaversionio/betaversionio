@@ -17,6 +17,14 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     ]);
 
     if (isPublic) {
+      // Still try to authenticate so @CurrentUser() is populated when a
+      // valid token is present, but never reject the request.
+      const result = super.canActivate(context);
+
+      if (result instanceof Promise) {
+        return result.catch(() => true);
+      }
+
       return true;
     }
 

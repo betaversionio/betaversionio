@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/auth-provider";
-import { Refresh } from "iconsax-react";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/auth-provider';
+import { Loader2 } from 'lucide-react';
 
 export default function ProjectCreateLayout({
   children,
@@ -16,7 +16,7 @@ export default function ProjectCreateLayout({
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push(
-        "/login?callbackUrl=" + encodeURIComponent(window.location.pathname),
+        '/login?callbackUrl=' + encodeURIComponent(window.location.pathname),
       );
     }
   }, [isLoading, isAuthenticated, router]);
@@ -24,7 +24,7 @@ export default function ProjectCreateLayout({
   if (isLoading) {
     return (
       <div className="flex h-dvh items-center justify-center">
-        <Refresh size={32} color="currentColor" className="animate-spin text-muted-foreground" />
+        <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
       </div>
     );
   }

@@ -3,17 +3,12 @@
 import { use } from 'react';
 import Link from 'next/link';
 import { useUserProfile } from '@/hooks/queries/use-user-queries';
+import { useProjects } from '@/hooks/queries/use-project-queries';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import { Separator } from '@/components/ui/separator';
+import { ProjectCard } from '@/features/projects/components/project-card';
 import {
   MapPin,
   Globe,
@@ -22,18 +17,7 @@ import {
   Twitter,
   ExternalLink,
   Loader2,
-  FolderKanban,
 } from 'lucide-react';
-
-function getInitials(name: string | null | undefined): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 const socialIcons: Record<string, React.ElementType> = {
   Github: Github,
@@ -50,14 +34,6 @@ const proficiencyColors: Record<string, string> = {
   Expert: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
 };
 
-const statusColors: Record<string, string> = {
-  Draft:
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  Active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  Completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  Archived: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-};
-
 export default function PublicProfilePage({
   params,
 }: {
@@ -65,6 +41,10 @@ export default function PublicProfilePage({
 }) {
   const { username } = use(params);
   const { data: profile, isLoading, error } = useUserProfile(username);
+  const { data: projectsData } = useProjects(
+    { authorId: profile?.id ?? '' },
+    { enabled: !!profile },
+  );
 
   if (isLoading) {
     return (
@@ -93,12 +73,12 @@ export default function PublicProfilePage({
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Profile Header */}
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
-          <Avatar className="h-24 w-24 md:h-32 md:w-32">
-            <AvatarImage src={profile.avatarUrl ?? undefined} />
-            <AvatarFallback className="text-2xl">
-              {getInitials(profile.name)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={profile.avatarUrl}
+            name={profile.name}
+            className="h-24 w-24 md:h-32 md:w-32"
+            fallbackClassName="text-2xl"
+          />
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-3xl font-bold">{profile.name}</h1>
             <p className="text-lg text-muted-foreground">@{profile.username}</p>
@@ -178,58 +158,20 @@ export default function PublicProfilePage({
         )}
 
         {/* Projects */}
-        {profile.projects.length > 0 && (
+        {projectsData && projectsData.items.length > 0 && (
           <section>
             <h2 className="mb-4 text-xl font-semibold">Projects</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              {profile.projects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="transition-shadow hover:shadow-md"
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <FolderKanban className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="line-clamp-1 text-base">
-                          {project.title}
-                        </CardTitle>
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className={statusColors[project.status] ?? ''}
-                      >
-                        {project.status}
-                      </Badge>
-                    </div>
-                    {project.shortDescription && (
-                      <CardDescription className="line-clamp-2">
-                        {project.shortDescription}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-1">
-                      {project.techStack.slice(0, 5).map((tech) => (
-                        <Badge key={tech} variant="outline" className="text-xs">
-                          {tech}
-                        </Badge>
-                      ))}
-                      {project.techStack.length > 5 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{project.techStack.length - 5}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+              {projectsData.items.map((project) => (
+                <ProjectCard key={project.id} project={project} />
               ))}
             </div>
           </section>
         )}
 
         {/* Empty state */}
-        {profile.techStack.length === 0 && profile.projects.length === 0 && (
+        {profile.techStack.length === 0 &&
+          (!projectsData || projectsData.items.length === 0) && (
           <div className="py-12 text-center">
             <p className="text-muted-foreground">
               This developer hasn&apos;t added any content yet.

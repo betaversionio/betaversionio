@@ -2,7 +2,7 @@
 
 import { Logout } from 'iconsax-react';
 import { useAuth } from '@/providers/auth-provider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -15,16 +15,6 @@ interface SidebarFooterProps {
   onLogout: () => void;
 }
 
-function getInitials(name: string | null | undefined): string {
-  if (!name) return 'U';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 export function SidebarFooter({ onLogout }: SidebarFooterProps) {
   const { collapsed } = useSidebar();
   const { user } = useAuth();
@@ -35,15 +25,12 @@ export function SidebarFooter({ onLogout }: SidebarFooterProps) {
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <div className="flex justify-center">
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarImage
-                  src={user?.avatarUrl ?? undefined}
-                  alt={user?.name ?? user?.username ?? 'User'}
-                />
-                <AvatarFallback className="text-xs">
-                  {getInitials(user?.name)}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                src={user?.avatarUrl}
+                name={user?.name}
+                className="h-8 w-8 shrink-0"
+                fallbackClassName="text-xs"
+              />
             </div>
           </TooltipTrigger>
           <TooltipContent side="right">
@@ -72,15 +59,12 @@ export function SidebarFooter({ onLogout }: SidebarFooterProps) {
   return (
     <div className="border-t border-border p-2">
       <div className="flex items-center gap-3 rounded-md p-2">
-        <Avatar className="h-8 w-8 shrink-0">
-          <AvatarImage
-            src={user?.avatarUrl ?? undefined}
-            alt={user?.name ?? user?.username ?? 'User'}
-          />
-          <AvatarFallback className="text-xs">
-            {getInitials(user?.name)}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          src={user?.avatarUrl}
+          name={user?.name}
+          className="h-8 w-8 shrink-0"
+          fallbackClassName="text-xs"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">
             {user?.name ?? user?.username}

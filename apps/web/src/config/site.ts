@@ -6,8 +6,8 @@ export const siteConfig = {
   ogImage: '/opengraph-image.png',
   logo: '/icon.svg',
   links: {
-    twitter: 'https://twitter.com/betaversion_io',
-    github: 'https://github.com/betaversion-io',
+    twitter: 'https://x.com/betaversion_io',
+    github: 'https://github.com/betaversionio',
     discord: 'https://discord.gg/betaversion',
   },
   keywords: [

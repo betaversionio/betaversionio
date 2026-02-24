@@ -87,7 +87,7 @@ export default function CreateProjectPage() {
         title: 'Project created',
         description: 'Your project has been published successfully.',
       });
-      router.push('/projects');
+      router.push('/my-projects');
     } catch (error) {
       toast({
         title: 'Failed to create project',

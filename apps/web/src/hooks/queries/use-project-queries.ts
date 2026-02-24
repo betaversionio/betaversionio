@@ -12,21 +12,21 @@ import type {
   ToggleProjectVoteInput,
 } from "@devcom/shared";
 
-interface ProjectAuthor {
+export interface ProjectAuthor {
   id: string;
   username: string;
   name: string | null;
   avatarUrl: string | null;
 }
 
-interface ProjectMaker {
+export interface ProjectMaker {
   id: string;
   userId: string;
   role: string;
   user: ProjectAuthor;
 }
 
-interface ProjectComment {
+export interface ProjectComment {
   id: string;
   projectId: string;
   authorId: string;
@@ -38,7 +38,7 @@ interface ProjectComment {
   updatedAt: string;
 }
 
-interface Project {
+export interface Project {
   id: string;
   title: string;
   slug: string;
@@ -60,6 +60,7 @@ interface Project {
   author: ProjectAuthor;
   makers: ProjectMaker[];
   comments?: ProjectComment[];
+  hasVoted?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -74,7 +75,7 @@ interface PaginatedProjects {
   };
 }
 
-interface PaginatedComments {
+export interface PaginatedComments {
   items: ProjectComment[];
   meta: {
     page: number;
@@ -91,6 +92,9 @@ interface ProjectFilters {
   tags?: string;
   page?: number;
   limit?: number;
+  phase?: string;
+  productionType?: string;
+  sort?: string;
 }
 
 export const projectKeys = {
@@ -104,13 +108,17 @@ export const projectKeys = {
     [...projectKeys.all, "comments", projectId] as const,
 };
 
-export function useProjects(filters: ProjectFilters = {}) {
+export function useProjects(
+  filters: ProjectFilters = {},
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: projectKeys.list(filters),
     queryFn: () =>
       apiClient.get<PaginatedProjects>("/projects", {
         params: filters as Record<string, string | number | boolean | undefined>,
       } as never),
+    enabled: options?.enabled,
   });
 }
 

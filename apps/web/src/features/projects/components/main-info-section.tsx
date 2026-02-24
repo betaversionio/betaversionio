@@ -5,8 +5,6 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { CreateProjectInput } from '@devcom/shared';
 import { ProjectStatus, ProjectPhase, ProductionType } from '@devcom/shared';
 import { AvatarUpload } from '@/components/patterns/p-file-upload-2';
-import { useUploadToR2 } from '@/hooks/use-upload-to-r2';
-import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import {
   Field,
@@ -51,9 +49,6 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
     formState: { errors },
   } = form;
 
-  const { toast } = useToast();
-  const logoUpload = useUploadToR2({ folder: 'projects/logos' });
-
   const [tagInput, setTagInput] = useState('');
   const [techInput, setTechInput] = useState('');
   const [linkInput, setLinkInput] = useState('');
@@ -66,6 +61,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
   const phase = watch('phase');
   const productionType = watch('productionType');
   const isOpenSource = watch('isOpenSource');
+  const logo = watch('logo');
   const description = watch('description') ?? '';
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -134,27 +130,11 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
           <AvatarUpload
             maxSize={2 * 1024 * 1024}
             rounded="md"
-            onFileChange={async (file) => {
-              if (!file || !(file.file instanceof File)) {
-                setValue('logo', undefined);
-                return;
-              }
-              try {
-                const publicUrl = await logoUpload.upload(file.file);
-                setValue('logo', publicUrl);
-              } catch {
-                toast({
-                  title: 'Logo upload failed',
-                  description: 'Could not upload your logo. Please try again.',
-                  variant: 'destructive',
-                });
-              }
-            }}
+            defaultAvatar={logo}
+            uploadFolder="projects/logos"
+            onUpload={(url) => setValue('logo', url)}
           />
-          {logoUpload.isUploading && (
-            <p className="text-xs text-muted-foreground">Uploading logo...</p>
-          )}
-          {errors.logo && <FieldError>{errors.logo.message}</FieldError>}
+          <FieldError>{errors.logo?.message}</FieldError>
         </Field>
 
         {/* Title */}
@@ -166,7 +146,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
             value={title}
             onChange={handleTitleChange}
           />
-          {errors.title && <FieldError>{errors.title.message}</FieldError>}
+          <FieldError>{errors.title?.message}</FieldError>
         </Field>
 
         {/* Slug */}
@@ -180,7 +160,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
           <FieldDescription>
             Auto-generated from title. Used in the project URL.
           </FieldDescription>
-          {errors.slug && <FieldError>{errors.slug.message}</FieldError>}
+          <FieldError>{errors.slug?.message}</FieldError>
         </Field>
 
         {/* Tagline */}
@@ -191,7 +171,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
             placeholder="A short, catchy summary of your project"
             {...register('tagline')}
           />
-          {errors.tagline && <FieldError>{errors.tagline.message}</FieldError>}
+          <FieldError>{errors.tagline?.message}</FieldError>
         </Field>
       </FieldGroup>
 
@@ -213,9 +193,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
             height={240}
             maxHeight={480}
           />
-          {errors.description && (
-            <FieldError>{errors.description.message}</FieldError>
-          )}
+          <FieldError>{errors.description?.message}</FieldError>
         </Field>
       </FieldGroup>
 
@@ -329,7 +307,7 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
               <Plus className="h-4 w-4" />
             </Button>
           </div>
-          {errors.links && <FieldError>{errors.links.message}</FieldError>}
+          <FieldError>{errors.links?.message}</FieldError>
         </Field>
       </FieldGroup>
 

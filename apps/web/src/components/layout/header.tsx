@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/providers/auth-provider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,12 +24,12 @@ import {
   DashboardSquare01Icon,
   Settings01Icon,
   Logout01Icon,
-  CompassIcon,
   RssIcon,
+  KanbanIcon,
 } from '@hugeicons/core-free-icons';
 
 const navLinks = [
-  { href: '/explore', label: 'Explore', icon: CompassIcon },
+  { href: '/projects', label: 'Projects', icon: KanbanIcon },
   { href: '/feed', label: 'Feed', icon: RssIcon },
 ];
 
@@ -43,16 +43,6 @@ export function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  function getInitials(name: string | null | undefined): string {
-    if (!name) return 'U';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  }
 
   return (
     <header
@@ -106,15 +96,12 @@ export function Header() {
                   variant="ghost"
                   className="relative ml-1 h-8 w-8 rounded-full"
                 >
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage
-                      src={user.avatarUrl ?? undefined}
-                      alt={user.name ?? user.username}
-                    />
-                    <AvatarFallback className="text-[10px]">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    src={user.avatarUrl}
+                    name={user.name}
+                    className="h-7 w-7"
+                    fallbackClassName="text-[10px]"
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-52" align="end" forceMount>

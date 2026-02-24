@@ -12,29 +12,16 @@ import {
   FieldGroup,
   FieldTitle,
 } from '@/components/ui/field';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared/user-avatar';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Search, Users } from 'lucide-react';
 
 interface MakersSectionProps {
   form: UseFormReturn<CreateProjectInput>;
+  initialMakerUsers?: Record<string, FoundUser>;
 }
 
-function getInitials(name: string | null | undefined): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-interface FoundUser {
+export interface FoundUser {
   id: string;
   username: string;
   name: string | null;
@@ -42,7 +29,7 @@ interface FoundUser {
   headline: string | null;
 }
 
-export function MakersSection({ form }: MakersSectionProps) {
+export function MakersSection({ form, initialMakerUsers }: MakersSectionProps) {
   const { setValue, watch } = form;
   const makers = watch('makers') ?? [];
 
@@ -77,7 +64,7 @@ export function MakersSection({ form }: MakersSectionProps) {
 
   const [makerDisplayMap, setMakerDisplayMap] = useState<
     Record<string, FoundUser>
-  >({});
+  >(initialMakerUsers ?? {});
 
   function selectUser(user: FoundUser) {
     setSelectedUser(user);
@@ -123,12 +110,12 @@ export function MakersSection({ form }: MakersSectionProps) {
                   className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-muted"
                   onClick={() => selectUser(user)}
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatarUrl ?? undefined} />
-                    <AvatarFallback className="text-[10px]">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    src={user.avatarUrl}
+                    name={user.name}
+                    className="h-8 w-8"
+                    fallbackClassName="text-[10px]"
+                  />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">
                       {user.name ?? user.username}
@@ -185,12 +172,12 @@ export function MakersSection({ form }: MakersSectionProps) {
                   className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/30"
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={display?.avatarUrl ?? undefined} />
-                      <AvatarFallback className="text-xs">
-                        {getInitials(display?.name)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      src={display?.avatarUrl}
+                      name={display?.name}
+                      className="h-9 w-9"
+                      fallbackClassName="text-xs"
+                    />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">
                         {display?.name ?? display?.username ?? maker.userId}

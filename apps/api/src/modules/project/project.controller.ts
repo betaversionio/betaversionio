@@ -49,34 +49,55 @@ export class ProjectController {
   @Public()
   @Get()
   async findAll(
+    @CurrentUser("id") userId: string | undefined,
     @Query("page") page?: string,
     @Query("limit") limit?: string,
     @Query("search") search?: string,
     @Query("status") status?: string,
     @Query("tags") tags?: string,
+    @Query("authorId") authorId?: string,
+    @Query("phase") phase?: string,
+    @Query("productionType") productionType?: string,
+    @Query("sort") sort?: string,
   ) {
     const pageNum = page ? parseInt(page, 10) : PAGINATION.DEFAULT_PAGE;
     const limitNum = limit
       ? Math.min(parseInt(limit, 10), PAGINATION.MAX_LIMIT)
       : PAGINATION.DEFAULT_LIMIT;
 
-    return this.projectService.findAll(pageNum, limitNum, search, status, tags);
+    const resolvedAuthorId = authorId === "me" ? userId : authorId;
+
+    return this.projectService.findAll(
+      pageNum,
+      limitNum,
+      search,
+      status,
+      tags,
+      resolvedAuthorId,
+      phase,
+      productionType,
+      sort,
+      userId,
+    );
   }
 
   @Public()
   @Get(":slug")
-  async findBySlug(@Param("slug") slug: string) {
-    return this.projectService.findBySlug(slug);
+  async findBySlug(
+    @Param("slug") slug: string,
+    @CurrentUser("id") userId: string | undefined,
+  ) {
+    return this.projectService.findBySlug(slug, userId);
   }
 
-  @Patch(":id")
+  @Patch(":slug")
   async update(
-    @Param("id") id: string,
+    @Param("slug") slug: string,
     @CurrentUser("id") userId: string,
     @Body() body: UpdateProjectInput,
   ) {
     const dto = updateProjectSchema.parse(body);
-    return this.projectService.update(id, userId, dto);
+    return this.projectService.update(slug, userId, dto);
   }
 
   @Delete(":id")

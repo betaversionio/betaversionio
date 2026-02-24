@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   formatBytes,
   useFileUpload,
+  type FileMetadata,
   type FileWithPreview,
 } from '@/hooks/use-file-upload';
-import { Alert, AlertDescription, AlertTitle } from '@/components/reui/alert';
+import { useUploadToR2 } from '@/hooks/use-upload-to-r2';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,7 +19,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
-import { CircleAlert, ImageIcon, Upload, X, ZoomIn } from 'lucide-react';
+import {
+  CircleAlert,
+  ImageIcon,
+  Loader2,
+  Upload,
+  X,
+  ZoomIn,
+} from 'lucide-react';
 
 interface GalleryUploadProps {
   maxFiles?: number;
@@ -26,6 +35,12 @@ interface GalleryUploadProps {
   multiple?: boolean;
   className?: string;
   onFilesChange?: (files: FileWithPreview[]) => void;
+  /** R2 folder path — when provided, files are auto-uploaded to R2 */
+  uploadFolder?: string;
+  /** Called with the list of public URLs whenever the set changes */
+  onUpload?: (urls: string[]) => void;
+  /** Pre-existing image URLs to display (e.g. from an existing project) */
+  initialUrls?: string[];
 }
 
 export function GalleryUpload({
@@ -35,12 +50,99 @@ export function GalleryUpload({
   multiple = true,
   className,
   onFilesChange,
+  uploadFolder,
+  onUpload,
+  initialUrls,
 }: GalleryUploadProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loadingImages, setLoadingImages] = useState<Record<string, boolean>>(
     {},
   );
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+
+  // ─── R2 upload state ─────────────────────────────────────────────────────────
+  const r2 = useUploadToR2({ folder: uploadFolder ?? '' });
+
+  // fileId → R2 public URL
+  const uploadedUrls = useRef<Map<string, string>>(new Map());
+  // IDs currently being uploaded (ref for async correctness, state for UI)
+  const inFlightIds = useRef<Set<string>>(new Set());
+  const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
+  // Latest file list (ref so async callbacks see current value)
+  const filesRef = useRef<FileWithPreview[]>([]);
+
+  // Convert initialUrls → FileMetadata for the useFileUpload hook (runs once)
+  const [initialFileEntries] = useState<FileMetadata[]>(() => {
+    const entries = (initialUrls ?? []).map((url, i) => ({
+      id: `existing-${i}`,
+      name: url.split('/').pop() ?? `image-${i}`,
+      size: 0,
+      type: 'image/jpeg',
+      url,
+    }));
+    // Pre-populate the URL map so existing images are in the output from the start
+    entries.forEach((f) => uploadedUrls.current.set(f.id, f.url));
+    return entries;
+  });
+
+  // Emit the current URL list derived from the latest files + uploadedUrls map
+  const emitUrls = useCallback(() => {
+    if (!onUpload) return;
+    const urls = filesRef.current
+      .map((f) => uploadedUrls.current.get(f.id))
+      .filter((url): url is string => !!url);
+    onUpload(urls);
+  }, [onUpload]);
+
+  // Intercept file changes to handle R2 uploads when uploadFolder is set
+  const handleFilesChanged = useCallback(
+    async (files: FileWithPreview[]) => {
+      filesRef.current = files;
+      onFilesChange?.(files);
+
+      if (!uploadFolder) return;
+
+      // Remove entries for files that were deleted
+      const currentIds = new Set(files.map((f) => f.id));
+      for (const id of uploadedUrls.current.keys()) {
+        if (!currentIds.has(id)) uploadedUrls.current.delete(id);
+      }
+
+      // Emit immediately (handles removal case)
+      emitUrls();
+
+      // Find new files that need uploading
+      const newFiles = files.filter(
+        (f) =>
+          f.file instanceof File &&
+          !uploadedUrls.current.has(f.id) &&
+          !inFlightIds.current.has(f.id),
+      );
+
+      if (newFiles.length > 0) {
+        for (const f of newFiles) inFlightIds.current.add(f.id);
+        setUploadingIds(new Set(inFlightIds.current));
+
+        await Promise.all(
+          newFiles.map(async (fileItem) => {
+            try {
+              const publicUrl = await r2.upload(fileItem.file as File);
+              uploadedUrls.current.set(fileItem.id, publicUrl);
+            } catch {
+              // error is tracked by r2.error
+            } finally {
+              inFlightIds.current.delete(fileItem.id);
+              setUploadingIds(new Set(inFlightIds.current));
+            }
+          }),
+        );
+
+        // Emit after uploads complete (uses latest filesRef)
+        emitUrls();
+      }
+    },
+    [onFilesChange, uploadFolder, r2, emitUrls],
+  );
 
   const [
     { files, isDragging, errors },
@@ -59,11 +161,20 @@ export function GalleryUpload({
     maxSize,
     accept,
     multiple,
-    onFilesChange,
+    initialFiles: initialFileEntries,
+    onFilesChange: handleFilesChanged,
   });
 
   const isImage = (file: { type: string }) => {
     return file.type.startsWith('image/');
+  };
+
+  const handleClear = () => {
+    clearFiles();
+    uploadedUrls.current.clear();
+    inFlightIds.current.clear();
+    setUploadingIds(new Set());
+    onUpload?.([]);
   };
 
   return (
@@ -74,7 +185,7 @@ export function GalleryUpload({
           'rounded-lg relative border border-dashed p-8 text-center transition-colors',
           isDragging
             ? 'border-primary bg-primary/5'
-            : 'border-muted-foreground/10 hover:border-muted-foreground/20',
+            : 'border-muted-foreground/25 hover:border-muted-foreground/50',
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -123,14 +234,24 @@ export function GalleryUpload({
             <h4 className="text-sm font-medium">
               Gallery ({files.length}/{maxFiles})
             </h4>
-            <div className="text-muted-foreground text-xs">
-              Total:{' '}
-              {formatBytes(
-                files.reduce((acc, file) => acc + file.file.size, 0),
-              )}
-            </div>
+            {uploadFolder ? (
+              uploadingIds.size > 0 && (
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Uploading {uploadingIds.size} image
+                  {uploadingIds.size > 1 ? 's' : ''}...
+                </span>
+              )
+            ) : (
+              <div className="text-muted-foreground text-xs">
+                Total:{' '}
+                {formatBytes(
+                  files.reduce((acc, file) => acc + file.file.size, 0),
+                )}
+              </div>
+            )}
           </div>
-          <Button onClick={clearFiles} variant="outline" size="sm">
+          <Button onClick={handleClear} variant="outline" size="sm">
             Clear all
           </Button>
         </div>
@@ -174,7 +295,14 @@ export function GalleryUpload({
                 </div>
               )}
 
-              {/* Overlay */}
+              {/* R2 uploading overlay */}
+              {uploadingIds.has(fileItem.id) && (
+                <div className="rounded-lg absolute inset-0 flex items-center justify-center bg-background/60">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+
+              {/* Hover overlay */}
               <div className="rounded-lg bg-black/50 absolute inset-0 flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover/item:opacity-100">
                 {/* View Button */}
                 {fileItem.preview && (
@@ -207,9 +335,11 @@ export function GalleryUpload({
                 <p className="truncate text-xs font-medium">
                   {fileItem.file.name}
                 </p>
-                <p className="text-xs text-gray-300">
-                  {formatBytes(fileItem.file.size)}
-                </p>
+                {fileItem.file.size > 0 && (
+                  <p className="text-xs text-gray-300">
+                    {formatBytes(fileItem.file.size)}
+                  </p>
+                )}
               </div>
             </div>
           ))}
@@ -217,7 +347,7 @@ export function GalleryUpload({
       )}
 
       {/* Error Messages */}
-      {errors.length > 0 && (
+      {(errors.length > 0 || r2.error) && (
         <Alert variant="destructive" className="mt-5">
           <CircleAlert />
           <AlertTitle>File upload error(s)</AlertTitle>
@@ -227,6 +357,7 @@ export function GalleryUpload({
                 {error}
               </p>
             ))}
+            {r2.error && <p className="last:mb-0">{r2.error}</p>}
           </AlertDescription>
         </Alert>
       )}

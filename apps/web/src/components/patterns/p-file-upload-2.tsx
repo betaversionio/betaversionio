@@ -5,11 +5,12 @@ import {
   useFileUpload,
   type FileWithPreview,
 } from '@/hooks/use-file-upload';
-import { Alert, AlertDescription, AlertTitle } from '@/components/reui/alert';
+import { useUploadToR2 } from '@/hooks/use-upload-to-r2';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { CircleAlert, User, X } from 'lucide-react';
+import { CircleAlert, Loader2, User, X } from 'lucide-react';
 
 interface AvatarUploadProps {
   maxSize?: number;
@@ -17,6 +18,10 @@ interface AvatarUploadProps {
   rounded?: 'full' | 'md';
   onFileChange?: (file: FileWithPreview | null) => void;
   defaultAvatar?: string;
+  /** R2 folder path — when provided, the component uploads automatically */
+  uploadFolder?: string;
+  /** Called with the public URL after a successful upload, or undefined on remove */
+  onUpload?: (url: string | undefined) => void;
 }
 
 export function AvatarUpload({
@@ -25,7 +30,11 @@ export function AvatarUpload({
   rounded = 'full',
   onFileChange,
   defaultAvatar,
+  uploadFolder,
+  onUpload,
 }: AvatarUploadProps) {
+  const r2 = useUploadToR2({ folder: uploadFolder ?? '' });
+
   const [
     { files, isDragging, errors },
     {
@@ -42,8 +51,23 @@ export function AvatarUpload({
     maxSize,
     accept: 'image/*',
     multiple: false,
-    onFilesChange: (files) => {
-      onFileChange?.(files[0] || null);
+    onFilesChange: async (files) => {
+      const file = files[0] || null;
+      onFileChange?.(file);
+
+      if (!uploadFolder) return;
+
+      if (!file || !(file.file instanceof File)) {
+        onUpload?.(undefined);
+        return;
+      }
+
+      try {
+        const publicUrl = await r2.upload(file.file);
+        onUpload?.(publicUrl);
+      } catch {
+        // error state is tracked by r2.error
+      }
     },
   });
 
@@ -53,6 +77,7 @@ export function AvatarUpload({
   const handleRemove = () => {
     if (currentFile) {
       removeFile(currentFile.id);
+      if (uploadFolder) onUpload?.(undefined);
     }
   };
 
@@ -63,10 +88,10 @@ export function AvatarUpload({
         <div
           className={cn(
             'group/avatar relative h-48 w-48 cursor-pointer overflow-hidden border border-dashed transition-colors',
-            rounded === 'full' ? 'rounded-full' : 'rounded-md',
+            rounded === 'full' ? 'rounded-full' : 'rounded-lg',
             isDragging
               ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/10 hover:border-muted-foreground/20',
+              : 'border-muted-foreground/25 hover:border-muted-foreground/50',
             previewUrl && 'border-solid',
           )}
           onDragEnter={handleDragEnter}
@@ -88,6 +113,12 @@ export function AvatarUpload({
               <User className="text-muted-foreground size-10" />
             </div>
           )}
+
+          {r2.isUploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+              <Loader2 className="size-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
         </div>
 
         {/* Remove Button - only show when file is uploaded */}
@@ -107,7 +138,11 @@ export function AvatarUpload({
       {/* Upload Instructions */}
       <div className="space-y-0.5 text-center">
         <p className="text-sm font-medium">
-          {currentFile ? 'Avatar uploaded' : 'Upload avatar'}
+          {r2.isUploading
+            ? 'Uploading...'
+            : currentFile
+              ? 'Avatar uploaded'
+              : 'Upload avatar'}
         </p>
         <p className="text-muted-foreground text-xs">
           PNG, JPG up to {formatBytes(maxSize)}
@@ -115,7 +150,7 @@ export function AvatarUpload({
       </div>
 
       {/* Error Messages */}
-      {errors.length > 0 && (
+      {(errors.length > 0 || r2.error) && (
         <Alert variant="destructive" className="mt-5">
           <CircleAlert />
           <AlertTitle>File upload error(s)</AlertTitle>
@@ -125,6 +160,7 @@ export function AvatarUpload({
                 {error}
               </p>
             ))}
+            {r2.error && <p className="last:mb-0">{r2.error}</p>}
           </AlertDescription>
         </Alert>
       )}
