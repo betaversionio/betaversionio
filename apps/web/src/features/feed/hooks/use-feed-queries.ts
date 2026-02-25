@@ -62,6 +62,7 @@ interface PostDetail extends Post {
 export const feedKeys = {
   all: ["feed"] as const,
   lists: () => [...feedKeys.all, "list"] as const,
+  userPosts: (authorId: string) => [...feedKeys.all, "user", authorId] as const,
   details: () => [...feedKeys.all, "detail"] as const,
   detail: (id: string) => [...feedKeys.details(), id] as const,
 };
@@ -79,6 +80,17 @@ export function useFeed() {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.meta.hasMore ? lastPage.meta.nextCursor ?? undefined : undefined,
+  });
+}
+
+export function useUserPosts(authorId: string) {
+  return useQuery({
+    queryKey: feedKeys.userPosts(authorId),
+    queryFn: () =>
+      apiClient.get<CursorPaginatedPosts>("/posts/feed", {
+        params: { authorId, limit: 10 },
+      }),
+    enabled: !!authorId,
   });
 }
 

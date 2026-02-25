@@ -1,0 +1,60 @@
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+
+export interface FullProfile {
+  id: string;
+  email: string;
+  username: string;
+  name: string | null;
+  avatarUrl: string | null;
+  profile: {
+    bio: string | null;
+    headline: string | null;
+    location: string | null;
+    website: string | null;
+  } | null;
+  socialLinks: Array<{ platform: string; url: string }>;
+  techStack: Array<{
+    name: string;
+    category: string;
+    proficiency: string;
+  }>;
+  education: Array<{
+    id: string;
+    institution: string;
+    degree: string;
+    fieldOfStudy: string | null;
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string | null;
+  }>;
+  experiences: Array<{
+    id: string;
+    company: string;
+    position: string;
+    location: string | null;
+    employmentType: string;
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string | null;
+  }>;
+  services: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+  }>;
+}
+
+export const profileKeys = {
+  all: ['profile'] as const,
+  me: () => [...profileKeys.all, 'me'] as const,
+};
+
+export function useMyFullProfile() {
+  return useQuery({
+    queryKey: profileKeys.me(),
+    queryFn: () => apiClient.get<FullProfile>('/users/me'),
+  });
+}

@@ -16,16 +16,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { slugify } from '@/lib/utils';
 import { Plus, Library, Loader2, Check } from 'lucide-react';
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 100);
-}
 
 interface AddToCollectionModalProps {
   projectId: string;

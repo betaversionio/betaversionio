@@ -26,7 +26,7 @@ export interface FoundUser {
   username: string;
   name: string | null;
   avatarUrl: string | null;
-  headline: string | null;
+  profile: { headline: string | null } | null;
 }
 
 export function MakersSection({ form, initialMakerUsers }: MakersSectionProps) {

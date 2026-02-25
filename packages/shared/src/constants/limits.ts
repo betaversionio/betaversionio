@@ -4,7 +4,7 @@ export const USERNAME = {
 } as const;
 
 export const BIO = {
-  MAX: 500,
+  MAX: 5000,
 } as const;
 
 export const PROJECT_TITLE = {
@@ -67,6 +67,18 @@ export const PROJECT_UPDATE_TITLE = {
 
 export const PROJECT_UPDATE_CONTENT = {
   MAX: 10000,
+} as const;
+
+export const BLOG_TITLE = {
+  MAX: 200,
+} as const;
+
+export const BLOG_CONTENT = {
+  MAX: 50000,
+} as const;
+
+export const BLOG_EXCERPT = {
+  MAX: 500,
 } as const;
 
 export const COLLECTION_TITLE = {

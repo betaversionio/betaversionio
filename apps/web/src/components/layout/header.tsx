@@ -5,17 +5,9 @@ import Link from 'next/link';
 import { useAuth } from '@/providers/auth-provider';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { UserAvatar } from '@/components/shared/user-avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { LogoWithText } from '@/components/shared/logo-with-text';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { UserMenu } from '@/components/shared/user-menu';
 import {
   HambergerMenu,
   CloseSquare,
@@ -50,7 +42,7 @@ export function Header() {
     <header
       className={cn(
         'fixed top-0 right-0 left-0 z-50 transition-all duration-200',
-        scrolled
+        scrolled || mobileOpen
           ? 'border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80'
           : 'bg-transparent',
       )}
@@ -79,72 +71,22 @@ export function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/70 bg-background/80 text-foreground/70 shadow-sm backdrop-blur transition-colors hover:bg-background md:hidden"
+            className="md:hidden"
             aria-label="Toggle navigation"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? (
-              <CloseSquare size={16} />
+              <CloseSquare size={18} color="currentColor" />
             ) : (
-              <HambergerMenu size={16} />
+              <HambergerMenu size={18} color="currentColor" />
             )}
           </button>
 
           {isLoading ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
           ) : isAuthenticated && user ? (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative ml-1 h-8 w-8 rounded-full"
-                >
-                  <UserAvatar
-                    src={user.avatarUrl}
-                    name={user.name}
-                    className="h-7 w-7"
-                    fallbackClassName="text-[10px]"
-                  />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-52" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user.name}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href={`/@${user.username}`}>
-                    <UserIcon size={15} className="mr-2" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard">
-                    <Category size={15} className="mr-2" />
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">
-                    <Setting2 size={15} className="mr-2" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout()}>
-                  <LogoutIcon size={15} className="mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserMenu user={user} onLogout={logout} />
           ) : (
             <>
               <Link
@@ -167,7 +109,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background/95 px-4 py-3 shadow-lg backdrop-blur md:hidden">
+        <div className="border-t border-border px-4 py-3 shadow-lg md:hidden">
           <div className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link
@@ -176,7 +118,7 @@ export function Header() {
                 className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                 onClick={() => setMobileOpen(false)}
               >
-                <link.icon size={16} />
+                <link.icon size={16} color="currentColor" />
                 {link.label}
               </Link>
             ))}
@@ -189,7 +131,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <UserIcon size={16} />
+                  <UserIcon size={16} color="currentColor" />
                   Profile
                 </Link>
                 <Link
@@ -197,7 +139,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <Category size={16} />
+                  <Category size={16} color="currentColor" />
                   Dashboard
                 </Link>
                 <Link
@@ -205,7 +147,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <Setting2 size={16} />
+                  <Setting2 size={16} color="currentColor" />
                   Settings
                 </Link>
                 <div className="flex flex-col gap-2 pt-4">
@@ -217,7 +159,11 @@ export function Header() {
                       setMobileOpen(false);
                     }}
                   >
-                    <LogoutIcon size={16} className="mr-1.5" />
+                    <LogoutIcon
+                      size={16}
+                      color="currentColor"
+                      className="mr-1.5"
+                    />
                     Logout
                   </Button>
                 </div>

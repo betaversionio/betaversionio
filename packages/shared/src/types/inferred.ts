@@ -49,6 +49,14 @@ import {
   addCollectionItemSchema,
 } from "../schemas/collection";
 
+import {
+  createBlogSchema,
+  updateBlogSchema,
+  toggleBlogVoteSchema,
+  createBlogCommentSchema,
+  updateBlogCommentSchema,
+} from "../schemas/blog";
+
 // ─── Auth Types ──────────────────────────────────────────────────────────────
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -100,3 +108,11 @@ export type ToggleReactionInput = z.infer<typeof toggleReactionSchema>;
 export type CreateCollectionInput = z.infer<typeof createCollectionSchema>;
 export type UpdateCollectionInput = z.infer<typeof updateCollectionSchema>;
 export type AddCollectionItemInput = z.infer<typeof addCollectionItemSchema>;
+
+// ─── Blog Types ─────────────────────────────────────────────────────────────
+
+export type CreateBlogInput = z.infer<typeof createBlogSchema>;
+export type UpdateBlogInput = z.infer<typeof updateBlogSchema>;
+export type ToggleBlogVoteInput = z.infer<typeof toggleBlogVoteSchema>;
+export type CreateBlogCommentInput = z.infer<typeof createBlogCommentSchema>;
+export type UpdateBlogCommentInput = z.infer<typeof updateBlogCommentSchema>;

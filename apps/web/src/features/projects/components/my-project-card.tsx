@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TechBadge } from '@/components/shared/tech-badge';
 import { Pencil } from 'lucide-react';
 import { Heart, Message } from 'iconsax-react';
 import { statusColors } from '@/features/projects/constants';
@@ -30,7 +31,7 @@ export function MyProjectCard({ project }: MyProjectCardProps) {
   return (
     <Card className="group relative flex h-full flex-col transition-shadow hover:shadow-md">
       <Link
-        href={`/my-projects/${project.slug}`}
+        href={`/projects/${project.slug}`}
         className="absolute inset-0 z-0"
       />
 
@@ -65,9 +66,12 @@ export function MyProjectCard({ project }: MyProjectCardProps) {
       <CardContent className="px-6 pb-4">
         <div className="flex flex-wrap gap-1.5">
           {project.techStack.slice(0, 4).map((tech) => (
-            <Badge key={tech} variant="outline" className="text-xs">
-              {tech}
-            </Badge>
+            <TechBadge
+              key={tech}
+              name={tech}
+              variant="outline"
+              className="gap-1.5 text-xs"
+            />
           ))}
           {project.techStack.length > 4 && (
             <Badge variant="outline" className="text-xs">

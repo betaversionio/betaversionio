@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -8,9 +9,10 @@ import {
   Proficiency,
 } from '@devcom/shared';
 import type { UpdateTechStackInput } from '@devcom/shared';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
+import { profileKeys } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -30,8 +32,17 @@ import {
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Plus, Trash2 } from 'lucide-react';
 
-export function TechStackForm() {
+interface TechStackFormProps {
+  initialData?: Array<{
+    name: string;
+    category: string;
+    proficiency: string;
+  }>;
+}
+
+export function TechStackForm({ initialData }: TechStackFormProps = {}) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<UpdateTechStackInput>({
     resolver: zodResolver(updateTechStackSchema),
@@ -46,6 +57,18 @@ export function TechStackForm() {
     },
   });
 
+  useEffect(() => {
+    if (initialData && initialData.length > 0) {
+      form.reset({
+        items: initialData.map((t) => ({
+          name: t.name,
+          category: t.category as TechCategory,
+          proficiency: t.proficiency as Proficiency,
+        })),
+      });
+    }
+  }, [initialData, form]);
+
   const {
     fields: techFields,
     append,
@@ -59,6 +82,7 @@ export function TechStackForm() {
     mutationFn: (data: UpdateTechStackInput) =>
       apiClient.patch('/users/me/tech-stack', data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
       toast({ title: 'Tech stack updated' });
     },
     onError: (error) => {

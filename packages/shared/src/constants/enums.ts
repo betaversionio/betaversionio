@@ -53,6 +53,16 @@ export enum ProjectStatus {
 
 export const ProjectStatusSchema = z.nativeEnum(ProjectStatus);
 
+// ─── BlogStatus ─────────────────────────────────────────────────────────────
+
+export enum BlogStatus {
+  Draft = "Draft",
+  Published = "Published",
+  Archived = "Archived",
+}
+
+export const BlogStatusSchema = z.nativeEnum(BlogStatus);
+
 // ─── PostType ────────────────────────────────────────────────────────────────
 
 export enum PostType {

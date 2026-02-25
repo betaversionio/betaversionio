@@ -103,13 +103,18 @@ export class FeedService {
    * Get the feed with cursor-based pagination.
    * Orders by createdAt desc, uses post id as cursor.
    */
-  async getFeed(cursor?: string, limit?: number) {
+  async getFeed(cursor?: string, limit?: number, authorId?: string) {
     const take = limit
       ? Math.min(limit, FEED.MAX_CURSOR_LIMIT)
       : FEED.DEFAULT_CURSOR_LIMIT;
 
+    const where: Record<string, unknown> = { deletedAt: null };
+    if (authorId) {
+      where.authorId = authorId;
+    }
+
     const queryOptions: Record<string, unknown> = {
-      where: { deletedAt: null },
+      where,
       include: {
         author: {
           select: {

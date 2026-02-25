@@ -18,7 +18,7 @@ import {
 } from '@/features/auth';
 import { refreshAccessToken, hasAccessTokenCookie } from '@/lib/api-client';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   username: string;

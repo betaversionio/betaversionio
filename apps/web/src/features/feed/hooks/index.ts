@@ -1,5 +1,6 @@
 export {
   useFeed,
+  useUserPosts,
   usePost,
   useCreatePost,
   useToggleReaction,

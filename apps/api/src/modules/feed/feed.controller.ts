@@ -46,12 +46,13 @@ export class FeedController {
   async getFeed(
     @Query("cursor") cursor?: string,
     @Query("limit") limit?: string,
+    @Query("authorId") authorId?: string,
   ) {
     const limitNum = limit
       ? Math.min(parseInt(limit, 10), FEED.MAX_CURSOR_LIMIT)
       : FEED.DEFAULT_CURSOR_LIMIT;
 
-    return this.feedService.getFeed(cursor, limitNum);
+    return this.feedService.getFeed(cursor, limitNum, authorId);
   }
 
   @Public()

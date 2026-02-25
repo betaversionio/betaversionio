@@ -130,7 +130,7 @@ function EditProjectForm({ project }: { project: ProjectData }) {
         username: m.user.username,
         name: m.user.name,
         avatarUrl: m.user.avatarUrl,
-        headline: null,
+        profile: null,
       };
       return acc;
     },

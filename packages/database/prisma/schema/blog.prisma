@@ -1,0 +1,87 @@
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum BlogStatus {
+  Draft
+  Published
+  Archived
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Blog {
+  id            String     @id @default(cuid())
+  title         String
+  slug          String     @unique
+  excerpt       String?    @db.VarChar(500)
+  content       String     @db.Text
+  coverImage    String?
+  tags          String[]
+  status        BlogStatus @default(Draft)
+  upvotesCount  Int        @default(0)
+  commentsCount Int        @default(0)
+  viewsCount    Int        @default(0)
+  authorId      String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  views    BlogView[]
+  votes    BlogVote[]
+  comments BlogComment[]
+
+  @@index([authorId])
+  @@index([status])
+  @@map("blogs")
+}
+
+model BlogView {
+  id        String   @id @default(cuid())
+  blogId    String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@index([blogId])
+  @@map("blog_views")
+}
+
+model BlogVote {
+  id        String   @id @default(cuid())
+  blogId    String
+  userId    String
+  value     Int
+  createdAt DateTime @default(now())
+
+  // Relations
+  blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([blogId, userId])
+  @@map("blog_votes")
+}
+
+model BlogComment {
+  id        String    @id @default(cuid())
+  blogId    String
+  authorId  String
+  content   String    @db.Text
+  parentId  String?
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  blog    Blog          @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  author  User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  BlogComment?  @relation("BlogCommentReplies", fields: [parentId], references: [id])
+  replies BlogComment[] @relation("BlogCommentReplies")
+
+  @@index([blogId])
+  @@index([authorId])
+  @@map("blog_comments")
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updateProfileSchema } from '@devcom/shared';
@@ -9,9 +10,9 @@ import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/providers/auth-provider';
 import { useToast } from '@/hooks/use-toast';
 import { authKeys } from '@/features/auth';
+import { profileKeys } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Field,
   FieldLabel,
@@ -19,7 +20,16 @@ import {
   FieldGroup,
 } from '@/components/ui/field';
 
-export function ProfileForm() {
+interface ProfileFormProps {
+  initialData?: {
+    name?: string | null;
+    headline?: string | null;
+    location?: string | null;
+    website?: string | null;
+  };
+}
+
+export function ProfileForm({ initialData }: ProfileFormProps = {}) {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -28,12 +38,22 @@ export function ProfileForm() {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user?.name ?? '',
-      bio: '',
       headline: '',
       location: '',
       website: '',
     },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        name: initialData.name ?? user?.name ?? '',
+        headline: initialData.headline ?? '',
+        location: initialData.location ?? '',
+        website: initialData.website ?? '',
+      });
+    }
+  }, [initialData, user?.name, form]);
 
   const mutation = useMutation({
     mutationFn: (data: UpdateProfileInput) => {
@@ -45,6 +65,7 @@ export function ProfileForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
       toast({
         title: 'Profile updated',
         description: 'Your profile has been saved.',
@@ -80,17 +101,6 @@ export function ProfileForm() {
             {...form.register('headline')}
           />
           <FieldError errors={[form.formState.errors.headline]} />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="bio">Bio</FieldLabel>
-          <Textarea
-            id="bio"
-            placeholder="Tell the world about yourself..."
-            rows={4}
-            {...form.register('bio')}
-          />
-          <FieldError errors={[form.formState.errors.bio]} />
         </Field>
 
         <div className="grid gap-5 md:grid-cols-2">

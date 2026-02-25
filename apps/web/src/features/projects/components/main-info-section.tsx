@@ -27,16 +27,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { slugify } from '@/lib/utils';
 import { X, Plus } from 'lucide-react';
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 100);
-}
 
 interface MainInfoSectionProps {
   form: UseFormReturn<CreateProjectInput>;

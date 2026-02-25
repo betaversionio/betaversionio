@@ -31,7 +31,7 @@ export function CollectionCard({
         <CardTitle className="line-clamp-1">{collection.title}</CardTitle>
         {collection.description && (
           <CardDescription className="line-clamp-2">
-            {collection.description}
+            {collection.description.replace(/<[^>]*>/g, '')}
           </CardDescription>
         )}
       </CardHeader>

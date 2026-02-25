@@ -13,6 +13,7 @@ import { FeedModule } from "./modules/feed/feed.module";
 import { StorageModule } from "./modules/storage/storage.module";
 import { CollectionModule } from "./modules/collection/collection.module";
 import { NotificationModule } from "./modules/notification/notification.module";
+import { BlogModule } from "./modules/blog/blog.module";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { NotificationModule } from "./modules/notification/notification.module";
     StorageModule,
     CollectionModule,
     NotificationModule,
+    BlogModule,
   ],
   providers: [
     {

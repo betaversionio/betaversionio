@@ -79,6 +79,9 @@ model User {
   projectCollections    ProjectCollection[]
   notificationsReceived Notification[]        @relation("NotificationRecipient")
   notificationsActed    Notification[]        @relation("NotificationActor")
+  blogs                 Blog[]
+  blogVotes             BlogVote[]
+  blogComments          BlogComment[]
 
   @@map("users")
 }

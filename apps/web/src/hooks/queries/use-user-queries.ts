@@ -1,16 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   email: string;
   username: string;
   name: string | null;
   avatarUrl: string | null;
-  bio: string | null;
-  headline: string | null;
-  location: string | null;
-  website: string | null;
+  profile: {
+    bio: string | null;
+    headline: string | null;
+    location: string | null;
+    website: string | null;
+  } | null;
   socialLinks: Array<{ platform: string; url: string }>;
   techStack: Array<{
     name: string;
@@ -58,7 +60,9 @@ interface UserSearchResult {
   username: string;
   name: string | null;
   avatarUrl: string | null;
-  headline: string | null;
+  profile: {
+    headline: string | null;
+  } | null;
 }
 
 interface PaginatedUsers {

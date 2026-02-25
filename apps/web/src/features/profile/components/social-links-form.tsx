@@ -5,9 +5,10 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updateSocialLinksSchema, SocialPlatform } from '@devcom/shared';
 import type { UpdateSocialLinksInput } from '@devcom/shared';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
+import { profileKeys } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -99,8 +100,13 @@ function PlatformIcon({
   }
 }
 
-export function SocialLinksForm() {
+interface SocialLinksFormProps {
+  initialData?: Array<{ platform: string; url: string }>;
+}
+
+export function SocialLinksForm({ initialData }: SocialLinksFormProps = {}) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<UpdateSocialLinksInput>({
     resolver: zodResolver(updateSocialLinksSchema),
@@ -108,6 +114,17 @@ export function SocialLinksForm() {
       links: [{ platform: SocialPlatform.Github, url: '' }],
     },
   });
+
+  useEffect(() => {
+    if (initialData && initialData.length > 0) {
+      form.reset({
+        links: initialData.map((l) => ({
+          platform: l.platform as SocialPlatform,
+          url: l.url,
+        })),
+      });
+    }
+  }, [initialData, form]);
 
   const {
     fields: socialFields,
@@ -136,6 +153,7 @@ export function SocialLinksForm() {
     mutationFn: (data: UpdateSocialLinksInput) =>
       apiClient.patch('/users/me/social-links', data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
       toast({ title: 'Social links updated' });
     },
     onError: (error) => {

@@ -1,6 +1,7 @@
 export { PostComposer, PostCard, FeedSidebar } from "./components";
 export {
   useFeed,
+  useUserPosts,
   usePost,
   useCreatePost,
   useToggleReaction,

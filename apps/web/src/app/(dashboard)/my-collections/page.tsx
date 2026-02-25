@@ -14,16 +14,8 @@ import {
 } from '@/features/collections';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header';
+import { slugify } from '@/lib/utils';
 import { Add, Book } from 'iconsax-react';
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 100);
-}
 
 export default function MyCollectionsPage() {
   const { user } = useAuth();
@@ -57,7 +49,7 @@ export default function MyCollectionsPage() {
         title="My Collections"
         description="Organize projects into curated lists."
       >
-        <Button size="sm" className="gap-1.5" onClick={() => setShowForm(true)}>
+        <Button onClick={() => setShowForm(true)}>
           <Add size={16} color="currentColor" />
           New Collection
         </Button>
@@ -69,7 +61,11 @@ export default function MyCollectionsPage() {
         </div>
       ) : !data?.items.length ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-          <Book size={40} className="text-muted-foreground" color="currentColor" />
+          <Book
+            size={40}
+            className="text-muted-foreground"
+            color="currentColor"
+          />
           <h3 className="mt-4 font-semibold">No collections yet</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Create your first collection to organize projects.
