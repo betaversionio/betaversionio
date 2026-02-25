@@ -35,7 +35,7 @@ export function TeamTab({ makers }: TeamTabProps) {
       {makers.map((maker) => (
         <Link
           key={maker.id}
-          href={`/u/${maker.user.username}`}
+          href={`/@${maker.user.username}`}
           className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/30"
         >
           <div className="flex items-center gap-3">

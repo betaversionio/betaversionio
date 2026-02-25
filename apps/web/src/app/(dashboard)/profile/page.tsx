@@ -14,6 +14,9 @@ import {
   ProfileForm,
   SocialLinksForm,
   TechStackForm,
+  EducationForm,
+  ExperienceForm,
+  ServicesForm,
 } from '@/features/profile';
 
 export default function EditProfilePage() {
@@ -61,6 +64,21 @@ export default function EditProfilePage() {
 
       {/* Tech Stack */}
       <TechStackForm />
+
+      <Separator />
+
+      {/* Experience */}
+      <ExperienceForm />
+
+      <Separator />
+
+      {/* Education */}
+      <EducationForm />
+
+      <Separator />
+
+      {/* Services */}
+      <ServicesForm />
     </div>
   );
 }

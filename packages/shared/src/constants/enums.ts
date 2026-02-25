@@ -102,3 +102,15 @@ export enum ProductionType {
 }
 
 export const ProductionTypeSchema = z.nativeEnum(ProductionType);
+
+// ─── EmploymentType ─────────────────────────────────────────────────────────
+
+export enum EmploymentType {
+  FullTime = "FullTime",
+  PartTime = "PartTime",
+  Contract = "Contract",
+  Freelance = "Freelance",
+  Internship = "Internship",
+}
+
+export const EmploymentTypeSchema = z.nativeEnum(EmploymentType);

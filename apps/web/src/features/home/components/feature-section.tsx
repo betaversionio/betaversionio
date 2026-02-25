@@ -119,7 +119,7 @@ const features: FeatureType[] = [
       'Code snippets, TILs, project updates, and milestones. A feed built for builders, not buzzwords.',
   },
   {
-    title: 'Project Showcase',
+    title: 'Community Hub',
     icon: <HugeiconsIcon icon={ThumbsUpIcon} />,
     description:
       'Upvote projects, leave threaded comments, add team makers, and showcase your work Product Hunt-style.',

@@ -18,4 +18,3 @@ export { CommentsTab } from './components/detail/comments-tab';
 
 // Shared
 export { statusColors } from './constants';
-export { formatDate } from './utils';

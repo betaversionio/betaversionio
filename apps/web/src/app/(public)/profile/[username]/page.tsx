@@ -9,6 +9,13 @@ import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Separator } from '@/components/ui/separator';
 import { ProjectCard } from '@/features/projects/components/project-card';
+import { formatDate } from '@/lib/format';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   MapPin,
   Globe,
@@ -17,6 +24,9 @@ import {
   Twitter,
   ExternalLink,
   Loader2,
+  Briefcase,
+  GraduationCap,
+  Wrench,
 } from 'lucide-react';
 
 const socialIcons: Record<string, React.ElementType> = {
@@ -157,6 +167,84 @@ export default function PublicProfilePage({
           </section>
         )}
 
+        {/* Experience */}
+        {profile.experiences.length > 0 && (
+          <section>
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <Briefcase className="h-5 w-5" />
+              Experience
+            </h2>
+            <div className="space-y-4">
+              {profile.experiences.map((exp) => (
+                <div
+                  key={exp.id}
+                  className="relative border-l-2 border-muted-foreground/20 pl-6"
+                >
+                  <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-primary" />
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-semibold">{exp.position}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {exp.company}
+                      {exp.location && ` · ${exp.location}`}
+                      {' · '}
+                      {exp.employmentType.replace(/([A-Z])/g, ' $1').trim()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(exp.startDate, 'MMM YYYY')} &ndash;{' '}
+                      {exp.current
+                        ? 'Present'
+                        : exp.endDate
+                          ? formatDate(exp.endDate, 'MMM YYYY')
+                          : ''}
+                    </p>
+                    {exp.description && (
+                      <p className="mt-1 text-sm">{exp.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Education */}
+        {profile.education.length > 0 && (
+          <section>
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <GraduationCap className="h-5 w-5" />
+              Education
+            </h2>
+            <div className="space-y-4">
+              {profile.education.map((edu) => (
+                <div
+                  key={edu.id}
+                  className="relative border-l-2 border-muted-foreground/20 pl-6"
+                >
+                  <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-primary" />
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-semibold">{edu.institution}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {edu.degree}
+                      {edu.fieldOfStudy && ` · ${edu.fieldOfStudy}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(edu.startDate, 'MMM YYYY')} &ndash;{' '}
+                      {edu.current
+                        ? 'Present'
+                        : edu.endDate
+                          ? formatDate(edu.endDate, 'MMM YYYY')
+                          : ''}
+                    </p>
+                    {edu.description && (
+                      <p className="mt-1 text-sm">{edu.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Projects */}
         {projectsData && projectsData.items.length > 0 && (
           <section>
@@ -169,8 +257,37 @@ export default function PublicProfilePage({
           </section>
         )}
 
+        {/* Services */}
+        {profile.services.length > 0 && (
+          <section>
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+              <Wrench className="h-5 w-5" />
+              Services
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {profile.services.map((service) => (
+                <Card key={service.id}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{service.title}</CardTitle>
+                  </CardHeader>
+                  {service.description && (
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">
+                        {service.description}
+                      </p>
+                    </CardContent>
+                  )}
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Empty state */}
         {profile.techStack.length === 0 &&
+          profile.experiences.length === 0 &&
+          profile.education.length === 0 &&
+          profile.services.length === 0 &&
           (!projectsData || projectsData.items.length === 0) && (
           <div className="py-12 text-center">
             <p className="text-muted-foreground">

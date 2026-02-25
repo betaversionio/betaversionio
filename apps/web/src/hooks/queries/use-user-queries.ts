@@ -25,6 +25,32 @@ interface UserProfile {
     techStack: string[];
     status: string;
   }>;
+  education: Array<{
+    id: string;
+    institution: string;
+    degree: string;
+    fieldOfStudy: string | null;
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string | null;
+  }>;
+  experiences: Array<{
+    id: string;
+    company: string;
+    position: string;
+    location: string | null;
+    employmentType: string;
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string | null;
+  }>;
+  services: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+  }>;
 }
 
 interface UserSearchResult {

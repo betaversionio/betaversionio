@@ -10,12 +10,18 @@ import {
   updateProfileSchema,
   updateSocialLinksSchema,
   updateTechStackSchema,
+  updateEducationSchema,
+  updateExperienceSchema,
+  updateServicesSchema,
   paginationSchema,
 } from "@devcom/shared";
 import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
   UpdateTechStackInput,
+  UpdateEducationInput,
+  UpdateExperienceInput,
+  UpdateServicesInput,
 } from "@devcom/shared";
 
 import { Public } from "../../common/decorators/public.decorator";
@@ -55,6 +61,30 @@ export class UserController {
     @Body(new ZodValidationPipe(updateTechStackSchema)) dto: UpdateTechStackInput,
   ) {
     return this.userService.updateTechStack(userId, dto);
+  }
+
+  @Patch("me/education")
+  async updateEducation(
+    @CurrentUser("id") userId: string,
+    @Body(new ZodValidationPipe(updateEducationSchema)) dto: UpdateEducationInput,
+  ) {
+    return this.userService.updateEducation(userId, dto);
+  }
+
+  @Patch("me/experience")
+  async updateExperience(
+    @CurrentUser("id") userId: string,
+    @Body(new ZodValidationPipe(updateExperienceSchema)) dto: UpdateExperienceInput,
+  ) {
+    return this.userService.updateExperience(userId, dto);
+  }
+
+  @Patch("me/services")
+  async updateServices(
+    @CurrentUser("id") userId: string,
+    @Body(new ZodValidationPipe(updateServicesSchema)) dto: UpdateServicesInput,
+  ) {
+    return this.userService.updateServices(userId, dto);
   }
 
   @Public()

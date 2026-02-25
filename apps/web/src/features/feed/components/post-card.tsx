@@ -12,7 +12,7 @@ import { Markdown } from '@/components/ui/markdown';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Heart, Message, Send2, More } from 'iconsax-react';
 import type { PostData } from '../types';
-import { timeAgo, formatCount } from '../utils';
+import { timeAgo, formatCount } from '@/lib/format';
 import { reactionConfig, postTypeLabels } from '../config';
 
 function PostComments({

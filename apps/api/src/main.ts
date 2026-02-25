@@ -13,8 +13,24 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // ── CORS ──────────────────────────────────────────────────────────────────
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const rootDomain = process.env.ROOT_DOMAIN || 'betaversion.io';
   app.enableCors({
-    origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      // Allow the main app URL
+      if (origin === appUrl) return callback(null, true);
+      // Allow any subdomain of the root domain
+      if (new RegExp(`^https?://[\\w-]+\\.${rootDomain.replace('.', '\\.')}$`).test(origin)) {
+        return callback(null, true);
+      }
+      // Allow localhost subdomains in dev
+      if (/^http:\/\/[\w-]+\.localhost(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   });
 

@@ -8,7 +8,7 @@ import {
   useCreateProjectComment,
 } from '@/hooks/queries/use-project-queries';
 import { useAuth } from '@/providers/auth-provider';
-import { formatDate } from '@/features/projects/utils';
+import { timeAgo } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
@@ -69,13 +69,13 @@ function CommentItem({
         <div className="min-w-0 flex-1 py-3">
           <div className="flex items-center gap-2">
             <Link
-              href={`/u/${comment.author.username}`}
+              href={`/@${comment.author.username}`}
               className="text-sm font-medium hover:underline"
             >
               {comment.author.name ?? comment.author.username}
             </Link>
             <span className="text-xs text-muted-foreground">
-              {formatDate(comment.createdAt)}
+              {timeAgo(comment.createdAt)}
             </span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">

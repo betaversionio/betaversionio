@@ -9,4 +9,3 @@ export {
 } from "./hooks";
 export type { PostData } from "./types";
 export { reactionConfig, postTypeLabels } from "./config";
-export { timeAgo, formatCount } from "./utils";

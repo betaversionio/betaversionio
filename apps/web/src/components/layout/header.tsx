@@ -117,7 +117,7 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href={`/u/${user.username}`}>
+                  <Link href={`/@${user.username}`}>
                     <HugeiconsIcon icon={UserIcon} size={15} className="mr-2" />
                     Profile
                   </Link>
@@ -193,7 +193,7 @@ export function Header() {
               <>
                 <div className="my-2 border-t border-border" />
                 <Link
-                  href={`/u/${user.username}`}
+                  href={`/@${user.username}`}
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >

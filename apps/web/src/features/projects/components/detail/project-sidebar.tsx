@@ -7,6 +7,7 @@ import { useToggleProjectVote } from '@/hooks/queries/use-project-queries';
 import { useAuth } from '@/providers/auth-provider';
 import { statusColors } from '@/features/projects/constants';
 import { Badge } from '@/components/ui/badge';
+import { TechBadge } from '@/components/shared/tech-badge';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Separator } from '@/components/ui/separator';
@@ -88,6 +89,23 @@ export function ProjectSidebar({ project }: ProjectSidebarProps) {
           )}
         </div>
 
+        {/* Tech Stack */}
+        {project.techStack.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Tech Stack
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {project.techStack.map((tech) => (
+                  <TechBadge key={tech} name={tech} variant="secondary" className="gap-1.5 py-1" />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         <Separator />
 
         {/* Links */}
@@ -156,7 +174,7 @@ export function ProjectSidebar({ project }: ProjectSidebarProps) {
             Created by
           </p>
           <Link
-            href={`/u/${project.author.username}`}
+            href={`/@${project.author.username}`}
             className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
           >
             <UserAvatar

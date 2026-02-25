@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { TechBadge } from '@/components/shared/tech-badge';
 import { Code1 } from 'iconsax-react';
 
 interface TechTabProps {
@@ -37,9 +38,7 @@ export function TechTab({ techStack, tags }: TechTabProps) {
           </h3>
           <div className="flex flex-wrap gap-2">
             {techStack.map((tech) => (
-              <Badge key={tech} variant="secondary">
-                {tech}
-              </Badge>
+              <TechBadge key={tech} name={tech} variant="secondary" className="gap-1.5 py-1" />
             ))}
           </div>
         </section>

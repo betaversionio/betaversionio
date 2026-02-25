@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import {
   Card,
@@ -8,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/shared/user-avatar';
+import { TechBadge } from '@/components/shared/tech-badge';
 import { Heart, Message } from 'iconsax-react';
 import { statusColors } from '@/features/projects/constants';
 
@@ -69,9 +72,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <CardContent className="px-6 pb-4">
         <div className="flex flex-wrap gap-1.5">
           {project.techStack.slice(0, 4).map((tech) => (
-            <Badge key={tech} variant="outline" className="text-xs">
-              {tech}
-            </Badge>
+            <TechBadge key={tech} name={tech} variant="outline" className="gap-1.5 text-xs" />
           ))}
           {project.techStack.length > 4 && (
             <Badge variant="outline" className="text-xs">

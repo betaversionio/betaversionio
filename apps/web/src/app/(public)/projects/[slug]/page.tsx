@@ -6,11 +6,10 @@ import { useProject } from '@/hooks/queries/use-project-queries';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
-import { DocumentText1, People, Code1 } from 'iconsax-react';
+import { DocumentText1, People } from 'iconsax-react';
 import { ProjectSidebar } from '@/features/projects/components/detail/project-sidebar';
 import { OverviewTab } from '@/features/projects/components/detail/overview-tab';
 import { TeamTab } from '@/features/projects/components/detail/team-tab';
-import { TechTab } from '@/features/projects/components/detail/tech-tab';
 
 export default function ProjectDetailPage({
   params,
@@ -64,10 +63,6 @@ export default function ProjectDetailPage({
                     </span>
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="tech">
-                  <Code1 size={14} color="currentColor" variant="Linear" className="mr-1.5" />
-                  Tech
-                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview">
@@ -82,12 +77,6 @@ export default function ProjectDetailPage({
                 <TeamTab makers={project.makers} />
               </TabsContent>
 
-              <TabsContent value="tech">
-                <TechTab
-                  techStack={project.techStack}
-                  tags={project.tags}
-                />
-              </TabsContent>
 
             </Tabs>
           </div>

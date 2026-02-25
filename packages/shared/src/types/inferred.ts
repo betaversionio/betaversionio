@@ -12,6 +12,12 @@ import {
   updateSocialLinksSchema,
   techStackItemSchema,
   updateTechStackSchema,
+  educationItemSchema,
+  updateEducationSchema,
+  experienceItemSchema,
+  updateExperienceSchema,
+  serviceItemSchema,
+  updateServicesSchema,
 } from "../schemas/user";
 
 import {
@@ -43,6 +49,12 @@ export type SocialLinkInput = z.infer<typeof socialLinkSchema>;
 export type UpdateSocialLinksInput = z.infer<typeof updateSocialLinksSchema>;
 export type TechStackItemInput = z.infer<typeof techStackItemSchema>;
 export type UpdateTechStackInput = z.infer<typeof updateTechStackSchema>;
+export type EducationItemInput = z.infer<typeof educationItemSchema>;
+export type UpdateEducationInput = z.infer<typeof updateEducationSchema>;
+export type ExperienceItemInput = z.infer<typeof experienceItemSchema>;
+export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>;
+export type ServiceItemInput = z.infer<typeof serviceItemSchema>;
+export type UpdateServicesInput = z.infer<typeof updateServicesSchema>;
 
 // ─── Project Types ───────────────────────────────────────────────────────────
 

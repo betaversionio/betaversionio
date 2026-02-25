@@ -61,7 +61,7 @@ export function DashboardHeader() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={`/u/${user?.username}`}>
+              <Link href={`/@${user?.username}`}>
                 <User size={16} color="currentColor" className="mr-2" />
                 Profile
               </Link>

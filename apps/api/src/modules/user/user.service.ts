@@ -3,8 +3,14 @@ import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
   UpdateTechStackInput,
+  UpdateEducationInput,
+  UpdateExperienceInput,
+  UpdateServicesInput,
   SocialLinkInput,
   TechStackItemInput,
+  EducationItemInput,
+  ExperienceItemInput,
+  ServiceItemInput,
 } from "@devcom/shared";
 import { PAGINATION } from "@devcom/shared";
 
@@ -21,6 +27,9 @@ export class UserService {
         profile: true,
         socialLinks: true,
         techStack: true,
+        education: { orderBy: { startDate: "desc" } },
+        experiences: { orderBy: { startDate: "desc" } },
+        services: true,
       },
     });
 
@@ -44,6 +53,9 @@ export class UserService {
         profile: true,
         socialLinks: true,
         techStack: true,
+        education: { orderBy: { startDate: "desc" } },
+        experiences: { orderBy: { startDate: "desc" } },
+        services: true,
         projects: {
           where: { deletedAt: null },
           orderBy: { createdAt: "desc" },
@@ -186,6 +198,86 @@ export class UserService {
       }
 
       return tx.techStackItem.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      });
+    });
+  }
+
+  async updateEducation(userId: string, dto: UpdateEducationInput) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.education.deleteMany({
+        where: { userId },
+      });
+
+      if (dto.items.length > 0) {
+        await tx.education.createMany({
+          data: dto.items.map((item: EducationItemInput) => ({
+            userId,
+            institution: item.institution,
+            degree: item.degree,
+            fieldOfStudy: item.fieldOfStudy,
+            startDate: new Date(item.startDate),
+            endDate: item.endDate ? new Date(item.endDate) : null,
+            current: item.current,
+            description: item.description,
+          })),
+        });
+      }
+
+      return tx.education.findMany({
+        where: { userId },
+        orderBy: { startDate: "desc" },
+      });
+    });
+  }
+
+  async updateExperience(userId: string, dto: UpdateExperienceInput) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.experience.deleteMany({
+        where: { userId },
+      });
+
+      if (dto.items.length > 0) {
+        await tx.experience.createMany({
+          data: dto.items.map((item: ExperienceItemInput) => ({
+            userId,
+            company: item.company,
+            position: item.position,
+            location: item.location,
+            employmentType: item.employmentType,
+            startDate: new Date(item.startDate),
+            endDate: item.endDate ? new Date(item.endDate) : null,
+            current: item.current,
+            description: item.description,
+          })),
+        });
+      }
+
+      return tx.experience.findMany({
+        where: { userId },
+        orderBy: { startDate: "desc" },
+      });
+    });
+  }
+
+  async updateServices(userId: string, dto: UpdateServicesInput) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.service.deleteMany({
+        where: { userId },
+      });
+
+      if (dto.items.length > 0) {
+        await tx.service.createMany({
+          data: dto.items.map((item: ServiceItemInput) => ({
+            userId,
+            title: item.title,
+            description: item.description,
+          })),
+        });
+      }
+
+      return tx.service.findMany({
         where: { userId },
         orderBy: { createdAt: "asc" },
       });

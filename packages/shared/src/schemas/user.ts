@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SocialPlatformSchema, TechCategorySchema, ProficiencySchema } from "../constants/enums";
+import { SocialPlatformSchema, TechCategorySchema, ProficiencySchema, EmploymentTypeSchema } from "../constants/enums";
 import { BIO } from "../constants/limits";
 
 export const updateProfileSchema = z.object({
@@ -41,4 +41,48 @@ export const techStackItemSchema = z.object({
 
 export const updateTechStackSchema = z.object({
   items: z.array(techStackItemSchema),
+});
+
+// ─── Education ──────────────────────────────────────────────────────────────
+
+export const educationItemSchema = z.object({
+  institution: z.string().min(1, "Institution is required").max(200),
+  degree: z.string().min(1, "Degree is required").max(200),
+  fieldOfStudy: z.string().max(200).optional(),
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().optional(),
+  current: z.boolean(),
+  description: z.string().max(2000).optional(),
+});
+
+export const updateEducationSchema = z.object({
+  items: z.array(educationItemSchema),
+});
+
+// ─── Experience ─────────────────────────────────────────────────────────────
+
+export const experienceItemSchema = z.object({
+  company: z.string().min(1, "Company is required").max(200),
+  position: z.string().min(1, "Position is required").max(200),
+  location: z.string().max(200).optional(),
+  employmentType: EmploymentTypeSchema,
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().optional(),
+  current: z.boolean(),
+  description: z.string().max(2000).optional(),
+});
+
+export const updateExperienceSchema = z.object({
+  items: z.array(experienceItemSchema),
+});
+
+// ─── Services ───────────────────────────────────────────────────────────────
+
+export const serviceItemSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100),
+  description: z.string().max(500).optional(),
+});
+
+export const updateServicesSchema = z.object({
+  items: z.array(serviceItemSchema),
 });
