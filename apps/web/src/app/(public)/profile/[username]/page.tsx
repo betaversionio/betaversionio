@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useUserProfile } from '@/hooks/queries/use-user-queries';
 import { useProjects } from '@/hooks/queries/use-project-queries';
 import { useBlogs } from '@/hooks/queries/use-blog-queries';
+import { useFollowCounts } from '@/hooks/queries/use-follow-queries';
+import { FollowButton } from '@/components/shared/follow-button';
 import { useUserPosts } from '@/features/feed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -79,6 +81,7 @@ export default function PublicProfilePage({
     { enabled: !!profile },
   );
   const { data: postsData } = useUserPosts(profile?.id ?? '');
+  const { data: followCounts } = useFollowCounts(profile?.id);
 
   if (isLoading) {
     return (
@@ -195,6 +198,23 @@ export default function PublicProfilePage({
                 })}
               </div>
             )}
+
+            {/* Follow counts + button */}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 md:justify-start">
+              {followCounts && (
+                <div className="flex items-center gap-3 text-sm">
+                  <span>
+                    <span className="font-semibold">{followCounts.followersCount}</span>{' '}
+                    <span className="text-muted-foreground">followers</span>
+                  </span>
+                  <span>
+                    <span className="font-semibold">{followCounts.followingCount}</span>{' '}
+                    <span className="text-muted-foreground">following</span>
+                  </span>
+                </div>
+              )}
+              <FollowButton targetUserId={profile.id} />
+            </div>
           </div>
         </div>
 

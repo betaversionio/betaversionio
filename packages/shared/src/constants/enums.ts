@@ -147,6 +147,7 @@ export enum NotificationType {
   ProjectBookmark = "ProjectBookmark",
   ProjectUpdate = "ProjectUpdate",
   LaunchDay = "LaunchDay",
+  NewFollower = "NewFollower",
 }
 
 export const NotificationTypeSchema = z.nativeEnum(NotificationType);

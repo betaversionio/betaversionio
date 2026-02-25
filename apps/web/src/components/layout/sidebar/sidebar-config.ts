@@ -1,4 +1,4 @@
-import { Category, Document, Home2, Kanban } from 'iconsax-react';
+import { Category, Document, Home2, Kanban, People } from 'iconsax-react';
 import { Library } from 'lucide-react';
 
 export type NavItem = {
@@ -17,6 +17,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { icon: Home2, label: 'Home', href: '/feed' },
       { icon: Category, label: 'Dashboard', href: '/dashboard' },
+      { icon: People, label: 'Network', href: '/network' },
     ],
   },
   {

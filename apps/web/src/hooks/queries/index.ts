@@ -36,6 +36,16 @@ export {
 } from "./use-profile-queries";
 export type { FullProfile } from "./use-profile-queries";
 export {
+  useFollowCounts,
+  useFollowStatus,
+  useToggleFollow,
+  useMyFollowers,
+  useMyFollowing,
+  useMyMutuals,
+  useSuggestedUsers,
+  followKeys,
+} from "./use-follow-queries";
+export {
   useBlogs,
   useBlog,
   useCreateBlog,

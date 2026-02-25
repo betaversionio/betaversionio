@@ -14,6 +14,7 @@ import { StorageModule } from "./modules/storage/storage.module";
 import { CollectionModule } from "./modules/collection/collection.module";
 import { NotificationModule } from "./modules/notification/notification.module";
 import { BlogModule } from "./modules/blog/blog.module";
+import { FollowModule } from "./modules/follow/follow.module";
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { BlogModule } from "./modules/blog/blog.module";
     CollectionModule,
     NotificationModule,
     BlogModule,
+    FollowModule,
   ],
   providers: [
     {

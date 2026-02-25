@@ -82,6 +82,8 @@ model User {
   blogs                 Blog[]
   blogVotes             BlogVote[]
   blogComments          BlogComment[]
+  followers             Follow[]              @relation("UserFollowing")
+  following             Follow[]              @relation("UserFollowers")
 
   @@map("users")
 }
