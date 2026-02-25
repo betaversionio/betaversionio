@@ -53,6 +53,26 @@ export const RESUME_TITLE = {
   MAX: 100,
 } as const;
 
+export const PROJECT_REVIEW_TITLE = {
+  MAX: 200,
+} as const;
+
+export const PROJECT_REVIEW_CONTENT = {
+  MAX: 5000,
+} as const;
+
+export const PROJECT_UPDATE_TITLE = {
+  MAX: 200,
+} as const;
+
+export const PROJECT_UPDATE_CONTENT = {
+  MAX: 10000,
+} as const;
+
+export const COLLECTION_TITLE = {
+  MAX: 200,
+} as const;
+
 export const LIMITS = {
   USERNAME,
   BIO,

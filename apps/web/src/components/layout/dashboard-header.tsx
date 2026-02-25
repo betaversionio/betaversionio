@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { NotificationBell } from '@/features/notifications/notification-bell';
 import { useSidebar } from './sidebar/sidebar-context';
 import { HambergerMenu, User, Logout } from 'iconsax-react';
 
@@ -34,6 +35,7 @@ export function DashboardHeader() {
       <div className="hidden md:block" />
 
       <div className="flex items-center gap-2">
+        <NotificationBell />
         <ThemeToggle />
 
         <DropdownMenu>

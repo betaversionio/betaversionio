@@ -25,6 +25,13 @@ enum ProductionType {
   Freelance
 }
 
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
+  Cancelled
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model Project {
@@ -42,19 +49,32 @@ model Project {
   status          ProjectStatus  @default(Draft)
   phase           ProjectPhase   @default(Idea)
   productionType  ProductionType @default(Hobby)
+  demoUrl         String?
+  videoUrl        String?
+  launchDate      DateTime?
   upvotesCount    Int            @default(0)
   downvotesCount  Int            @default(0)
   commentsCount   Int            @default(0)
+  bookmarksCount  Int            @default(0)
+  reviewsCount    Int            @default(0)
+  averageRating   Float          @default(0)
+  viewsCount      Int            @default(0)
   authorId        String
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   deletedAt       DateTime?
 
   // Relations
-  author   User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  makers   ProjectMaker[]
-  comments ProjectComment[]
-  votes    ProjectVote[]
+  author      User                    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  makers      ProjectMaker[]
+  comments    ProjectComment[]
+  votes       ProjectVote[]
+  bookmarks   ProjectBookmark[]
+  reviews     ProjectReview[]
+  updates     ProjectUpdate[]
+  invitations ProjectInvitation[]
+  views       ProjectView[]
+  collectionItems ProjectCollectionItem[]
 
   @@map("projects")
 }
@@ -80,6 +100,7 @@ model ProjectComment {
   authorId  String
   content   String    @db.Text
   parentId  String?
+  editedAt  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -106,4 +127,132 @@ model ProjectVote {
 
   @@unique([projectId, userId])
   @@map("project_votes")
+}
+
+model ProjectBookmark {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId, createdAt])
+  @@map("project_bookmarks")
+}
+
+model ProjectReview {
+  id        String    @id @default(cuid())
+  projectId String
+  authorId  String
+  rating    Int
+  title     String    @db.VarChar(200)
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, authorId])
+  @@index([projectId, createdAt])
+  @@map("project_reviews")
+}
+
+model ProjectUpdate {
+  id        String    @id @default(cuid())
+  projectId String
+  authorId  String
+  title     String    @db.VarChar(200)
+  content   String    @db.Text
+  version   String?   @db.VarChar(50)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@map("project_updates")
+}
+
+model ProjectInvitation {
+  id          String           @id @default(cuid())
+  projectId   String
+  inviterId   String
+  inviteeId   String
+  role        String           @db.VarChar(100)
+  status      InvitationStatus @default(Pending)
+  message     String?          @db.VarChar(500)
+  respondedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inviter User    @relation("SentInvitations", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee User    @relation("ReceivedInvitations", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, inviteeId, status])
+  @@index([inviteeId, status])
+  @@map("project_invitations")
+}
+
+model ProjectView {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String?
+  fingerprint String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, createdAt])
+  @@index([projectId, userId])
+  @@map("project_views")
+}
+
+model ProjectCollection {
+  id          String    @id @default(cuid())
+  authorId    String
+  title       String    @db.VarChar(200)
+  slug        String    @unique
+  description String?   @db.Text
+  isPublic    Boolean   @default(true)
+  coverImage  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  author User                    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  items  ProjectCollectionItem[]
+
+  @@index([authorId, createdAt])
+  @@map("project_collections")
+}
+
+model ProjectCollectionItem {
+  id           String   @id @default(cuid())
+  collectionId String
+  projectId    String
+  note         String?  @db.VarChar(500)
+  position     Int      @default(0)
+  addedAt      DateTime @default(now())
+
+  // Relations
+  collection ProjectCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  project    Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, projectId])
+  @@map("project_collection_items")
 }

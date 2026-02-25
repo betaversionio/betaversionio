@@ -5,7 +5,7 @@ import type { IconName } from 'tech-stack-icons';
  * Only non-obvious aliases need to be here; exact slug matches are
  * resolved automatically via the VALID set.
  */
-const ALIASES: Record<string, IconName> = {
+export const ALIASES: Record<string, IconName> = {
   // ── Languages ───────────────────────────────────────────────
   javascript: 'js',
   typescript: 'typescript',

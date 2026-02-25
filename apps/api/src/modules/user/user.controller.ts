@@ -6,6 +6,7 @@ import {
   Param,
   Query,
 } from "@nestjs/common";
+import { ProjectService } from "../project/project.service";
 import {
   updateProfileSchema,
   updateSocialLinksSchema,
@@ -14,6 +15,7 @@ import {
   updateExperienceSchema,
   updateServicesSchema,
   paginationSchema,
+  respondInvitationSchema,
 } from "@devcom/shared";
 import type {
   UpdateProfileInput,
@@ -32,7 +34,10 @@ import { UserService } from "./user.service";
 
 @Controller("users")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly projectService: ProjectService,
+  ) {}
 
   @Get("me")
   async getMe(@CurrentUser("id") userId: string) {
@@ -85,6 +90,21 @@ export class UserController {
     @Body(new ZodValidationPipe(updateServicesSchema)) dto: UpdateServicesInput,
   ) {
     return this.userService.updateServices(userId, dto);
+  }
+
+  @Get("me/invitations")
+  async getMyInvitations(@CurrentUser("id") userId: string) {
+    return this.projectService.getReceivedInvitations(userId);
+  }
+
+  @Patch("me/invitations/:invitationId")
+  async respondToInvitation(
+    @CurrentUser("id") userId: string,
+    @Param("invitationId") invitationId: string,
+    @Body() body: { action: string },
+  ) {
+    const dto = respondInvitationSchema.parse(body);
+    return this.projectService.respondToInvitation(invitationId, userId, dto);
   }
 
   @Public()

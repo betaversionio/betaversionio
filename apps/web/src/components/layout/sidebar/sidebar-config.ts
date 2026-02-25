@@ -6,10 +6,14 @@ import {
   Kanban,
   Setting2,
   User,
+  Archive,
+  Notification,
+  Send2,
 } from 'iconsax-react';
+import { Bookmark, Library } from 'lucide-react';
 
 export type NavItem = {
-  icon: typeof Element4;
+  icon: typeof Element4 | typeof Bookmark;
   label: string;
   href: string;
 };
@@ -37,6 +41,15 @@ export const navGroups: NavGroup[] = [
     items: [
       { icon: Kanban, label: 'Projects', href: '/my-projects' },
       { icon: Document, label: 'Resume', href: '/resume' },
+      { icon: Library as never, label: 'Collections', href: '/my-collections' },
+    ],
+  },
+  {
+    title: 'Activity',
+    items: [
+      { icon: Bookmark as never, label: 'Saved', href: '/saved' },
+      { icon: Send2, label: 'Invitations', href: '/invitations' },
+      { icon: Notification, label: 'Notifications', href: '/notifications' },
     ],
   },
   {

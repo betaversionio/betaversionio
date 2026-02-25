@@ -114,3 +114,29 @@ export enum EmploymentType {
 }
 
 export const EmploymentTypeSchema = z.nativeEnum(EmploymentType);
+
+// ─── InvitationStatus ──────────────────────────────────────────────────────
+
+export enum InvitationStatus {
+  Pending = "Pending",
+  Accepted = "Accepted",
+  Rejected = "Rejected",
+  Cancelled = "Cancelled",
+}
+
+export const InvitationStatusSchema = z.nativeEnum(InvitationStatus);
+
+// ─── NotificationType ──────────────────────────────────────────────────────
+
+export enum NotificationType {
+  ProjectComment = "ProjectComment",
+  ProjectVote = "ProjectVote",
+  ProjectReview = "ProjectReview",
+  ProjectInvitation = "ProjectInvitation",
+  InvitationAccepted = "InvitationAccepted",
+  ProjectBookmark = "ProjectBookmark",
+  ProjectUpdate = "ProjectUpdate",
+  LaunchDay = "LaunchDay",
+}
+
+export const NotificationTypeSchema = z.nativeEnum(NotificationType);

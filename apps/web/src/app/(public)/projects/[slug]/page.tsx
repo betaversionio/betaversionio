@@ -1,15 +1,19 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import Link from 'next/link';
-import { useProject } from '@/hooks/queries/use-project-queries';
+import { useProject, useRecordProjectView } from '@/hooks/queries/use-project-queries';
+import { useAuth } from '@/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
-import { DocumentText1, People } from 'iconsax-react';
+import { DocumentText1, People, Star1, Refresh } from 'iconsax-react';
 import { ProjectSidebar } from '@/features/projects/components/detail/project-sidebar';
 import { OverviewTab } from '@/features/projects/components/detail/overview-tab';
 import { TeamTab } from '@/features/projects/components/detail/team-tab';
+import { ReviewsTab } from '@/features/projects/components/detail/reviews-tab';
+import { UpdatesTab } from '@/features/projects/components/detail/updates-tab';
+import { RelatedProjects } from '@/features/projects/components/detail/related-projects';
 
 export default function ProjectDetailPage({
   params,
@@ -17,7 +21,16 @@ export default function ProjectDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
+  const { user } = useAuth();
   const { data: project, isLoading, error } = useProject(slug);
+  const recordView = useRecordProjectView(project?.id ?? '');
+
+  useEffect(() => {
+    if (project?.id) {
+      recordView.mutate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?.id]);
 
   if (isLoading) {
     return (
@@ -41,6 +54,8 @@ export default function ProjectDetailPage({
     );
   }
 
+  const isOwner = user?.id === project.authorId;
+
   return (
     <div className="container px-4 pb-8 pt-20 md:pb-12">
       <div className="mx-auto max-w-6xl">
@@ -63,6 +78,19 @@ export default function ProjectDetailPage({
                     </span>
                   )}
                 </TabsTrigger>
+                <TabsTrigger value="reviews">
+                  <Star1 size={14} color="currentColor" variant="Linear" className="mr-1.5" />
+                  Reviews
+                  {project.reviewsCount > 0 && (
+                    <span className="ml-1.5 text-xs text-muted-foreground">
+                      {project.reviewsCount}
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="updates">
+                  <Refresh size={14} color="currentColor" variant="Linear" className="mr-1.5" />
+                  Updates
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview">
@@ -70,17 +98,35 @@ export default function ProjectDetailPage({
                   images={project.images}
                   title={project.title}
                   description={project.description}
+                  demoUrl={project.demoUrl}
+                  videoUrl={project.videoUrl}
                 />
               </TabsContent>
 
               <TabsContent value="team">
-                <TeamTab makers={project.makers} />
+                <TeamTab
+                  makers={project.makers}
+                  projectId={project.id}
+                  isOwner={isOwner}
+                />
               </TabsContent>
 
+              <TabsContent value="reviews">
+                <ReviewsTab
+                  projectId={project.id}
+                  averageRating={project.averageRating}
+                  reviewsCount={project.reviewsCount}
+                />
+              </TabsContent>
 
+              <TabsContent value="updates">
+                <UpdatesTab projectId={project.id} isOwner={isOwner} />
+              </TabsContent>
             </Tabs>
           </div>
         </div>
+
+        <RelatedProjects slug={slug} />
       </div>
     </div>
   );

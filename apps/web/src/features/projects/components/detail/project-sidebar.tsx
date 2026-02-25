@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Project } from '@/hooks/queries/use-project-queries';
-import { useToggleProjectVote } from '@/hooks/queries/use-project-queries';
+import { useToggleProjectVote, useToggleBookmark } from '@/hooks/queries/use-project-queries';
 import { useAuth } from '@/providers/auth-provider';
 import { statusColors } from '@/features/projects/constants';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,9 @@ import {
   CommentsTab,
   CommentComposer,
 } from '@/features/projects/components/detail/comments-tab';
-import { Globe, ExternalLink } from 'lucide-react';
+import { ShareButtons } from '@/features/projects/components/detail/share-buttons';
+import { Globe, ExternalLink, Bookmark, Library } from 'lucide-react';
+import { AddToCollectionModal } from '@/features/projects/components/detail/add-to-collection-modal';
 import { Heart, Message, Code1 } from 'iconsax-react';
 
 function getLinkLabel(url: string): string | null {
@@ -42,8 +44,11 @@ interface ProjectSidebarProps {
 export function ProjectSidebar({ project }: ProjectSidebarProps) {
   const { user } = useAuth();
   const toggleVote = useToggleProjectVote(project.id);
+  const toggleBookmark = useToggleBookmark(project.id);
   const hasVoted = project.hasVoted ?? false;
+  const hasBookmarked = project.hasBookmarked ?? false;
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [collectionModalOpen, setCollectionModalOpen] = useState(false);
 
   return (
     <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[300px]">
@@ -138,7 +143,7 @@ export function ProjectSidebar({ project }: ProjectSidebarProps) {
         )}
 
         {/* Stats + Upvote */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button
             variant="outline"
             size="sm"
@@ -164,7 +169,34 @@ export function ProjectSidebar({ project }: ProjectSidebarProps) {
             {project.commentsCount}{' '}
             {project.commentsCount === 1 ? 'Comment' : 'Comments'}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={!user || toggleBookmark.isPending}
+            onClick={() => toggleBookmark.mutate()}
+          >
+            <Bookmark
+              className={`h-4 w-4 ${hasBookmarked ? 'fill-current' : ''}`}
+            />
+            {hasBookmarked ? 'Saved' : 'Save'}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={!user}
+            onClick={() => setCollectionModalOpen(true)}
+          >
+            <Library className="h-4 w-4" />
+            Collect
+          </Button>
         </div>
+
+        <Separator />
+
+        {/* Share */}
+        <ShareButtons title={project.title} slug={project.slug} />
 
         <Separator />
 
@@ -211,6 +243,12 @@ export function ProjectSidebar({ project }: ProjectSidebarProps) {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AddToCollectionModal
+        projectId={project.id}
+        open={collectionModalOpen}
+        onOpenChange={setCollectionModalOpen}
+      />
     </aside>
   );
 }

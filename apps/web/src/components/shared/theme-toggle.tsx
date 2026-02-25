@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Sun03Icon, Moon02Icon } from '@hugeicons/core-free-icons';
+import { Sun1, Moon } from 'iconsax-react';
 
 export function ThemeToggle() {
   const { theme, systemTheme, setTheme } = useTheme();
@@ -20,7 +19,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" disabled className="h-9 w-9">
-        <HugeiconsIcon icon={Moon02Icon} size={18} />
+        <Moon size={18} color="currentColor" />
         <span className="sr-only">Toggle theme</span>
       </Button>
     );
@@ -35,7 +34,11 @@ export function ThemeToggle() {
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
     >
-      <HugeiconsIcon icon={isDark ? Sun03Icon : Moon02Icon} size={18} />
+      {isDark ? (
+        <Sun1 size={18} color="currentColor" />
+      ) : (
+        <Moon size={18} color="currentColor" />
+      )}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

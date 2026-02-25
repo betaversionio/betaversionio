@@ -56,20 +56,29 @@ model User {
   deletedAt     DateTime?
 
   // Relations
-  profile           Profile?
-  socialLinks       SocialLink[]
-  techStack         TechStackItem[]
-  projects          Project[]
-  posts             Post[]
-  comments          Comment[]
-  reactions         Reaction[]
-  resumes           Resume[]
-  projectMakers     ProjectMaker[]
-  projectComments   ProjectComment[]
-  projectVotes      ProjectVote[]
-  education         Education[]
-  experiences       Experience[]
-  services          Service[]
+  profile               Profile?
+  socialLinks           SocialLink[]
+  techStack             TechStackItem[]
+  projects              Project[]
+  posts                 Post[]
+  comments              Comment[]
+  reactions             Reaction[]
+  resumes               Resume[]
+  projectMakers         ProjectMaker[]
+  projectComments       ProjectComment[]
+  projectVotes          ProjectVote[]
+  education             Education[]
+  experiences           Experience[]
+  services              Service[]
+  projectBookmarks      ProjectBookmark[]
+  projectReviews        ProjectReview[]
+  projectUpdates        ProjectUpdate[]
+  sentInvitations       ProjectInvitation[]   @relation("SentInvitations")
+  receivedInvitations   ProjectInvitation[]   @relation("ReceivedInvitations")
+  projectViews          ProjectView[]
+  projectCollections    ProjectCollection[]
+  notificationsReceived Notification[]        @relation("NotificationRecipient")
+  notificationsActed    Notification[]        @relation("NotificationActor")
 
   @@map("users")
 }

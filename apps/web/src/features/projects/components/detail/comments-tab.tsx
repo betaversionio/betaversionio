@@ -6,6 +6,8 @@ import type { ProjectComment } from '@/hooks/queries/use-project-queries';
 import {
   useProjectComments,
   useCreateProjectComment,
+  useUpdateProjectComment,
+  useDeleteProjectComment,
 } from '@/hooks/queries/use-project-queries';
 import { useAuth } from '@/providers/auth-provider';
 import { timeAgo } from '@/lib/format';
@@ -19,9 +21,25 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Message } from 'iconsax-react';
 
 /* ─── Single comment (recursive for replies) ─── */
@@ -37,8 +55,15 @@ function CommentItem({
 }) {
   const { user } = useAuth();
   const createComment = useCreateProjectComment(projectId);
+  const updateComment = useUpdateProjectComment(projectId);
+  const deleteComment = useDeleteProjectComment(projectId);
   const [replying, setReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const isOwn = user?.id === comment.authorId;
 
   async function handleReply() {
     if (!replyContent.trim()) return;
@@ -48,6 +73,20 @@ function CommentItem({
     });
     setReplyContent('');
     setReplying(false);
+  }
+
+  async function handleEdit() {
+    if (!editContent.trim()) return;
+    await updateComment.mutateAsync({
+      commentId: comment.id,
+      data: { content: editContent.trim() },
+    });
+    setEditing(false);
+  }
+
+  async function handleDelete() {
+    await deleteComment.mutateAsync(comment.id);
+    setDeleteOpen(false);
   }
 
   const hasReplies = comment.replies && comment.replies.length > 0;
@@ -77,11 +116,74 @@ function CommentItem({
             <span className="text-xs text-muted-foreground">
               {timeAgo(comment.createdAt)}
             </span>
+            {comment.editedAt && (
+              <span className="text-xs text-muted-foreground">(edited)</span>
+            )}
+            {isOwn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="ml-auto rounded p-0.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setEditContent(comment.content);
+                      setEditing(true);
+                    }}
+                  >
+                    <Pencil className="mr-2 h-3.5 w-3.5" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    <Trash2 className="mr-2 h-3.5 w-3.5" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {comment.content}
-          </p>
-          {user && (
+
+          {editing ? (
+            <div className="mt-2 space-y-2">
+              <Textarea
+                rows={2}
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="min-h-0 resize-none text-sm"
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  disabled={!editContent.trim()}
+                  isLoading={updateComment.isPending}
+                  onClick={handleEdit}
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditing(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-muted-foreground">
+              {comment.content}
+            </p>
+          )}
+
+          {user && !editing && (
             <button
               type="button"
               className="mt-1 text-xs text-muted-foreground hover:text-foreground"
@@ -143,6 +245,27 @@ function CommentItem({
           })}
         </div>
       )}
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Your comment will be permanently
+              deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

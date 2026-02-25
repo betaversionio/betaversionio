@@ -90,8 +90,8 @@ export function useSearchUsers(query: string) {
     queryKey: userKeys.search(query),
     queryFn: () =>
       apiClient.get<PaginatedUsers>("/users", {
-        params: { search: query, limit: 20 },
-      } as never),
+        params: { q: query, limit: 20 },
+      }),
     enabled: query.length >= 2,
   });
 }

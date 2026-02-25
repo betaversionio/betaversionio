@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { TechStackInput } from './tech-stack-input';
 import {
   Select,
   SelectContent,
@@ -50,7 +51,6 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
   } = form;
 
   const [tagInput, setTagInput] = useState('');
-  const [techInput, setTechInput] = useState('');
   const [linkInput, setLinkInput] = useState('');
 
   const title = watch('title');
@@ -63,6 +63,8 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
   const isOpenSource = watch('isOpenSource');
   const logo = watch('logo');
   const description = watch('description') ?? '';
+  const demoUrl = watch('demoUrl') ?? '';
+  const videoUrl = watch('videoUrl') ?? '';
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
@@ -85,24 +87,6 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
     setValue(
       'tags',
       tags.filter((t) => t !== tag),
-    );
-  }
-
-  function addTech(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const value = techInput.trim();
-      if (value && !techStack.includes(value)) {
-        setValue('techStack', [...techStack, value]);
-      }
-      setTechInput('');
-    }
-  }
-
-  function removeTech(tech: string) {
-    setValue(
-      'techStack',
-      techStack.filter((t) => t !== tech),
     );
   }
 
@@ -207,27 +191,9 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
           <FieldDescription>
             Technologies and frameworks used in your project.
           </FieldDescription>
-          {techStack.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {techStack.map((tech) => (
-                <Badge key={tech} variant="secondary" className="gap-1">
-                  {tech}
-                  <button
-                    type="button"
-                    onClick={() => removeTech(tech)}
-                    className="ml-1 rounded-full hover:bg-muted-foreground/20"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-          <Input
-            placeholder="Type a technology and press Enter"
-            value={techInput}
-            onChange={(e) => setTechInput(e.target.value)}
-            onKeyDown={addTech}
+          <TechStackInput
+            value={techStack}
+            onChange={(val) => setValue('techStack', val)}
           />
         </Field>
 
@@ -308,6 +274,39 @@ export function MainInfoSection({ form }: MainInfoSectionProps) {
             </Button>
           </div>
           <FieldError>{errors.links?.message}</FieldError>
+        </Field>
+      </FieldGroup>
+
+      <Separator />
+
+      {/* ── Demo & Video ──────────────────────────────── */}
+      <FieldGroup>
+        <Field data-invalid={!!errors.demoUrl}>
+          <FieldLabel htmlFor="demoUrl">Demo URL</FieldLabel>
+          <FieldDescription>
+            Link to a live demo of your project.
+          </FieldDescription>
+          <Input
+            id="demoUrl"
+            placeholder="https://my-project.com"
+            value={demoUrl}
+            onChange={(e) => setValue('demoUrl', e.target.value || undefined)}
+          />
+          <FieldError>{errors.demoUrl?.message}</FieldError>
+        </Field>
+
+        <Field data-invalid={!!errors.videoUrl}>
+          <FieldLabel htmlFor="videoUrl">Video URL</FieldLabel>
+          <FieldDescription>
+            YouTube or Loom video showcasing your project.
+          </FieldDescription>
+          <Input
+            id="videoUrl"
+            placeholder="https://youtube.com/watch?v=..."
+            value={videoUrl}
+            onChange={(e) => setValue('videoUrl', e.target.value || undefined)}
+          />
+          <FieldError>{errors.videoUrl?.message}</FieldError>
         </Field>
       </FieldGroup>
 

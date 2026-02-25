@@ -11,6 +11,8 @@ import { ProjectModule } from "./modules/project/project.module";
 import { ResumeModule } from "./modules/resume/resume.module";
 import { FeedModule } from "./modules/feed/feed.module";
 import { StorageModule } from "./modules/storage/storage.module";
+import { CollectionModule } from "./modules/collection/collection.module";
+import { NotificationModule } from "./modules/notification/notification.module";
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { StorageModule } from "./modules/storage/storage.module";
     ResumeModule,
     FeedModule,
     StorageModule,
+    CollectionModule,
+    NotificationModule,
   ],
   providers: [
     {

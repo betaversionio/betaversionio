@@ -16,21 +16,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogoWithText } from '@/components/shared/logo-with-text';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
-import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Menu01Icon,
-  Cancel01Icon,
-  UserIcon,
-  DashboardSquare01Icon,
-  Settings01Icon,
-  Logout01Icon,
-  RssIcon,
-  KanbanIcon,
-} from '@hugeicons/core-free-icons';
+  HambergerMenu,
+  CloseSquare,
+  User as UserIcon,
+  Category,
+  Setting2,
+  Logout as LogoutIcon,
+  Activity,
+  Kanban,
+  Book,
+} from 'iconsax-react';
+import { NotificationBell } from '@/features/notifications/notification-bell';
 
 const navLinks = [
-  { href: '/projects', label: 'Projects', icon: KanbanIcon },
-  { href: '/feed', label: 'Feed', icon: RssIcon },
+  { href: '/projects', label: 'Projects', icon: Kanban },
+  { href: '/collections', label: 'Collections', icon: Book },
+  { href: '/feed', label: 'Feed', icon: Activity },
 ];
 
 export function Header() {
@@ -72,6 +74,7 @@ export function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {isAuthenticated && <NotificationBell />}
           <ThemeToggle />
 
           {/* Mobile menu button */}
@@ -81,10 +84,11 @@ export function Header() {
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            <HugeiconsIcon
-              icon={mobileOpen ? Cancel01Icon : Menu01Icon}
-              size={16}
-            />
+            {mobileOpen ? (
+              <CloseSquare size={16} />
+            ) : (
+              <HambergerMenu size={16} />
+            )}
           </button>
 
           {isLoading ? (
@@ -118,37 +122,25 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href={`/@${user.username}`}>
-                    <HugeiconsIcon icon={UserIcon} size={15} className="mr-2" />
+                    <UserIcon size={15} className="mr-2" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">
-                    <HugeiconsIcon
-                      icon={DashboardSquare01Icon}
-                      size={15}
-                      className="mr-2"
-                    />
+                    <Category size={15} className="mr-2" />
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings">
-                    <HugeiconsIcon
-                      icon={Settings01Icon}
-                      size={15}
-                      className="mr-2"
-                    />
+                    <Setting2 size={15} className="mr-2" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()}>
-                  <HugeiconsIcon
-                    icon={Logout01Icon}
-                    size={15}
-                    className="mr-2"
-                  />
+                  <LogoutIcon size={15} className="mr-2" />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -184,7 +176,7 @@ export function Header() {
                 className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                 onClick={() => setMobileOpen(false)}
               >
-                <HugeiconsIcon icon={link.icon} size={16} />
+                <link.icon size={16} />
                 {link.label}
               </Link>
             ))}
@@ -197,7 +189,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <HugeiconsIcon icon={UserIcon} size={16} />
+                  <UserIcon size={16} />
                   Profile
                 </Link>
                 <Link
@@ -205,7 +197,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <HugeiconsIcon icon={DashboardSquare01Icon} size={16} />
+                  <Category size={16} />
                   Dashboard
                 </Link>
                 <Link
@@ -213,7 +205,7 @@ export function Header() {
                   className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-muted"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <HugeiconsIcon icon={Settings01Icon} size={16} />
+                  <Setting2 size={16} />
                   Settings
                 </Link>
                 <div className="flex flex-col gap-2 pt-4">
@@ -225,11 +217,7 @@ export function Header() {
                       setMobileOpen(false);
                     }}
                   >
-                    <HugeiconsIcon
-                      icon={Logout01Icon}
-                      size={16}
-                      className="mr-1.5"
-                    />
+                    <LogoutIcon size={16} className="mr-1.5" />
                     Logout
                   </Button>
                 </div>
