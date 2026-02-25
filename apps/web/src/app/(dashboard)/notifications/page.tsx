@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { timeAgo } from '@/lib/format';
+import { PageHeader } from '@/components/shared/page-header';
 import { cn } from '@/lib/utils';
 import { Loader2, Bell, CheckCheck } from 'lucide-react';
 import Link from 'next/link';
@@ -21,13 +22,10 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Notifications</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Stay up to date with activity on your projects.
-          </p>
-        </div>
+      <PageHeader
+        title="Notifications"
+        description="Stay up to date with activity on your projects."
+      >
         {data?.items.some((n) => !n.isRead) && (
           <Button
             variant="outline"
@@ -40,7 +38,7 @@ export default function NotificationsPage() {
             Mark all as read
           </Button>
         )}
-      </div>
+      </PageHeader>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from '@/components/shared/page-header';
 import {
   FileText,
   Plus,
@@ -131,12 +132,10 @@ export default function ResumeBuilderPage() {
   if (!resumes?.length && !editingId) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Resume Builder</h1>
-          <p className="text-muted-foreground">
-            Create and manage your developer resumes
-          </p>
-        </div>
+        <PageHeader
+          title="Resume Builder"
+          description="Create and manage your developer resumes."
+        />
 
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -199,15 +198,10 @@ export default function ResumeBuilderPage() {
   if (editingId) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Edit Resume
-            </h1>
-            <p className="text-muted-foreground">
-              Add your education, experience, skills, and certifications
-            </p>
-          </div>
+        <PageHeader
+          title="Edit Resume"
+          description="Add your education, experience, skills, and certifications."
+        >
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setEditingId(null)}>
               Back to List
@@ -217,7 +211,7 @@ export default function ResumeBuilderPage() {
               Generate PDF
             </Button>
           </div>
-        </div>
+        </PageHeader>
 
         <Tabs defaultValue="experience">
           <TabsList className="grid w-full grid-cols-4">
@@ -544,13 +538,10 @@ export default function ResumeBuilderPage() {
   // Resume list
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Resume Builder</h1>
-          <p className="text-muted-foreground">
-            Create and manage your developer resumes
-          </p>
-        </div>
+      <PageHeader
+        title="Resume Builder"
+        description="Create and manage your developer resumes."
+      >
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -590,7 +581,7 @@ export default function ResumeBuilderPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </PageHeader>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {resumes?.map((resume) => (

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ProjectStatus } from '@devcom/shared';
 import { useProjects } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MyProjectCard } from '@/features/projects';
@@ -23,20 +24,17 @@ export default function MyProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">My Projects</h1>
-          <p className="text-muted-foreground">
-            Manage and showcase your projects
-          </p>
-        </div>
+      <PageHeader
+        title="My Projects"
+        description="Manage and showcase your projects."
+      >
         <Button asChild>
           <Link href="/my-projects/new">
             <Plus className="mr-2 h-4 w-4" />
             New Project
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
       <Tabs
         value={activeFilter}

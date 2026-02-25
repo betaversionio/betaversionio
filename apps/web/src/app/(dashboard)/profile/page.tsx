@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/providers/auth-provider';
+import { PageHeader } from '@/components/shared/page-header';
 import { Separator } from '@/components/ui/separator';
 import {
   Card,
@@ -24,12 +25,10 @@ export default function EditProfilePage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Edit Profile</h1>
-        <p className="text-muted-foreground">
-          Manage your public developer profile
-        </p>
-      </div>
+      <PageHeader
+        title="Edit Profile"
+        description="Manage your public developer profile."
+      />
 
       {/* Profile Information + Avatar */}
       <Card>

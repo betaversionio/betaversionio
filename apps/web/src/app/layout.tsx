@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/providers/theme-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { AuthProvider } from '@/providers/auth-provider';
 import { GoogleProvider } from '@/providers/google-oauth-provider';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { GoogleAnalytics } from '@/components/shared/google-analytics';
 import { OrganizationJsonLd, WebsiteJsonLd } from '@/components/shared/json-ld';
 
@@ -104,7 +105,9 @@ export default function RootLayout({
         >
           <QueryProvider>
             <GoogleProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </AuthProvider>
             </GoogleProvider>
           </QueryProvider>
         </ThemeProvider>

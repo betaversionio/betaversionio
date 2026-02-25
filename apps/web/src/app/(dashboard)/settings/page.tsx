@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from '@/components/shared/page-header';
 import { Monitor, Moon, Sun } from "lucide-react";
 
 export default function SettingsPage() {
@@ -25,12 +26,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account preferences
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage your account preferences."
+      />
 
       <Tabs defaultValue="account" className="space-y-4">
         <TabsList>

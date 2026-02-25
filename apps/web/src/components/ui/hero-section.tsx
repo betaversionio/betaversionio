@@ -1,11 +1,20 @@
 import { cn } from '@/lib/utils';
 
 interface HeroSectionProps {
-  children: React.ReactNode;
+  title?: string;
+  highlightedText?: string;
+  description?: string;
+  children?: React.ReactNode;
   className?: string;
 }
 
-export function HeroSection({ children, className }: HeroSectionProps) {
+export function HeroSection({
+  title,
+  highlightedText,
+  description,
+  children,
+  className,
+}: HeroSectionProps) {
   return (
     <section
       className={cn(
@@ -30,7 +39,24 @@ export function HeroSection({ children, className }: HeroSectionProps) {
         }}
       />
 
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10">
+        {title && (
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
+              {title}{' '}
+              {highlightedText && (
+                <span className="text-primary">{highlightedText}</span>
+              )}
+            </h1>
+            {description && (
+              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                {description}
+              </p>
+            )}
+          </div>
+        )}
+        {children}
+      </div>
     </section>
   );
 }

@@ -59,17 +59,11 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <HeroSection>
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-            About <span className="text-primary">{siteConfig.name}</span>
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            The developer identity platform. Portfolio, resume, projects, feed,
-            and ideas — unified under one subdomain.
-          </p>
-        </div>
-      </HeroSection>
+      <HeroSection
+        title="About"
+        highlightedText={siteConfig.name}
+        description="The developer identity platform. Portfolio, resume, projects, feed, and ideas — unified under one subdomain."
+      />
 
       {/* Mission */}
       <section className="py-16 md:py-20">

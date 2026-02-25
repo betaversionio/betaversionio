@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { ProjectPhase, ProductionType } from '@devcom/shared';
 import { useProjects } from '@/hooks/queries/use-project-queries';
 import { ProjectCard } from '@/features/projects';
@@ -33,14 +34,17 @@ const sortOptions = [
   { value: 'likes', label: 'Most Liked' },
 ] as const;
 
-type SortOption = (typeof sortOptions)[number]['value'];
+const searchParams = {
+  search: parseAsString.withDefault(''),
+  sort: parseAsString.withDefault('latest'),
+  phase: parseAsString.withDefault('all'),
+  productionType: parseAsString.withDefault('all'),
+  page: parseAsInteger.withDefault(1),
+};
 
 export default function ProjectsPage() {
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortOption>('latest');
-  const [phase, setPhase] = useState<string>('all');
-  const [productionType, setProductionType] = useState<string>('all');
-  const [page, setPage] = useState(1);
+  const [{ search, sort, phase, productionType, page }, setParams] =
+    useQueryStates(searchParams, { shallow: false });
 
   const filters = {
     ...(search && { search }),
@@ -58,29 +62,24 @@ export default function ProjectsPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <HeroSection className="pt-20 pb-14 md:pt-28 md:pb-20">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-            Community <span className="text-primary">Projects</span>
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Discover and explore projects built by the community
-          </p>
-
-          {/* Search */}
-          <div className="mx-auto mt-6 max-w-xl">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search projects..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                className="rounded-full pl-10 h-12"
-              />
-            </div>
+      <HeroSection
+        title="Community"
+        highlightedText="Projects"
+        description="Discover and explore projects built by the community"
+        className="pt-20 pb-14 md:pt-28 md:pb-20"
+      >
+        {/* Search */}
+        <div className="mx-auto mt-6 max-w-xl px-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search projects..."
+              value={search}
+              onChange={(e) =>
+                setParams({ search: e.target.value, page: 1 })
+              }
+              className="rounded-full pl-10 h-12"
+            />
           </div>
         </div>
       </HeroSection>
@@ -92,10 +91,7 @@ export default function ProjectsPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Select
                 value={phase}
-                onValueChange={(v) => {
-                  setPhase(v);
-                  setPage(1);
-                }}
+                onValueChange={(v) => setParams({ phase: v, page: 1 })}
               >
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Phase" />
@@ -112,10 +108,9 @@ export default function ProjectsPage() {
 
               <Select
                 value={productionType}
-                onValueChange={(v) => {
-                  setProductionType(v);
-                  setPage(1);
-                }}
+                onValueChange={(v) =>
+                  setParams({ productionType: v, page: 1 })
+                }
               >
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Type" />
@@ -133,10 +128,7 @@ export default function ProjectsPage() {
 
             <Tabs
               value={sort}
-              onValueChange={(v) => {
-                setSort(v as SortOption);
-                setPage(1);
-              }}
+              onValueChange={(v) => setParams({ sort: v, page: 1 })}
             >
               <TabsList>
                 {sortOptions.map((opt) => (
@@ -185,7 +177,7 @@ export default function ProjectsPage() {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        onClick={() => setParams({ page: Math.max(1, page - 1) })}
                         className={
                           page <= 1
                             ? 'pointer-events-none opacity-50'
@@ -211,7 +203,7 @@ export default function ProjectsPage() {
                           <PaginationItem>
                             <PaginationLink
                               isActive={p === page}
-                              onClick={() => setPage(p)}
+                              onClick={() => setParams({ page: p })}
                               className="cursor-pointer"
                             >
                               {p}
@@ -223,7 +215,7 @@ export default function ProjectsPage() {
                     <PaginationItem>
                       <PaginationNext
                         onClick={() =>
-                          setPage((p) => Math.min(totalPages, p + 1))
+                          setParams({ page: Math.min(totalPages, page + 1) })
                         }
                         className={
                           page >= totalPages

@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PageHeader } from '@/components/shared/page-header';
 import {
   FolderKanban,
   Eye,
@@ -75,14 +76,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome message */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Welcome back, {user?.name?.split(" ")[0] ?? user?.username}
-        </h1>
-        <p className="text-muted-foreground">
-          Here&apos;s an overview of your developer profile activity.
-        </p>
-      </div>
+      <PageHeader
+        title={`Welcome back, ${user?.name?.split(' ')[0] ?? user?.username}`}
+        description="Here's an overview of your developer profile activity."
+      />
 
       {/* Quick stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

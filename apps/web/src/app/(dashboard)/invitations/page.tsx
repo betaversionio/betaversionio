@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { timeAgo } from '@/lib/format';
+import { PageHeader } from '@/components/shared/page-header';
 import { Loader2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,12 +18,10 @@ export default function InvitationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Invitations</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Team invitations you&apos;ve received.
-        </p>
-      </div>
+      <PageHeader
+        title="Invitations"
+        description="Team invitations you've received."
+      />
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">

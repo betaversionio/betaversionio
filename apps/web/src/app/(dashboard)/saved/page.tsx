@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useBookmarkedProjects } from '@/hooks/queries/use-project-queries';
 import { ProjectCard } from '@/features/projects';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/shared/page-header';
 import { Loader2, Bookmark } from 'lucide-react';
 
 export default function SavedPage() {
@@ -12,12 +13,10 @@ export default function SavedPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Saved Projects</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Projects you&apos;ve bookmarked for later.
-        </p>
-      </div>
+      <PageHeader
+        title="Saved Projects"
+        description="Projects you've bookmarked for later."
+      />
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
