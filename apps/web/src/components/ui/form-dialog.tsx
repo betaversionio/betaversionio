@@ -59,9 +59,11 @@ export function FormDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" size="sm" isLoading={isPending}>
-              {submitLabel}
-            </Button>
+            {submitLabel && (
+              <Button type="submit" size="sm" isLoading={isPending}>
+                {submitLabel}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

@@ -2,17 +2,25 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import type { CreateResumeInput, UpdateResumeInput } from "@devcom/shared";
+import { LatexService } from "./latex.service";
+import { StorageService } from "../storage/storage.service";
+import type {
+  CreateResumeInput,
+  UpdateResumeInput,
+  CompileLatexInput,
+} from "@devcom/shared";
 
 @Injectable()
 export class ResumeService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly latexService: LatexService,
+    private readonly storageService: StorageService,
+  ) {}
 
-  /**
-   * Create a new resume for the user.
-   */
   async create(userId: string, dto: CreateResumeInput) {
     return this.prisma.resume.create({
       data: {
@@ -20,6 +28,7 @@ export class ResumeService {
         title: dto.title,
         templateId: dto.templateId,
         sections: dto.sections as any,
+        latexSource: dto.latexSource,
       },
       include: {
         template: true,
@@ -28,9 +37,6 @@ export class ResumeService {
     });
   }
 
-  /**
-   * Find all resumes belonging to a user, including template and versions.
-   */
   async findAllByUser(userId: string) {
     return this.prisma.resume.findMany({
       where: {
@@ -47,9 +53,6 @@ export class ResumeService {
     });
   }
 
-  /**
-   * Find a single resume by ID. Verifies ownership.
-   */
   async findById(id: string, userId: string) {
     const resume = await this.prisma.resume.findUnique({
       where: { id },
@@ -72,9 +75,6 @@ export class ResumeService {
     return resume;
   }
 
-  /**
-   * Update a resume. Verifies ownership.
-   */
   async update(id: string, userId: string, dto: UpdateResumeInput) {
     const resume = await this.prisma.resume.findUnique({
       where: { id },
@@ -94,6 +94,12 @@ export class ResumeService {
         ...(dto.title !== undefined && { title: dto.title }),
         ...(dto.templateId !== undefined && { templateId: dto.templateId }),
         ...(dto.sections !== undefined && { sections: dto.sections as any }),
+        ...(dto.latexSource !== undefined && {
+          latexSource: dto.latexSource,
+        }),
+        ...(dto.githubRepo !== undefined && { githubRepo: dto.githubRepo }),
+        ...(dto.githubPath !== undefined && { githubPath: dto.githubPath }),
+        ...(dto.githubSha !== undefined && { githubSha: dto.githubSha }),
       },
       include: {
         template: true,
@@ -105,12 +111,36 @@ export class ResumeService {
   }
 
   /**
-   * Generate a PDF for the resume.
-   *
-   * TODO: Integrate with @react-pdf/renderer on the frontend or a server-side
-   * PDF generation library. For now, this creates a placeholder ResumeVersion
-   * entry. Once PDF generation is implemented, the generated file should be
-   * uploaded to Cloudflare R2 and the pdfUrl should point to the R2 public URL.
+   * Compile LaTeX source and return the PDF buffer (for preview, no R2 upload).
+   */
+  async compileLatex(id: string, userId: string, dto: CompileLatexInput) {
+    const resume = await this.prisma.resume.findUnique({
+      where: { id },
+    });
+
+    if (!resume || resume.deletedAt) {
+      throw new NotFoundException("Resume not found");
+    }
+
+    if (resume.userId !== userId) {
+      throw new ForbiddenException("You do not own this resume");
+    }
+
+    const result = await this.latexService.compile(dto.latexSource);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: "LaTeX compilation failed",
+        errors: result.errors,
+        log: result.log.slice(-2000),
+      });
+    }
+
+    return result.pdf;
+  }
+
+  /**
+   * Generate a PDF, upload to R2, and create a ResumeVersion.
    */
   async generatePdf(id: string, userId: string) {
     const resume = await this.prisma.resume.findUnique({
@@ -125,16 +155,30 @@ export class ResumeService {
       throw new ForbiddenException("You do not own this resume");
     }
 
-    // TODO: Replace with actual PDF generation + R2 upload
-    // 1. Render resume sections with the chosen template using @react-pdf/renderer
-    // 2. Upload the generated PDF buffer to R2 via StorageService
-    // 3. Use the returned public URL as pdfUrl
-    const placeholderUrl = `https://placeholder.devcom.io/resumes/${id}/${Date.now()}.pdf`;
+    if (!resume.latexSource) {
+      throw new BadRequestException("No LaTeX source to compile");
+    }
+
+    const result = await this.latexService.compile(resume.latexSource);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: "LaTeX compilation failed",
+        errors: result.errors,
+      });
+    }
+
+    const key = `resumes/${userId}/${id}/${Date.now()}.pdf`;
+    const pdfUrl = await this.storageService.uploadBuffer(
+      key,
+      result.pdf,
+      "application/pdf",
+    );
 
     const version = await this.prisma.resumeVersion.create({
       data: {
         resumeId: id,
-        pdfUrl: placeholderUrl,
+        pdfUrl,
       },
     });
 
@@ -142,9 +186,84 @@ export class ResumeService {
   }
 
   /**
-   * Find a user's public resume by username.
-   * Returns the most recently updated public resume.
+   * Soft delete a resume.
    */
+  async softDelete(id: string, userId: string) {
+    const resume = await this.prisma.resume.findUnique({
+      where: { id },
+    });
+
+    if (!resume || resume.deletedAt) {
+      throw new NotFoundException("Resume not found");
+    }
+
+    if (resume.userId !== userId) {
+      throw new ForbiddenException("You do not own this resume");
+    }
+
+    await this.prisma.resume.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  }
+
+  async setPrimary(id: string, userId: string) {
+    const resume = await this.prisma.resume.findUnique({
+      where: { id },
+    });
+
+    if (!resume || resume.deletedAt) {
+      throw new NotFoundException("Resume not found");
+    }
+
+    if (resume.userId !== userId) {
+      throw new ForbiddenException("You do not own this resume");
+    }
+
+    // Unset all other resumes as non-primary for this user
+    await this.prisma.resume.updateMany({
+      where: { userId, isPrimary: true },
+      data: { isPrimary: false },
+    });
+
+    // Set the target resume as primary (also make it public)
+    return this.prisma.resume.update({
+      where: { id },
+      data: { isPrimary: true, isPublic: true },
+      include: {
+        template: true,
+        versions: {
+          orderBy: { generatedAt: "desc" },
+        },
+      },
+    });
+  }
+
+  async unsetPrimary(id: string, userId: string) {
+    const resume = await this.prisma.resume.findUnique({
+      where: { id },
+    });
+
+    if (!resume || resume.deletedAt) {
+      throw new NotFoundException("Resume not found");
+    }
+
+    if (resume.userId !== userId) {
+      throw new ForbiddenException("You do not own this resume");
+    }
+
+    return this.prisma.resume.update({
+      where: { id },
+      data: { isPrimary: false },
+      include: {
+        template: true,
+        versions: {
+          orderBy: { generatedAt: "desc" },
+        },
+      },
+    });
+  }
+
   async findPublicResume(username: string) {
     const user = await this.prisma.user.findUnique({
       where: { username },
@@ -155,11 +274,12 @@ export class ResumeService {
       throw new NotFoundException("User not found");
     }
 
+    // Prefer the primary resume; fall back to any public one
     const resume = await this.prisma.resume.findFirst({
       where: {
         userId: user.id,
-        isPublic: true,
         deletedAt: null,
+        OR: [{ isPrimary: true }, { isPublic: true }],
       },
       include: {
         template: true,
@@ -168,7 +288,7 @@ export class ResumeService {
           take: 1,
         },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }],
     });
 
     if (!resume) {

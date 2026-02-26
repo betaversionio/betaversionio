@@ -35,7 +35,11 @@ import {
   respondInvitationSchema,
 } from "../schemas/project";
 
-import { createResumeSchema, updateResumeSchema } from "../schemas/resume";
+import {
+  createResumeSchema,
+  updateResumeSchema,
+  compileLatexSchema,
+} from "../schemas/resume";
 
 import {
   createPostSchema,
@@ -56,6 +60,11 @@ import {
   createBlogCommentSchema,
   updateBlogCommentSchema,
 } from "../schemas/blog";
+
+import {
+  connectGithubSchema,
+  pushFileSchema,
+} from "../schemas/github";
 
 // ─── Auth Types ──────────────────────────────────────────────────────────────
 
@@ -96,6 +105,7 @@ export type RespondInvitationInput = z.infer<typeof respondInvitationSchema>;
 
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;
 export type UpdateResumeInput = z.infer<typeof updateResumeSchema>;
+export type CompileLatexInput = z.infer<typeof compileLatexSchema>;
 
 // ─── Feed Types ──────────────────────────────────────────────────────────────
 
@@ -116,3 +126,8 @@ export type UpdateBlogInput = z.infer<typeof updateBlogSchema>;
 export type ToggleBlogVoteInput = z.infer<typeof toggleBlogVoteSchema>;
 export type CreateBlogCommentInput = z.infer<typeof createBlogCommentSchema>;
 export type UpdateBlogCommentInput = z.infer<typeof updateBlogCommentSchema>;
+
+// ─── GitHub Types ───────────────────────────────────────────────────────────
+
+export type ConnectGithubInput = z.infer<typeof connectGithubSchema>;
+export type PushFileInput = z.infer<typeof pushFileSchema>;

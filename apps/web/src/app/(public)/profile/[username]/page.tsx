@@ -6,9 +6,10 @@ import { useUserProfile } from '@/hooks/queries/use-user-queries';
 import { useProjects } from '@/hooks/queries/use-project-queries';
 import { useBlogs } from '@/hooks/queries/use-blog-queries';
 import { useFollowCounts } from '@/hooks/queries/use-follow-queries';
+import { usePublicResume } from '@/hooks/queries/use-resume-queries';
 import { FollowButton } from '@/components/shared/follow-button';
+import { useAuth } from '@/providers/auth-provider';
 import { useUserPosts } from '@/features/feed';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { TechBadge } from '@/components/shared/tech-badge';
@@ -16,19 +17,12 @@ import { Markdown } from '@/components/ui/markdown';
 import { ProjectCard } from '@/features/projects/components/project-card';
 import { BlogCard } from '@/features/blogs/components/blog-card';
 import { PostCard } from '@/features/feed';
-import { formatDate, timeAgo } from '@/lib/format';
 import { formatDateRange } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Loader2,
-  ExternalLink,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { HeroBackground } from '@/components/ui/hero-background';
+import { FileText, Loader2, Pencil } from 'lucide-react';
+import { SocialIcon } from 'react-social-icons';
 import {
   Location,
   Global,
@@ -37,21 +31,6 @@ import {
   Setting2,
   Code1,
 } from 'iconsax-react';
-
-const socialIcons: Record<string, { svg: string; viewBox: string }> = {
-  Github: {
-    viewBox: '0 0 24 24',
-    svg: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z',
-  },
-  Linkedin: {
-    viewBox: '0 0 24 24',
-    svg: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
-  },
-  Twitter: {
-    viewBox: '0 0 24 24',
-    svg: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z',
-  },
-};
 
 const employmentTypeLabels: Record<string, string> = {
   FullTime: 'Full-time',
@@ -82,6 +61,9 @@ export default function PublicProfilePage({
   );
   const { data: postsData } = useUserPosts(profile?.id ?? '');
   const { data: followCounts } = useFollowCounts(profile?.id);
+  const { data: publicResume } = usePublicResume(username);
+  const { user } = useAuth();
+  const isOwnProfile = user?.id === profile?.id;
 
   if (isLoading) {
     return (
@@ -110,7 +92,9 @@ export default function PublicProfilePage({
   const location = profile.profile?.location;
   const website = profile.profile?.website;
 
-  const projects = projectsData?.items ?? [];
+  const projects = (projectsData?.items ?? []).filter(
+    (p) => p.status === 'Active' || p.status === 'Completed',
+  );
   const blogs = blogsData?.items ?? [];
   const posts = postsData?.items ?? [];
 
@@ -122,183 +106,202 @@ export default function PublicProfilePage({
   ];
 
   return (
-    <div className="container px-4 pb-12 pt-20">
-      <div className="mx-auto max-w-5xl">
-        {/* ── Hero / Header ─────────────────────────────────────── */}
-        <div className="flex flex-col gap-6 md:flex-row md:gap-8">
-          <UserAvatar
-            src={profile.avatarUrl}
-            name={profile.name}
-            className="h-28 w-28 shrink-0 self-center ring-4 ring-background md:h-36 md:w-36 md:self-start"
-            fallbackClassName="text-3xl"
-          />
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl font-bold tracking-tight">
-              {profile.name ?? profile.username}
-            </h1>
-            <p className="text-muted-foreground">@{profile.username}</p>
-            {headline && (
-              <p className="mt-2 text-lg text-muted-foreground">{headline}</p>
-            )}
+    <div className="pb-12">
+      <HeroBackground className="pt-24 pb-10">
+        <div className="container px-4">
+          <div className="mx-auto max-w-5xl">
+            {/* ── Hero / Header ─────────────────────────────────────── */}
+            <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+              <UserAvatar
+                src={profile.avatarUrl}
+                name={profile.name}
+                className="h-28 w-28 shrink-0 self-center ring-4 ring-background md:h-36 md:w-36 md:self-start"
+                fallbackClassName="text-3xl"
+              />
+              <div className="flex-1 text-center md:text-left">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {profile.name ?? profile.username}
+                </h1>
+                <p className="text-muted-foreground">@{profile.username}</p>
+                {headline && (
+                  <p className="mt-2 text-md text-muted-foreground">
+                    {headline}
+                  </p>
+                )}
 
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted-foreground md:justify-start">
-              {location && (
-                <span className="flex items-center gap-1.5">
-                  <Location size={16} color="currentColor" variant="Bold" />
-                  {location}
-                </span>
-              )}
-              {website && (
-                <a
-                  href={website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 transition-colors hover:text-foreground"
-                >
-                  <Global size={16} color="currentColor" variant="Bold" />
-                  {website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                </a>
-              )}
-            </div>
-
-            {/* Social Links */}
-            {profile.socialLinks.length > 0 && (
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 md:justify-start">
-                {profile.socialLinks.map((link) => {
-                  const icon = socialIcons[link.platform];
-                  return (
-                    <Button
-                      key={link.platform}
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9"
-                      asChild
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted-foreground md:justify-start">
+                  {location && (
+                    <span className="flex items-center gap-1.5">
+                      <Location size={16} color="currentColor" variant="Bold" />
+                      {location}
+                    </span>
+                  )}
+                  {website && (
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 transition-colors hover:text-foreground"
                     >
+                      <Global size={16} color="currentColor" variant="Bold" />
+                      {website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                    </a>
+                  )}
+                </div>
+
+                {/* Social Links */}
+                {profile.socialLinks.length > 0 && (
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                    {profile.socialLinks.map((link) => (
+                      <span
+                        key={link.platform}
+                        className="rounded-full transition-colors hover:bg-muted"
+                      >
+                        <SocialIcon
+                          url={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          bgColor="transparent"
+                          fgColor="hsl(var(--foreground))"
+                          title={link.platform}
+                          style={{ height: 36, width: 36 }}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Follow counts + button */}
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 md:justify-start">
+                  {followCounts && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <span>
+                        <span className="font-semibold">
+                          {followCounts.followersCount}
+                        </span>{' '}
+                        <span className="text-muted-foreground">followers</span>
+                      </span>
+                      <span>
+                        <span className="font-semibold">
+                          {followCounts.followingCount}
+                        </span>{' '}
+                        <span className="text-muted-foreground">following</span>
+                      </span>
+                    </div>
+                  )}
+                  {publicResume?.pdfUrl && (
+                    <Button variant="outline" size="sm" asChild>
                       <a
-                        href={link.url}
+                        href={`/profile/${username}/resume.pdf`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        title={link.platform}
                       >
-                        {icon ? (
-                          <svg
-                            className="size-4"
-                            fill="currentColor"
-                            viewBox={icon.viewBox}
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d={icon.svg} />
-                          </svg>
-                        ) : (
-                          <ExternalLink className="h-4 w-4" />
-                        )}
+                        <FileText className="mr-1.5 h-3.5 w-3.5" />
+                        Resume
                       </a>
                     </Button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Follow counts + button */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-              {followCounts && (
-                <div className="flex items-center gap-3 text-sm">
-                  <span>
-                    <span className="font-semibold">{followCounts.followersCount}</span>{' '}
-                    <span className="text-muted-foreground">followers</span>
-                  </span>
-                  <span>
-                    <span className="font-semibold">{followCounts.followingCount}</span>{' '}
-                    <span className="text-muted-foreground">following</span>
-                  </span>
+                  )}
+                  {isOwnProfile ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href="/profile">
+                        <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                        Edit Profile
+                      </Link>
+                    </Button>
+                  ) : (
+                    user && <FollowButton targetUserId={profile.id} />
+                  )}
                 </div>
-              )}
-              <FollowButton targetUserId={profile.id} />
+              </div>
+            </div>
+
+            {/* ── Tab Navigation ────────────────────────────────────── */}
+            <div className="mt-8 border-b">
+              <nav className="-mb-px flex gap-6 overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      'flex shrink-0 items-center gap-1.5 border-b-2 px-1 pb-3 text-sm font-medium transition-colors',
+                      activeTab === tab.id
+                        ? 'border-primary text-foreground'
+                        : 'border-transparent text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {tab.label}
+                    {tab.count != null && tab.count > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[10px] font-medium">
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </nav>
             </div>
           </div>
         </div>
+      </HeroBackground>
 
-        {/* ── Tab Navigation ────────────────────────────────────── */}
-        <div className="mt-8 border-b">
-          <nav className="-mb-px flex gap-6 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'flex shrink-0 items-center gap-1.5 border-b-2 px-1 pb-3 text-sm font-medium transition-colors',
-                  activeTab === tab.id
-                    ? 'border-primary text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground',
+      <div className="container px-4">
+        <div className="mx-auto max-w-5xl">
+          {/* ── Tab Content ───────────────────────────────────────── */}
+          <div>
+            {activeTab === 'overview' && (
+              <OverviewTab
+                bio={bio}
+                techStack={profile.techStack}
+                experiences={profile.experiences}
+                education={profile.education}
+                services={profile.services}
+                projects={projects}
+                blogs={blogs}
+              />
+            )}
+
+            {activeTab === 'projects' && (
+              <section>
+                {projects.length === 0 ? (
+                  <EmptyState text="No projects yet." />
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {projects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
                 )}
-              >
-                {tab.label}
-                {tab.count != null && tab.count > 0 && (
-                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium">
-                    {tab.count}
-                  </span>
+              </section>
+            )}
+
+            {activeTab === 'blogs' && (
+              <section>
+                {blogs.length === 0 ? (
+                  <EmptyState text="No blog posts yet." />
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {blogs.map((blog) => (
+                      <BlogCard key={blog.id} blog={blog} />
+                    ))}
+                  </div>
                 )}
-              </button>
-            ))}
-          </nav>
-        </div>
+              </section>
+            )}
 
-        {/* ── Tab Content ───────────────────────────────────────── */}
-        <div className="mt-8">
-          {activeTab === 'overview' && (
-            <OverviewTab
-              bio={bio}
-              techStack={profile.techStack}
-              experiences={profile.experiences}
-              education={profile.education}
-              services={profile.services}
-              projects={projects}
-              blogs={blogs}
-            />
-          )}
-
-          {activeTab === 'projects' && (
-            <section>
-              {projects.length === 0 ? (
-                <EmptyState text="No projects yet." />
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-
-          {activeTab === 'blogs' && (
-            <section>
-              {blogs.length === 0 ? (
-                <EmptyState text="No blog posts yet." />
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {blogs.map((blog) => (
-                    <BlogCard key={blog.id} blog={blog} />
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-
-          {activeTab === 'posts' && (
-            <section>
-              {posts.length === 0 ? (
-                <EmptyState text="No posts yet." />
-              ) : (
-                <div className="mx-auto max-w-2xl space-y-4">
-                  {posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
+            {activeTab === 'posts' && (
+              <section>
+                {posts.length === 0 ? (
+                  <EmptyState text="No posts yet." />
+                ) : (
+                  <div className="mx-auto max-w-2xl space-y-4">
+                    {posts.map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -410,7 +413,8 @@ function OverviewTab({
                       {exp.company}
                       {exp.location && ` · ${exp.location}`}
                       {' · '}
-                      {employmentTypeLabels[exp.employmentType] ?? exp.employmentType}
+                      {employmentTypeLabels[exp.employmentType] ??
+                        exp.employmentType}
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {formatDateRange(exp.startDate, exp.endDate, exp.current)}

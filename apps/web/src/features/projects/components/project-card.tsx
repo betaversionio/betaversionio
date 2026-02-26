@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { TechBadge } from '@/components/shared/tech-badge';
 import { Heart, Message } from 'iconsax-react';
-import { statusColors } from '@/features/projects/constants';
+
 
 interface ProjectCardProps {
   project: {
@@ -21,7 +21,6 @@ interface ProjectCardProps {
     title: string;
     logo: string | null;
     tagline: string | null;
-    status: string;
     techStack: string[];
     upvotesCount: number;
     commentsCount: number;
@@ -42,25 +41,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
       />
 
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2.5">
-            {project.logo && (
-              <img
-                src={project.logo}
-                alt=""
-                className="h-8 w-8 rounded-md object-cover"
-              />
-            )}
-            <CardTitle className="line-clamp-1 text-lg">
-              {project.title}
-            </CardTitle>
-          </div>
-          <Badge
-            variant="secondary"
-            className={statusColors[project.status] ?? ''}
-          >
-            {project.status}
-          </Badge>
+        <div className="flex items-center gap-2.5">
+          {project.logo && (
+            <img
+              src={project.logo}
+              alt=""
+              className="h-8 w-8 rounded-md object-cover"
+            />
+          )}
+          <CardTitle className="line-clamp-1 text-lg">
+            {project.title}
+          </CardTitle>
         </div>
         {project.tagline && (
           <CardDescription className="line-clamp-2">

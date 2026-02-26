@@ -18,10 +18,17 @@ export {
 export {
   useResumes,
   useResume,
+  usePublicResume,
   useCreateResume,
   useUpdateResume,
+  useDeleteResume,
+  useCompileResume,
+  useGeneratePdf,
+  useSetPrimaryResume,
+  useUnsetPrimaryResume,
   resumeKeys,
 } from "./use-resume-queries";
+export type { Resume, PublicResumeInfo } from "./use-resume-queries";
 export {
   useFeed,
   usePost,
@@ -45,6 +52,23 @@ export {
   useSuggestedUsers,
   followKeys,
 } from "./use-follow-queries";
+export {
+  useGitHubStatus,
+  useConnectGitHub,
+  useDisconnectGitHub,
+  useGitHubRepos,
+  useGitHubContents,
+  useGitHubFileContent,
+  usePushToGitHub,
+  githubKeys,
+} from "./use-github-queries";
+export type {
+  GitHubStatus,
+  GitHubRepo,
+  GitHubContentItem,
+  GitHubFile,
+  PushResult,
+} from "./use-github-queries";
 export {
   useBlogs,
   useBlog,

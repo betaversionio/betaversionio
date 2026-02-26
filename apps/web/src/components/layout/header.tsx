@@ -18,11 +18,13 @@ import {
   Activity,
   Kanban,
   Book,
+  DocumentText,
 } from 'iconsax-react';
 import { NotificationBell } from '@/features/notifications/notification-bell';
 
 const navLinks = [
   { href: '/projects', label: 'Projects', icon: Kanban },
+  { href: '/blogs', label: 'Blogs', icon: DocumentText },
   { href: '/collections', label: 'Collections', icon: Book },
   { href: '/feed', label: 'Feed', icon: Activity },
 ];

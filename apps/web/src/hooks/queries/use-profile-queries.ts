@@ -45,6 +45,16 @@ export interface FullProfile {
     title: string;
     description: string | null;
   }>;
+  projects: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    tagline: string | null;
+    demoUrl: string | null;
+    links: string[];
+    techStack: string[];
+    isOpenSource: boolean;
+  }>;
 }
 
 export const profileKeys = {

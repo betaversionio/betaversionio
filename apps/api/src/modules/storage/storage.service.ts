@@ -96,6 +96,32 @@ export class StorageService implements OnModuleInit {
   }
 
   /**
+   * Upload a buffer directly to R2.
+   *
+   * @param key - The storage key (path) for the file
+   * @param buffer - The file content as a Buffer
+   * @param contentType - The MIME type of the file
+   * @returns The public URL of the uploaded file
+   */
+  async uploadBuffer(
+    key: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<string> {
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: buffer,
+      ContentType: contentType,
+    });
+
+    await this.s3Client.send(command);
+    this.logger.log(`Uploaded buffer: ${key} (${buffer.length} bytes)`);
+
+    return this.getPublicUrl(key);
+  }
+
+  /**
    * Delete a file from R2.
    *
    * @param key - The storage key (path) of the file to delete

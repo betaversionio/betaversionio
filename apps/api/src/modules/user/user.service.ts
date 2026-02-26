@@ -30,6 +30,21 @@ export class UserService {
         education: { orderBy: { startDate: "desc" } },
         experiences: { orderBy: { startDate: "desc" } },
         services: true,
+        projects: {
+          where: { deletedAt: null, status: "Active" },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            tagline: true,
+            demoUrl: true,
+            links: true,
+            techStack: true,
+            isOpenSource: true,
+          },
+        },
       },
     });
 

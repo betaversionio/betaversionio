@@ -69,6 +69,18 @@ export const createResumeSchema = z.object({
     ),
   templateId: z.string().uuid("Invalid template ID").optional(),
   sections: sectionsSchema,
+  latexSource: z.string().max(100_000).optional(),
 });
 
-export const updateResumeSchema = createResumeSchema.partial();
+export const updateResumeSchema = createResumeSchema.partial().extend({
+  githubRepo: z.string().max(200).optional(),
+  githubPath: z.string().max(500).optional(),
+  githubSha: z.string().max(100).optional(),
+});
+
+export const compileLatexSchema = z.object({
+  latexSource: z
+    .string()
+    .min(1, "LaTeX source is required")
+    .max(100_000, "LaTeX source is too long"),
+});

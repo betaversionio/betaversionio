@@ -15,6 +15,7 @@ import { CollectionModule } from "./modules/collection/collection.module";
 import { NotificationModule } from "./modules/notification/notification.module";
 import { BlogModule } from "./modules/blog/blog.module";
 import { FollowModule } from "./modules/follow/follow.module";
+import { GitHubModule } from "./modules/github/github.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { FollowModule } from "./modules/follow/follow.module";
     NotificationModule,
     BlogModule,
     FollowModule,
+    GitHubModule,
   ],
   providers: [
     {

@@ -3,6 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  StreamableFile,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
@@ -13,18 +14,22 @@ export interface WrappedResponse<T> {
 }
 
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, WrappedResponse<T>>
-{
+export class TransformInterceptor implements NestInterceptor {
   intercept(
     _context: ExecutionContext,
     next: CallHandler,
-  ): Observable<WrappedResponse<T>> {
+  ): Observable<any> {
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data,
-      })),
+      map((data) => {
+        // Don't wrap binary streams (e.g. PDF responses)
+        if (data instanceof StreamableFile) {
+          return data;
+        }
+        return {
+          success: true,
+          data,
+        };
+      }),
     );
   }
 }

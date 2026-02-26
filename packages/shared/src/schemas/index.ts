@@ -6,3 +6,4 @@ export * from "./resume";
 export * from "./feed";
 export * from "./collection";
 export * from "./blog";
+export * from "./github";

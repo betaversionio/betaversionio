@@ -3,10 +3,15 @@
 model Resume {
   id         String    @id @default(cuid())
   userId     String
-  title      String
-  templateId String?
-  sections   Json
+  title       String
+  templateId  String?
+  sections    Json
+  latexSource String?  @db.Text
+  githubRepo String?
+  githubPath String?
+  githubSha  String?
   isPublic   Boolean   @default(false)
+  isPrimary  Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?

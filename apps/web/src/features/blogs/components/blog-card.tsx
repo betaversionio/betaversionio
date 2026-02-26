@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/shared/user-avatar';
-import { Heart, Message } from 'iconsax-react';
-import { blogStatusColors } from '@/features/blogs/constants';
+import { Eye, Heart, Message } from 'iconsax-react';
+
 
 interface BlogCardProps {
   blog: {
@@ -20,10 +20,10 @@ interface BlogCardProps {
     title: string;
     coverImage: string | null;
     excerpt: string | null;
-    status: string;
     tags: string[];
     upvotesCount: number;
     commentsCount: number;
+    viewsCount: number;
     author: {
       username: string;
       name: string | null;
@@ -51,17 +51,9 @@ export function BlogCard({ blog }: BlogCardProps) {
       )}
 
       <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-2 text-lg">
-            {blog.title}
-          </CardTitle>
-          <Badge
-            variant="secondary"
-            className={blogStatusColors[blog.status] ?? ''}
-          >
-            {blog.status}
-          </Badge>
-        </div>
+        <CardTitle className="line-clamp-2 text-lg">
+          {blog.title}
+        </CardTitle>
         {blog.excerpt && (
           <CardDescription className="line-clamp-2">
             {blog.excerpt}
@@ -105,6 +97,10 @@ export function BlogCard({ blog }: BlogCardProps) {
             <span className="flex items-center gap-1">
               <Message size={16} color="currentColor" variant="Linear" />
               {blog.commentsCount}
+            </span>
+            <span className="flex items-center gap-1">
+              <Eye size={16} color="currentColor" variant="Linear" />
+              {blog.viewsCount}
             </span>
           </div>
         </div>
