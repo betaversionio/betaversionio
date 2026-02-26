@@ -1,15 +1,11 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 import type {
   CreateCollectionInput,
   UpdateCollectionInput,
   AddCollectionItemInput,
-} from "@devcom/shared";
-import type { Project, ProjectAuthor } from "./use-project-queries";
+} from '@betaversionio/shared';
+import type { Project, ProjectAuthor } from './use-project-queries';
 
 export interface CollectionItem {
   id: string;
@@ -46,11 +42,11 @@ interface PaginatedCollections {
 }
 
 export const collectionKeys = {
-  all: ["collections"] as const,
-  lists: () => [...collectionKeys.all, "list"] as const,
+  all: ['collections'] as const,
+  lists: () => [...collectionKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...collectionKeys.lists(), filters] as const,
-  detail: (slug: string) => [...collectionKeys.all, "detail", slug] as const,
+  detail: (slug: string) => [...collectionKeys.all, 'detail', slug] as const,
 };
 
 export function useCollections(
@@ -59,8 +55,11 @@ export function useCollections(
   return useQuery({
     queryKey: collectionKeys.list(filters),
     queryFn: () =>
-      apiClient.get<PaginatedCollections>("/collections", {
-        params: filters as Record<string, string | number | boolean | undefined>,
+      apiClient.get<PaginatedCollections>('/collections', {
+        params: filters as Record<
+          string,
+          string | number | boolean | undefined
+        >,
       } as never),
   });
 }
@@ -68,8 +67,7 @@ export function useCollections(
 export function useCollection(slug: string) {
   return useQuery({
     queryKey: collectionKeys.detail(slug),
-    queryFn: () =>
-      apiClient.get<ProjectCollection>(`/collections/${slug}`),
+    queryFn: () => apiClient.get<ProjectCollection>(`/collections/${slug}`),
     enabled: !!slug,
   });
 }
@@ -78,7 +76,7 @@ export function useCreateCollection() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateCollectionInput) =>
-      apiClient.post<ProjectCollection>("/collections", data),
+      apiClient.post<ProjectCollection>('/collections', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: collectionKeys.lists() });
     },

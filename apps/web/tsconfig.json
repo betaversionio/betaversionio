@@ -1,5 +1,5 @@
 {
-  "extends": "@devcom/typescript-config/next.json",
+  "extends": "@betaversionio/typescript-config/next.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

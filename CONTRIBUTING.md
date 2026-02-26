@@ -1,4 +1,4 @@
-# Contributing to DevCom
+# Contributing to BetaVersion.IO
 
 Thank you for your interest in contributing! This guide will help you get started.
 
@@ -13,8 +13,8 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ```bash
 # Clone the repo
-git clone https://github.com/betaversionio/devcom.git
-cd devcom
+git clone https://github.com/betaversionio/betaversionio.git
+cd betaversionio
 
 # Install dependencies
 pnpm install
@@ -36,7 +36,7 @@ pnpm dev:web    # Web only (localhost:3000)
 ## Project Structure
 
 ```
-devcom/
+betaversionio/
 ├── apps/
 │   ├── api/          # NestJS backend
 │   └── web/          # Next.js frontend
@@ -50,24 +50,25 @@ devcom/
 
 ## Available Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start all apps in dev mode |
-| `pnpm dev:api` | Start API only |
-| `pnpm dev:web` | Start web only |
-| `pnpm build` | Build all packages |
-| `pnpm typecheck` | Run TypeScript checks across monorepo |
-| `pnpm lint` | Lint all packages |
-| `pnpm format` | Format all files with Prettier |
-| `pnpm db:generate` | Regenerate Prisma client |
-| `pnpm db:push` | Push schema changes to database |
-| `pnpm db:migrate` | Create & apply a migration |
-| `pnpm db:seed` | Seed the database |
-| `pnpm db:studio` | Open Prisma Studio |
+| Command            | Description                           |
+| ------------------ | ------------------------------------- |
+| `pnpm dev`         | Start all apps in dev mode            |
+| `pnpm dev:api`     | Start API only                        |
+| `pnpm dev:web`     | Start web only                        |
+| `pnpm build`       | Build all packages                    |
+| `pnpm typecheck`   | Run TypeScript checks across monorepo |
+| `pnpm lint`        | Lint all packages                     |
+| `pnpm format`      | Format all files with Prettier        |
+| `pnpm db:generate` | Regenerate Prisma client              |
+| `pnpm db:push`     | Push schema changes to database       |
+| `pnpm db:migrate`  | Create & apply a migration            |
+| `pnpm db:seed`     | Seed the database                     |
+| `pnpm db:studio`   | Open Prisma Studio                    |
 
 ## Development Workflow
 
 1. **Create a branch** from `main`:
+
    ```bash
    git checkout -b feature/your-feature
    ```
@@ -75,6 +76,7 @@ devcom/
 2. **Make your changes** — follow existing code patterns and conventions.
 
 3. **Typecheck** before committing:
+
    ```bash
    pnpm typecheck
    ```
@@ -91,26 +93,27 @@ We use **gitmoji** — a single emoji followed by a short lowercase description.
 <emoji> <description>
 ```
 
-| Emoji | When to use |
-|---|---|
-| ✨ | New feature |
-| 🐛 | Bug fix |
-| ♻️ | Refactor |
-| 🔧 | Config / tooling |
-| 🎨 | Style / formatting |
-| 🔥 | Remove code or files |
-| 📝 | Documentation |
-| ✅ | Tests |
-| 🚀 | Performance / deploy |
-| 📦 | Dependencies |
-| 🏗️ | Architecture changes |
-| 🔒 | Security fix |
-| 💄 | UI / cosmetic |
-| 🚚 | Move / rename files |
-| 🗃️ | Database changes |
-| 🎉 | Initial commit |
+| Emoji | When to use          |
+| ----- | -------------------- |
+| ✨    | New feature          |
+| 🐛    | Bug fix              |
+| ♻️    | Refactor             |
+| 🔧    | Config / tooling     |
+| 🎨    | Style / formatting   |
+| 🔥    | Remove code or files |
+| 📝    | Documentation        |
+| ✅    | Tests                |
+| 🚀    | Performance / deploy |
+| 📦    | Dependencies         |
+| 🏗️    | Architecture changes |
+| 🔒    | Security fix         |
+| 💄    | UI / cosmetic        |
+| 🚚    | Move / rename files  |
+| 🗃️    | Database changes     |
+| 🎉    | Initial commit       |
 
 **Examples:**
+
 ```
 ✨ add user profile page
 🐛 fix refresh token cookie duplication
@@ -119,6 +122,7 @@ We use **gitmoji** — a single emoji followed by a short lowercase description.
 ```
 
 **Rules:**
+
 - Use the actual unicode emoji, not `:shortcode:`
 - Keep subject under 72 characters
 - Lowercase after the emoji
@@ -144,10 +148,11 @@ Follow existing modules (e.g. `user`, `auth`) for patterns.
 ## Adding Shared Types
 
 Shared validation schemas and inferred types live in `packages/shared/`:
+
 - Schemas: `src/schemas/<domain>.ts` (zod)
 - Types: `src/types/inferred.ts` (auto-inferred from schemas)
 
-Both the API and web app import from `@devcom/shared`.
+Both the API and web app import from `@betaversionio/shared`.
 
 ## Database Changes
 
@@ -156,12 +161,12 @@ Both the API and web app import from `@devcom/shared`.
 3. Run `pnpm db:push` (dev) or `pnpm db:migrate` (production) to apply changes
 4. Rebuild the package if the API doesn't pick up new types:
    ```bash
-   pnpm --filter @devcom/database build
+   pnpm --filter @betaversionio/database build
    ```
 
 ## Need Help?
 
-- Check existing [issues](https://github.com/betaversionio/devcom/issues) before creating a new one
+- Check existing [issues](https://github.com/betaversionio/betaversionio/issues) before creating a new one
 - Use the appropriate issue template
 - Be clear and provide context
 

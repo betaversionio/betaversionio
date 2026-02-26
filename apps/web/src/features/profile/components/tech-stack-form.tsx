@@ -7,8 +7,8 @@ import {
   updateTechStackSchema,
   TechCategory,
   Proficiency,
-} from '@devcom/shared';
-import type { UpdateTechStackInput } from '@devcom/shared';
+} from '@betaversionio/shared';
+import type { UpdateTechStackInput } from '@betaversionio/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';

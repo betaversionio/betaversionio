@@ -1,5 +1,5 @@
 {
-  "extends": "@devcom/typescript-config/base.json",
+  "extends": "@betaversionio/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "module": "CommonJS",

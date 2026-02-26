@@ -1,4 +1,4 @@
-# DevCom
+# BetaVersion.IO
 
 A developer community platform for sharing projects, ideas, and resumes. Built as a monorepo with a NestJS API and Next.js frontend.
 
@@ -13,7 +13,7 @@ A developer community platform for sharing projects, ideas, and resumes. Built a
 ## Project Structure
 
 ```
-devcom/
+betaversionio/
 ├── apps/
 │   ├── api/              # NestJS backend (localhost:4000)
 │   └── web/              # Next.js frontend (localhost:3000)
@@ -39,8 +39,8 @@ devcom/
 
 ```bash
 # Clone
-git clone https://github.com/betaversionio/devcom.git
-cd devcom
+git clone https://github.com/betaversionio/betaversionio.git
+cd betaversionio
 
 # Install dependencies
 pnpm install
@@ -59,20 +59,20 @@ pnpm dev
 
 ### Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start all apps |
-| `pnpm dev:api` | Start API only |
-| `pnpm dev:web` | Start web only |
-| `pnpm build` | Build all packages |
-| `pnpm typecheck` | TypeScript checks |
-| `pnpm lint` | Lint all packages |
-| `pnpm format` | Format with Prettier |
+| Command            | Description              |
+| ------------------ | ------------------------ |
+| `pnpm dev`         | Start all apps           |
+| `pnpm dev:api`     | Start API only           |
+| `pnpm dev:web`     | Start web only           |
+| `pnpm build`       | Build all packages       |
+| `pnpm typecheck`   | TypeScript checks        |
+| `pnpm lint`        | Lint all packages        |
+| `pnpm format`      | Format with Prettier     |
 | `pnpm db:generate` | Regenerate Prisma client |
-| `pnpm db:push` | Push schema to database |
-| `pnpm db:migrate` | Create & apply migration |
-| `pnpm db:seed` | Seed the database |
-| `pnpm db:studio` | Open Prisma Studio |
+| `pnpm db:push`     | Push schema to database  |
+| `pnpm db:migrate`  | Create & apply migration |
+| `pnpm db:seed`     | Seed the database        |
+| `pnpm db:studio`   | Open Prisma Studio       |
 
 ## Features
 

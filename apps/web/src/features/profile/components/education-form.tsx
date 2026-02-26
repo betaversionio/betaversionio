@@ -2,8 +2,8 @@
 
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateEducationSchema } from '@devcom/shared';
-import type { UpdateEducationInput } from '@devcom/shared';
+import { updateEducationSchema } from '@betaversionio/shared';
+import type { UpdateEducationInput } from '@betaversionio/shared';
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -76,10 +76,7 @@ export function EducationForm() {
           className="space-y-6"
         >
           {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="space-y-4 rounded-lg border p-4"
-            >
+            <div key={field.id} className="space-y-4 rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
                   Education #{index + 1}
@@ -149,10 +146,7 @@ export function EducationForm() {
                     form.setValue(`items.${index}.current`, !!checked)
                   }
                 />
-                <label
-                  htmlFor={`edu-current-${index}`}
-                  className="text-sm"
-                >
+                <label htmlFor={`edu-current-${index}`} className="text-sm">
                   Currently studying here
                 </label>
               </div>

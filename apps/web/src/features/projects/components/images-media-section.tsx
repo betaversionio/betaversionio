@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { CreateProjectInput } from '@devcom/shared';
+import type { CreateProjectInput } from '@betaversionio/shared';
 import { GalleryUpload } from '@/components/patterns/p-file-upload-4';
 
 interface ImagesMediaSectionProps {

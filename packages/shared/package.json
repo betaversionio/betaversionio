@@ -1,5 +1,5 @@
 {
-  "name": "@devcom/shared",
+  "name": "@betaversionio/shared",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
@@ -13,7 +13,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@devcom/typescript-config": "workspace:*",
+    "@betaversionio/typescript-config": "workspace:*",
     "typescript": "^5.9.3"
   }
 }

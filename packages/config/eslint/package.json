@@ -1,8 +1,12 @@
 {
-  "name": "@devcom/eslint-config",
+  "name": "@betaversionio/eslint-config",
   "version": "0.0.0",
   "private": true,
-  "files": ["base.js", "next.js", "nest.js"],
+  "files": [
+    "base.js",
+    "next.js",
+    "nest.js"
+  ],
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",

@@ -2,8 +2,8 @@
 
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateExperienceSchema, EmploymentType } from '@devcom/shared';
-import type { UpdateExperienceInput } from '@devcom/shared';
+import { updateExperienceSchema, EmploymentType } from '@betaversionio/shared';
+import type { UpdateExperienceInput } from '@betaversionio/shared';
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -92,10 +92,7 @@ export function ExperienceForm() {
           className="space-y-6"
         >
           {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="space-y-4 rounded-lg border p-4"
-            >
+            <div key={field.id} className="space-y-4 rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
                   Experience #{index + 1}
@@ -190,10 +187,7 @@ export function ExperienceForm() {
                     form.setValue(`items.${index}.current`, !!checked)
                   }
                 />
-                <label
-                  htmlFor={`exp-current-${index}`}
-                  className="text-sm"
-                >
+                <label htmlFor={`exp-current-${index}`} className="text-sm">
                   Currently working here
                 </label>
               </div>

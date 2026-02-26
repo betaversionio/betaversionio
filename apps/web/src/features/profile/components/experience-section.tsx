@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { EmploymentType } from '@devcom/shared';
-import type { ExperienceItemInput } from '@devcom/shared';
+import { EmploymentType } from '@betaversionio/shared';
+import type { ExperienceItemInput } from '@betaversionio/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -54,7 +54,9 @@ interface ExperienceSectionProps {
   items: ExperienceItem[];
 }
 
-export function ExperienceSection({ items: initialItems }: ExperienceSectionProps) {
+export function ExperienceSection({
+  items: initialItems,
+}: ExperienceSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [items, setItems] = useState<ExperienceItem[]>(initialItems);
@@ -90,7 +92,9 @@ export function ExperienceSection({ items: initialItems }: ExperienceSectionProp
       toast({
         title: 'Update failed',
         description:
-          error instanceof Error ? error.message : 'Failed to update experience.',
+          error instanceof Error
+            ? error.message
+            : 'Failed to update experience.',
         variant: 'destructive',
       });
     },
@@ -177,7 +181,9 @@ export function ExperienceSection({ items: initialItems }: ExperienceSectionProp
   return (
     <div className="space-y-4">
       {items.length === 0 && (
-        <p className="text-sm text-muted-foreground">No experience added yet.</p>
+        <p className="text-sm text-muted-foreground">
+          No experience added yet.
+        </p>
       )}
 
       {items.map((item, index) => (
@@ -186,8 +192,15 @@ export function ExperienceSection({ items: initialItems }: ExperienceSectionProp
           icon={<Briefcase size={20} color="currentColor" variant="Bulk" />}
           title={item.position}
           subtitle={item.company}
-          meta={employmentTypeLabels[item.employmentType as EmploymentType] ?? item.employmentType}
-          dateRange={formatDateRange(item.startDate, item.endDate, item.current)}
+          meta={
+            employmentTypeLabels[item.employmentType as EmploymentType] ??
+            item.employmentType
+          }
+          dateRange={formatDateRange(
+            item.startDate,
+            item.endDate,
+            item.current,
+          )}
           description={item.description}
           onEdit={() => openEdit(index)}
           onDelete={() => handleDelete(index)}
@@ -214,14 +227,20 @@ export function ExperienceSection({ items: initialItems }: ExperienceSectionProp
           </Field>
           <Field>
             <FieldLabel>Position</FieldLabel>
-            <Input placeholder="Senior Developer" {...form.register('position')} />
+            <Input
+              placeholder="Senior Developer"
+              {...form.register('position')}
+            />
           </Field>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field>
             <FieldLabel>Location</FieldLabel>
-            <Input placeholder="San Francisco, CA" {...form.register('location')} />
+            <Input
+              placeholder="San Francisco, CA"
+              {...form.register('location')}
+            />
           </Field>
           <Field>
             <FieldLabel>Employment Type</FieldLabel>

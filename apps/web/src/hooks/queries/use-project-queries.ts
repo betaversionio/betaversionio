@@ -1,9 +1,5 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
@@ -15,7 +11,7 @@ import type {
   UpdateProjectReviewInput,
   CreateProjectUpdateInput,
   UpdateProjectUpdateInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 export interface ProjectAuthor {
   id: string;
@@ -131,24 +127,22 @@ interface ProjectFilters {
 }
 
 export const projectKeys = {
-  all: ["projects"] as const,
-  lists: () => [...projectKeys.all, "list"] as const,
-  list: (filters: ProjectFilters) =>
-    [...projectKeys.lists(), filters] as const,
-  details: () => [...projectKeys.all, "detail"] as const,
+  all: ['projects'] as const,
+  lists: () => [...projectKeys.all, 'list'] as const,
+  list: (filters: ProjectFilters) => [...projectKeys.lists(), filters] as const,
+  details: () => [...projectKeys.all, 'detail'] as const,
   detail: (slug: string) => [...projectKeys.details(), slug] as const,
   comments: (projectId: string) =>
-    [...projectKeys.all, "comments", projectId] as const,
+    [...projectKeys.all, 'comments', projectId] as const,
   reviews: (projectId: string) =>
-    [...projectKeys.all, "reviews", projectId] as const,
+    [...projectKeys.all, 'reviews', projectId] as const,
   updates: (projectId: string) =>
-    [...projectKeys.all, "updates", projectId] as const,
-  related: (slug: string) =>
-    [...projectKeys.all, "related", slug] as const,
-  bookmarks: () => [...projectKeys.all, "bookmarks"] as const,
-  launchingToday: () => [...projectKeys.all, "launching-today"] as const,
+    [...projectKeys.all, 'updates', projectId] as const,
+  related: (slug: string) => [...projectKeys.all, 'related', slug] as const,
+  bookmarks: () => [...projectKeys.all, 'bookmarks'] as const,
+  launchingToday: () => [...projectKeys.all, 'launching-today'] as const,
   analytics: (projectId: string) =>
-    [...projectKeys.all, "analytics", projectId] as const,
+    [...projectKeys.all, 'analytics', projectId] as const,
 };
 
 // ─── Core Queries ────────────────────────────────────────────────────────────
@@ -160,8 +154,11 @@ export function useProjects(
   return useQuery({
     queryKey: projectKeys.list(filters),
     queryFn: () =>
-      apiClient.get<PaginatedProjects>("/projects", {
-        params: filters as Record<string, string | number | boolean | undefined>,
+      apiClient.get<PaginatedProjects>('/projects', {
+        params: filters as Record<
+          string,
+          string | number | boolean | undefined
+        >,
       } as never),
     enabled: options?.enabled,
   });
@@ -179,7 +176,7 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateProjectInput) =>
-      apiClient.post<Project>("/projects", data),
+      apiClient.post<Project>('/projects', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
@@ -231,10 +228,7 @@ export function useCreateProjectComment(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateProjectCommentInput) =>
-      apiClient.post<ProjectComment>(
-        `/projects/${projectId}/comments`,
-        data,
-      ),
+      apiClient.post<ProjectComment>(`/projects/${projectId}/comments`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.comments(projectId),
@@ -322,7 +316,7 @@ export function useBookmarkedProjects(page = 1, limit = 20) {
   return useQuery({
     queryKey: [...projectKeys.bookmarks(), page],
     queryFn: () =>
-      apiClient.get<PaginatedProjects>("/projects/bookmarks", {
+      apiClient.get<PaginatedProjects>('/projects/bookmarks', {
         params: { page, limit },
       } as never),
   });
@@ -345,10 +339,7 @@ export function useCreateProjectReview(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateProjectReviewInput) =>
-      apiClient.post<ProjectReview>(
-        `/projects/${projectId}/reviews`,
-        data,
-      ),
+      apiClient.post<ProjectReview>(`/projects/${projectId}/reviews`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.reviews(projectId),
@@ -478,7 +469,7 @@ export function useLaunchingTodayProjects(page = 1, limit = 6) {
   return useQuery({
     queryKey: [...projectKeys.launchingToday(), page],
     queryFn: () =>
-      apiClient.get<PaginatedProjects>("/projects/launching-today", {
+      apiClient.get<PaginatedProjects>('/projects/launching-today', {
         params: { page, limit },
       } as never),
   });
@@ -488,8 +479,7 @@ export function useLaunchingTodayProjects(page = 1, limit = 6) {
 
 export function useRecordProjectView(projectId: string) {
   return useMutation({
-    mutationFn: () =>
-      apiClient.post(`/projects/${projectId}/view`),
+    mutationFn: () => apiClient.post(`/projects/${projectId}/view`),
   });
 }
 

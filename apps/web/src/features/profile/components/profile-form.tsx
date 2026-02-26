@@ -3,8 +3,8 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateProfileSchema } from '@devcom/shared';
-import type { UpdateProfileInput } from '@devcom/shared';
+import { updateProfileSchema } from '@betaversionio/shared';
+import type { UpdateProfileInput } from '@betaversionio/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/providers/auth-provider';

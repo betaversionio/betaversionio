@@ -3,13 +3,13 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateCollectionInput,
   UpdateCollectionInput,
   AddCollectionItemInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 const AUTHOR_SELECT = {
   id: true,
@@ -27,7 +27,7 @@ export class CollectionService {
       where: { slug: dto.slug },
     });
     if (existing) {
-      throw new ConflictException("A collection with this slug already exists");
+      throw new ConflictException('A collection with this slug already exists');
     }
 
     return this.prisma.projectCollection.create({
@@ -40,7 +40,7 @@ export class CollectionService {
               include: { author: { select: AUTHOR_SELECT } },
             },
           },
-          orderBy: { position: "asc" },
+          orderBy: { position: 'asc' },
         },
       },
     });
@@ -61,7 +61,7 @@ export class CollectionService {
           author: { select: AUTHOR_SELECT },
           _count: { select: { items: true } },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -88,13 +88,13 @@ export class CollectionService {
               },
             },
           },
-          orderBy: { position: "asc" },
+          orderBy: { position: 'asc' },
         },
       },
     });
 
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
 
     return collection;
@@ -105,10 +105,10 @@ export class CollectionService {
       where: { slug },
     });
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
     if (collection.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this collection");
+      throw new ForbiddenException('You are not the owner of this collection');
     }
 
     if (dto.slug && dto.slug !== collection.slug) {
@@ -116,7 +116,9 @@ export class CollectionService {
         where: { slug: dto.slug },
       });
       if (existingSlug) {
-        throw new ConflictException("A collection with this slug already exists");
+        throw new ConflictException(
+          'A collection with this slug already exists',
+        );
       }
     }
 
@@ -131,7 +133,7 @@ export class CollectionService {
               include: { author: { select: AUTHOR_SELECT } },
             },
           },
-          orderBy: { position: "asc" },
+          orderBy: { position: 'asc' },
         },
       },
     });
@@ -142,10 +144,10 @@ export class CollectionService {
       where: { slug },
     });
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
     if (collection.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this collection");
+      throw new ForbiddenException('You are not the owner of this collection');
     }
     await this.prisma.projectCollection.update({
       where: { id: collection.id },
@@ -162,10 +164,10 @@ export class CollectionService {
       where: { id: collectionId },
     });
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
     if (collection.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner");
+      throw new ForbiddenException('You are not the owner');
     }
 
     const maxPos = await this.prisma.projectCollectionItem.aggregate({
@@ -188,44 +190,36 @@ export class CollectionService {
     });
   }
 
-  async removeItem(
-    collectionId: string,
-    itemId: string,
-    userId: string,
-  ) {
+  async removeItem(collectionId: string, itemId: string, userId: string) {
     const collection = await this.prisma.projectCollection.findUnique({
       where: { id: collectionId },
     });
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
     if (collection.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner");
+      throw new ForbiddenException('You are not the owner');
     }
 
     const item = await this.prisma.projectCollectionItem.findUnique({
       where: { id: itemId },
     });
     if (!item || item.collectionId !== collectionId) {
-      throw new NotFoundException("Item not found");
+      throw new NotFoundException('Item not found');
     }
 
     await this.prisma.projectCollectionItem.delete({ where: { id: itemId } });
   }
 
-  async reorderItems(
-    collectionId: string,
-    userId: string,
-    itemIds: string[],
-  ) {
+  async reorderItems(collectionId: string, userId: string, itemIds: string[]) {
     const collection = await this.prisma.projectCollection.findUnique({
       where: { id: collectionId },
     });
     if (!collection || collection.deletedAt) {
-      throw new NotFoundException("Collection not found");
+      throw new NotFoundException('Collection not found');
     }
     if (collection.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner");
+      throw new ForbiddenException('You are not the owner');
     }
 
     await this.prisma.$transaction(

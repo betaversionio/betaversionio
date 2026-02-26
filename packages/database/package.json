@@ -1,5 +1,5 @@
 {
-  "name": "@devcom/database",
+  "name": "@betaversionio/database",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
@@ -20,7 +20,7 @@
     "pg": "^8.18.0"
   },
   "devDependencies": {
-    "@devcom/typescript-config": "workspace:*",
+    "@betaversionio/typescript-config": "workspace:*",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.3.1",
     "prisma": "^7.4.1",

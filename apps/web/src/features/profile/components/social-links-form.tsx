@@ -3,8 +3,8 @@
 import { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateSocialLinksSchema, SocialPlatform } from '@devcom/shared';
-import type { UpdateSocialLinksInput } from '@devcom/shared';
+import { updateSocialLinksSchema, SocialPlatform } from '@betaversionio/shared';
+import type { UpdateSocialLinksInput } from '@betaversionio/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -139,14 +139,16 @@ export function SocialLinksForm({ initialData }: SocialLinksFormProps = {}) {
 
   // Auto-detect platform when URL changes
   useEffect(() => {
-    watchedLinks?.forEach((link: { url: string; platform: SocialPlatform }, index: number) => {
-      if (link.url) {
-        const detected = detectPlatform(link.url);
-        if (detected !== link.platform) {
-          form.setValue(`links.${index}.platform`, detected);
+    watchedLinks?.forEach(
+      (link: { url: string; platform: SocialPlatform }, index: number) => {
+        if (link.url) {
+          const detected = detectPlatform(link.url);
+          if (detected !== link.platform) {
+            form.setValue(`links.${index}.platform`, detected);
+          }
         }
-      }
-    });
+      },
+    );
   }, [watchedLinks, form]);
 
   const mutation = useMutation({

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { CreateBlogInput } from '@devcom/shared';
-import { BlogStatus } from '@devcom/shared';
+import type { CreateBlogInput } from '@betaversionio/shared';
+import { BlogStatus } from '@betaversionio/shared';
 import { AvatarUpload } from '@/components/patterns/p-file-upload-2';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -189,9 +189,7 @@ export function BlogMainInfoSection({ form }: BlogMainInfoSectionProps) {
           <FieldLabel>Status</FieldLabel>
           <Select
             value={status}
-            onValueChange={(value) =>
-              setValue('status', value as BlogStatus)
-            }
+            onValueChange={(value) => setValue('status', value as BlogStatus)}
           >
             <SelectTrigger>
               <SelectValue />

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createCollectionSchema } from '@devcom/shared';
+import { createCollectionSchema } from '@betaversionio/shared';
 import { FormDialog } from '@/components/ui/form-dialog';
 import { Input } from '@/components/ui/input';
 import {
@@ -73,10 +73,7 @@ export function CollectionFormDialog({
       <FieldGroup>
         <Field>
           <FieldLabel>Title</FieldLabel>
-          <Input
-            placeholder="Collection title"
-            {...form.register('title')}
-          />
+          <Input placeholder="Collection title" {...form.register('title')} />
           <FieldError errors={[form.formState.errors.title]} />
         </Field>
         <Field>

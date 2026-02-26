@@ -9,8 +9,8 @@ import {
   ProjectStatus,
   ProjectPhase,
   ProductionType,
-} from '@devcom/shared';
-import type { CreateProjectInput } from '@devcom/shared';
+} from '@betaversionio/shared';
+import type { CreateProjectInput } from '@betaversionio/shared';
 import { useCreateProject } from '@/hooks/queries';
 import { useToast } from '@/hooks/use-toast';
 import { SidebarProvider } from '@/components/layout/sidebar/sidebar-context';

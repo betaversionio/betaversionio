@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { CreateBlogInput } from '@devcom/shared';
+import type { CreateBlogInput } from '@betaversionio/shared';
 import { GalleryUpload } from '@/components/patterns/p-file-upload-4';
 
 interface BlogCoverSectionProps {

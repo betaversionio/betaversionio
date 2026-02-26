@@ -2,14 +2,14 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { FEED } from "@devcom/shared";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { FEED } from '@betaversionio/shared';
 import type {
   CreatePostInput,
   CreateCommentInput,
   ToggleReactionInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 @Injectable()
 export class FeedService {
@@ -47,7 +47,7 @@ export class FeedService {
       // Handle hashtags
       if (dto.hashtags && dto.hashtags.length > 0) {
         for (const tagName of dto.hashtags) {
-          const normalizedTag = tagName.toLowerCase().replace(/^#/, "");
+          const normalizedTag = tagName.toLowerCase().replace(/^#/, '');
 
           // Find or create the hashtag
           const hashtag = await tx.hashtag.upsert({
@@ -136,7 +136,7 @@ export class FeedService {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: take + 1, // Fetch one extra to determine hasMore
     };
 
@@ -199,10 +199,10 @@ export class FeedService {
                   },
                 },
               },
-              orderBy: { createdAt: "asc" },
+              orderBy: { createdAt: 'asc' },
             },
           },
-          orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: 'asc' },
         },
         reactions: true,
         postHashtags: {
@@ -220,7 +220,7 @@ export class FeedService {
     });
 
     if (!post || post.deletedAt) {
-      throw new NotFoundException("Post not found");
+      throw new NotFoundException('Post not found');
     }
 
     return post;
@@ -240,7 +240,7 @@ export class FeedService {
     });
 
     if (!post || post.deletedAt) {
-      throw new NotFoundException("Post not found");
+      throw new NotFoundException('Post not found');
     }
 
     // Check if a reaction of this type already exists from this user
@@ -266,7 +266,7 @@ export class FeedService {
         data: { likesCount: { decrement: 1 } },
       });
 
-      return { action: "removed", type: dto.type };
+      return { action: 'removed', type: dto.type };
     } else {
       // Add the reaction
       await this.prisma.reaction.create({
@@ -283,7 +283,7 @@ export class FeedService {
         data: { likesCount: { increment: 1 } },
       });
 
-      return { action: "added", type: dto.type };
+      return { action: 'added', type: dto.type };
     }
   }
 
@@ -292,17 +292,13 @@ export class FeedService {
    * Supports nested replies via optional parentId.
    * Increments the denormalized commentsCount on the post.
    */
-  async createComment(
-    postId: string,
-    userId: string,
-    dto: CreateCommentInput,
-  ) {
+  async createComment(postId: string, userId: string, dto: CreateCommentInput) {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
     });
 
     if (!post || post.deletedAt) {
-      throw new NotFoundException("Post not found");
+      throw new NotFoundException('Post not found');
     }
 
     // If parentId is given, verify the parent comment exists and belongs to this post
@@ -313,7 +309,7 @@ export class FeedService {
 
       if (!parentComment || parentComment.postId !== postId) {
         throw new NotFoundException(
-          "Parent comment not found or does not belong to this post",
+          'Parent comment not found or does not belong to this post',
         );
       }
     }
@@ -355,11 +351,11 @@ export class FeedService {
     });
 
     if (!post || post.deletedAt) {
-      throw new NotFoundException("Post not found");
+      throw new NotFoundException('Post not found');
     }
 
     if (post.authorId !== userId) {
-      throw new ForbiddenException("You are not the author of this post");
+      throw new ForbiddenException('You are not the author of this post');
     }
 
     return this.prisma.post.update({

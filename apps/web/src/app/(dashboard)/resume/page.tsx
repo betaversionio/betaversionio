@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useResumes } from "@/hooks/queries";
-import { PageHeader } from "@/components/shared/page-header";
-import { ResumeCard, CreateResumeDialog } from "@/features/resume";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileText, Plus, Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { useResumes } from '@/hooks/queries';
+import { PageHeader } from '@/components/shared/page-header';
+import { ResumeCard, CreateResumeDialog } from '@/features/resume';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText, Plus, Loader2 } from 'lucide-react';
 
 export default function ResumesPage() {
   const { data: resumes, isLoading } = useResumes();
@@ -31,12 +31,10 @@ export default function ResumesPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
-            <h3 className="text-lg font-semibold">
-              Create your first resume
-            </h3>
+            <h3 className="text-lg font-semibold">Create your first resume</h3>
             <p className="mb-4 text-sm text-muted-foreground">
               Write LaTeX, compile to PDF, and download — like Overleaf, built
-              into DevCom.
+              into BetaVersion.IO.
             </p>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />

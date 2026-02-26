@@ -1,10 +1,10 @@
-import { DecorIcon } from "@/components/ui/decor-icon";
+import { DecorIcon } from '@/components/ui/decor-icon';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from '@/components/ui/accordion';
 
 export function FaqsSection() {
   return (
@@ -18,8 +18,8 @@ export function FaqsSection() {
             Frequently Asked Questions
           </h2>
           <p className="text-muted-foreground">
-            Quick answers to common questions about DevCom. Open any question to
-            learn more.
+            Quick answers to common questions about BetaVersion.IO. Open any
+            question to learn more.
           </p>
           <p className="text-muted-foreground">
             {"Can't find what you're looking for? "}
@@ -65,44 +65,44 @@ export function FaqsSection() {
 
 const faqs = [
   {
-    id: "item-1",
-    title: "What is DevCom?",
+    id: 'item-1',
+    title: 'What is BetaVersion.IO?',
     content:
-      "DevCom is a developer identity platform that unifies your portfolio, resume, projects, feed, and ideas under a single subdomain (yourname.betaversion.io). Think of it as replacing your LinkedIn + GitHub profile + personal site + resume PDF with one living platform.",
+      'BetaVersion.IO is a developer identity platform that unifies your portfolio, resume, projects, feed, and ideas under a single subdomain (yourname.betaversion.io). Think of it as replacing your LinkedIn + GitHub profile + personal site + resume PDF with one living platform.',
   },
   {
-    id: "item-2",
-    title: "Is DevCom free?",
+    id: 'item-2',
+    title: 'Is BetaVersion.IO free?',
     content:
-      "Yes. DevCom is free and open source. The free tier includes a full portfolio, project showcase, resume builder, feed, and idea board. We plan to offer a Pro tier for custom domains, premium templates, and advanced analytics.",
+      'Yes. BetaVersion.IO is free and open source. The free tier includes a full portfolio, project showcase, resume builder, feed, and idea board. We plan to offer a Pro tier for custom domains, premium templates, and advanced analytics.',
   },
   {
-    id: "item-3",
-    title: "How does the subdomain work?",
+    id: 'item-3',
+    title: 'How does the subdomain work?',
     content:
-      "When you sign up and choose a username, you get yourname.betaversion.io as your permanent developer URL. It hosts your portfolio, projects, and a live resume PDF at /resume.pdf. You can also map a custom domain in the future.",
+      'When you sign up and choose a username, you get yourname.betaversion.io as your permanent developer URL. It hosts your portfolio, projects, and a live resume PDF at /resume.pdf. You can also map a custom domain in the future.',
   },
   {
-    id: "item-4",
-    title: "Can I import my GitHub data?",
+    id: 'item-4',
+    title: 'Can I import my GitHub data?',
     content:
-      "Yes. Sign in with GitHub and DevCom automatically pulls your repos, languages, and contribution data. Your profile is pre-filled so you can have a complete developer identity in minutes.",
+      'Yes. Sign in with GitHub and BetaVersion.IO automatically pulls your repos, languages, and contribution data. Your profile is pre-filled so you can have a complete developer identity in minutes.',
   },
   {
-    id: "item-5",
-    title: "What makes this different from LinkedIn or a portfolio site?",
+    id: 'item-5',
+    title: 'What makes this different from LinkedIn or a portfolio site?',
     content:
-      "DevCom is built exclusively for developers. No recruiter spam, no buzzword bingo — just your actual work. It combines portfolio, resume, feed, and collaboration tools in one place, so you're known by what you build.",
+      "BetaVersion.IO is built exclusively for developers. No recruiter spam, no buzzword bingo — just your actual work. It combines portfolio, resume, feed, and collaboration tools in one place, so you're known by what you build.",
   },
   {
-    id: "item-6",
-    title: "How does the resume builder work?",
+    id: 'item-6',
+    title: 'How does the resume builder work?',
     content:
-      "Fill in structured sections (experience, education, skills, projects) through a clean form, pick a template, and DevCom renders it into a polished ATS-friendly PDF. It's always live at yourname.betaversion.io/resume.pdf and auto-updates when you edit.",
+      "Fill in structured sections (experience, education, skills, projects) through a clean form, pick a template, and BetaVersion.IO renders it into a polished ATS-friendly PDF. It's always live at yourname.betaversion.io/resume.pdf and auto-updates when you edit.",
   },
   {
-    id: "item-7",
-    title: "Can I collaborate with other developers?",
+    id: 'item-7',
+    title: 'Can I collaborate with other developers?',
     content:
       "Absolutely. Tag collaborators on projects (they appear on everyone's profile), post ideas on the Idea Board to find teammates, and use the developer feed to share updates with the community.",
   },

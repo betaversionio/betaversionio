@@ -3,8 +3,8 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
@@ -18,7 +18,7 @@ import type {
   UpdateProjectUpdateInput,
   CreateInvitationInput,
   RespondInvitationInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 const AUTHOR_SELECT = {
   id: true,
@@ -41,7 +41,7 @@ export class ProjectService {
     });
 
     if (existing) {
-      throw new ConflictException("A project with this slug already exists");
+      throw new ConflictException('A project with this slug already exists');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -69,7 +69,7 @@ export class ProjectService {
 
       // Auto-add author as maker with role "Creator"
       const makerEntries = [
-        { projectId: project.id, userId, role: "Creator" },
+        { projectId: project.id, userId, role: 'Creator' },
         ...(dto.makers ?? [])
           .filter((m) => m.userId !== userId)
           .map((m) => ({
@@ -118,8 +118,8 @@ export class ProjectService {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -131,11 +131,11 @@ export class ProjectService {
       // Owner viewing their own projects: show all statuses
     } else {
       // Public browsing: exclude Draft and Archived
-      where.status = { notIn: ["Draft", "Archived"] };
+      where.status = { notIn: ['Draft', 'Archived'] };
     }
 
     if (tags) {
-      const tagList = tags.split(",").map((t) => t.trim());
+      const tagList = tags.split(',').map((t) => t.trim());
       where.tags = { hasSome: tagList };
     }
 
@@ -150,18 +150,18 @@ export class ProjectService {
     // Sorting logic
     let orderBy: Record<string, string> | Record<string, string>[];
     switch (sort) {
-      case "likes":
-        orderBy = { upvotesCount: "desc" };
+      case 'likes':
+        orderBy = { upvotesCount: 'desc' };
         break;
-      case "trending":
+      case 'trending':
         orderBy = [
-          { upvotesCount: "desc" },
-          { commentsCount: "desc" },
-          { createdAt: "desc" },
+          { upvotesCount: 'desc' },
+          { commentsCount: 'desc' },
+          { createdAt: 'desc' },
         ];
         break;
       default:
-        orderBy = { createdAt: "desc" };
+        orderBy = { createdAt: 'desc' };
     }
 
     const [items, total] = await Promise.all([
@@ -207,7 +207,7 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const comments = await this.buildCommentTree(project.id);
@@ -239,11 +239,11 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     if (project.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this project");
+      throw new ForbiddenException('You are not the owner of this project');
     }
 
     if (dto.slug && dto.slug !== project.slug) {
@@ -252,7 +252,7 @@ export class ProjectService {
       });
 
       if (existingSlug) {
-        throw new ConflictException("A project with this slug already exists");
+        throw new ConflictException('A project with this slug already exists');
       }
     }
 
@@ -300,11 +300,11 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     if (project.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this project");
+      throw new ForbiddenException('You are not the owner of this project');
     }
 
     return this.prisma.project.update({
@@ -322,11 +322,11 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     if (project.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this project");
+      throw new ForbiddenException('You are not the owner of this project');
     }
 
     const existing = await this.prisma.projectMaker.findUnique({
@@ -339,7 +339,7 @@ export class ProjectService {
     });
 
     if (existing) {
-      throw new ConflictException("User is already a maker on this project");
+      throw new ConflictException('User is already a maker on this project');
     }
 
     return this.prisma.projectMaker.create({
@@ -363,11 +363,11 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     if (project.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this project");
+      throw new ForbiddenException('You are not the owner of this project');
     }
 
     const maker = await this.prisma.projectMaker.findUnique({
@@ -380,7 +380,7 @@ export class ProjectService {
     });
 
     if (!maker) {
-      throw new NotFoundException("Maker not found on this project");
+      throw new NotFoundException('Maker not found on this project');
     }
 
     await this.prisma.projectMaker.delete({
@@ -404,7 +404,7 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const existing = await this.prisma.projectVote.findUnique({
@@ -424,13 +424,13 @@ export class ProjectService {
         });
 
         const counterField =
-          dto.value === 1 ? "upvotesCount" : "downvotesCount";
+          dto.value === 1 ? 'upvotesCount' : 'downvotesCount';
         await this.prisma.project.update({
           where: { id: projectId },
           data: { [counterField]: { decrement: 1 } },
         });
 
-        return { action: "removed", value: dto.value };
+        return { action: 'removed', value: dto.value };
       } else {
         // Different vote — switch
         await this.prisma.projectVote.update({
@@ -439,9 +439,9 @@ export class ProjectService {
         });
 
         const incrementField =
-          dto.value === 1 ? "upvotesCount" : "downvotesCount";
+          dto.value === 1 ? 'upvotesCount' : 'downvotesCount';
         const decrementField =
-          dto.value === 1 ? "downvotesCount" : "upvotesCount";
+          dto.value === 1 ? 'downvotesCount' : 'upvotesCount';
         await this.prisma.project.update({
           where: { id: projectId },
           data: {
@@ -450,7 +450,7 @@ export class ProjectService {
           },
         });
 
-        return { action: "switched", value: dto.value };
+        return { action: 'switched', value: dto.value };
       }
     } else {
       // No existing vote — create it
@@ -462,14 +462,13 @@ export class ProjectService {
         },
       });
 
-      const counterField =
-        dto.value === 1 ? "upvotesCount" : "downvotesCount";
+      const counterField = dto.value === 1 ? 'upvotesCount' : 'downvotesCount';
       await this.prisma.project.update({
         where: { id: projectId },
         data: { [counterField]: { increment: 1 } },
       });
 
-      return { action: "added", value: dto.value };
+      return { action: 'added', value: dto.value };
     }
   }
 
@@ -487,7 +486,7 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     if (dto.parentId) {
@@ -497,7 +496,7 @@ export class ProjectService {
 
       if (!parentComment || parentComment.projectId !== projectId) {
         throw new NotFoundException(
-          "Parent comment not found or does not belong to this project",
+          'Parent comment not found or does not belong to this project',
         );
       }
     }
@@ -536,11 +535,11 @@ export class ProjectService {
     });
 
     if (!comment || comment.deletedAt || comment.projectId !== projectId) {
-      throw new NotFoundException("Comment not found");
+      throw new NotFoundException('Comment not found');
     }
 
     if (comment.authorId !== userId) {
-      throw new ForbiddenException("You can only edit your own comments");
+      throw new ForbiddenException('You can only edit your own comments');
     }
 
     return this.prisma.projectComment.update({
@@ -558,21 +557,17 @@ export class ProjectService {
   /**
    * Soft-delete own comment on a project. Decrements commentsCount.
    */
-  async deleteComment(
-    projectId: string,
-    commentId: string,
-    userId: string,
-  ) {
+  async deleteComment(projectId: string, commentId: string, userId: string) {
     const comment = await this.prisma.projectComment.findUnique({
       where: { id: commentId },
     });
 
     if (!comment || comment.deletedAt || comment.projectId !== projectId) {
-      throw new NotFoundException("Comment not found");
+      throw new NotFoundException('Comment not found');
     }
 
     if (comment.authorId !== userId) {
-      throw new ForbiddenException("You can only delete your own comments");
+      throw new ForbiddenException('You can only delete your own comments');
     }
 
     await this.prisma.projectComment.update({
@@ -596,7 +591,7 @@ export class ProjectService {
     });
 
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const total = await this.prisma.projectComment.count({
@@ -630,7 +625,7 @@ export class ProjectService {
       include: {
         author: { select: AUTHOR_SELECT },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: 'asc' },
     });
 
     type CommentNode = (typeof allComments)[number] & {
@@ -663,7 +658,7 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const existing = await this.prisma.projectBookmark.findUnique({
@@ -676,7 +671,7 @@ export class ProjectService {
         where: { id: projectId },
         data: { bookmarksCount: { decrement: 1 } },
       });
-      return { action: "removed" as const };
+      return { action: 'removed' as const };
     }
 
     await this.prisma.projectBookmark.create({
@@ -686,7 +681,7 @@ export class ProjectService {
       where: { id: projectId },
       data: { bookmarksCount: { increment: 1 } },
     });
-    return { action: "added" as const };
+    return { action: 'added' as const };
   }
 
   async getBookmarkedProjects(userId: string, page: number, limit: number) {
@@ -702,7 +697,7 @@ export class ProjectService {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -726,14 +721,14 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const existing = await this.prisma.projectReview.findUnique({
       where: { projectId_authorId: { projectId, authorId: userId } },
     });
     if (existing && !existing.deletedAt) {
-      throw new ConflictException("You already reviewed this project");
+      throw new ConflictException('You already reviewed this project');
     }
 
     const review = await this.prisma.projectReview.create({
@@ -751,7 +746,7 @@ export class ProjectService {
       this.prisma.projectReview.findMany({
         where,
         include: { author: { select: AUTHOR_SELECT } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -773,10 +768,10 @@ export class ProjectService {
       where: { id: reviewId },
     });
     if (!review || review.deletedAt || review.projectId !== projectId) {
-      throw new NotFoundException("Review not found");
+      throw new NotFoundException('Review not found');
     }
     if (review.authorId !== userId) {
-      throw new ForbiddenException("You can only edit your own reviews");
+      throw new ForbiddenException('You can only edit your own reviews');
     }
 
     const updated = await this.prisma.projectReview.update({
@@ -793,10 +788,10 @@ export class ProjectService {
       where: { id: reviewId },
     });
     if (!review || review.deletedAt || review.projectId !== projectId) {
-      throw new NotFoundException("Review not found");
+      throw new NotFoundException('Review not found');
     }
     if (review.authorId !== userId) {
-      throw new ForbiddenException("You can only delete your own reviews");
+      throw new ForbiddenException('You can only delete your own reviews');
     }
 
     await this.prisma.projectReview.update({
@@ -832,7 +827,7 @@ export class ProjectService {
     const where = {
       launchDate: { gte: today, lt: tomorrow },
       deletedAt: null,
-      status: { notIn: ["Draft" as const, "Archived" as const] },
+      status: { notIn: ['Draft' as const, 'Archived' as const] },
     };
 
     const [items, total] = await Promise.all([
@@ -842,7 +837,7 @@ export class ProjectService {
           author: { select: AUTHOR_SELECT },
           makers: { include: { user: { select: AUTHOR_SELECT } } },
         },
-        orderBy: { upvotesCount: "desc" },
+        orderBy: { upvotesCount: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -863,7 +858,7 @@ export class ProjectService {
     const where = {
       launchDate: { gt: now, lte: nextWeek },
       deletedAt: null,
-      status: { notIn: ["Draft" as const, "Archived" as const] },
+      status: { notIn: ['Draft' as const, 'Archived' as const] },
     };
 
     const [items, total] = await Promise.all([
@@ -873,7 +868,7 @@ export class ProjectService {
           author: { select: AUTHOR_SELECT },
           makers: { include: { user: { select: AUTHOR_SELECT } } },
         },
-        orderBy: { launchDate: "asc" },
+        orderBy: { launchDate: 'asc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -897,10 +892,10 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
     if (project.authorId !== userId) {
-      throw new ForbiddenException("Only the project owner can post updates");
+      throw new ForbiddenException('Only the project owner can post updates');
     }
 
     return this.prisma.projectUpdate.create({
@@ -915,7 +910,7 @@ export class ProjectService {
       this.prisma.projectUpdate.findMany({
         where,
         include: { author: { select: AUTHOR_SELECT } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -937,10 +932,10 @@ export class ProjectService {
       where: { id: updateId },
     });
     if (!update || update.deletedAt || update.projectId !== projectId) {
-      throw new NotFoundException("Update not found");
+      throw new NotFoundException('Update not found');
     }
     if (update.authorId !== userId) {
-      throw new ForbiddenException("Only the author can edit this update");
+      throw new ForbiddenException('Only the author can edit this update');
     }
     return this.prisma.projectUpdate.update({
       where: { id: updateId },
@@ -958,10 +953,10 @@ export class ProjectService {
       where: { id: updateId },
     });
     if (!update || update.deletedAt || update.projectId !== projectId) {
-      throw new NotFoundException("Update not found");
+      throw new NotFoundException('Update not found');
     }
     if (update.authorId !== userId) {
-      throw new ForbiddenException("Only the author can delete this update");
+      throw new ForbiddenException('Only the author can delete this update');
     }
     await this.prisma.projectUpdate.update({
       where: { id: updateId },
@@ -976,14 +971,14 @@ export class ProjectService {
       where: { slug },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
 
     const candidates = await this.prisma.project.findMany({
       where: {
         id: { not: project.id },
         deletedAt: null,
-        status: { notIn: ["Draft", "Archived"] },
+        status: { notIn: ['Draft', 'Archived'] },
         OR: [
           { tags: { hasSome: project.tags } },
           { techStack: { hasSome: project.techStack } },
@@ -1024,24 +1019,26 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
     if (project.authorId !== userId) {
-      throw new ForbiddenException("Only the project owner can send invitations");
+      throw new ForbiddenException(
+        'Only the project owner can send invitations',
+      );
     }
 
     const invitee = await this.prisma.user.findUnique({
       where: { username: dto.username },
     });
     if (!invitee) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     const existingMaker = await this.prisma.projectMaker.findUnique({
       where: { projectId_userId: { projectId, userId: invitee.id } },
     });
     if (existingMaker) {
-      throw new ConflictException("User is already a team member");
+      throw new ConflictException('User is already a team member');
     }
 
     return this.prisma.projectInvitation.create({
@@ -1065,10 +1062,10 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
     if (project.authorId !== userId) {
-      throw new ForbiddenException("Only the owner can view invitations");
+      throw new ForbiddenException('Only the owner can view invitations');
     }
 
     return this.prisma.projectInvitation.findMany({
@@ -1076,7 +1073,7 @@ export class ProjectService {
       include: {
         invitee: { select: AUTHOR_SELECT },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -1089,10 +1086,10 @@ export class ProjectService {
       where: { id: invitationId },
     });
     if (!invitation || invitation.projectId !== projectId) {
-      throw new NotFoundException("Invitation not found");
+      throw new NotFoundException('Invitation not found');
     }
     if (invitation.inviterId !== userId) {
-      throw new ForbiddenException("Only the inviter can cancel");
+      throw new ForbiddenException('Only the inviter can cancel');
     }
     await this.prisma.projectInvitation.delete({
       where: { id: invitationId },
@@ -1101,12 +1098,12 @@ export class ProjectService {
 
   async getReceivedInvitations(userId: string) {
     return this.prisma.projectInvitation.findMany({
-      where: { inviteeId: userId, status: "Pending" },
+      where: { inviteeId: userId, status: 'Pending' },
       include: {
         project: { select: { id: true, title: true, slug: true, logo: true } },
         inviter: { select: AUTHOR_SELECT },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -1119,20 +1116,20 @@ export class ProjectService {
       where: { id: invitationId },
     });
     if (!invitation || invitation.inviteeId !== userId) {
-      throw new NotFoundException("Invitation not found");
+      throw new NotFoundException('Invitation not found');
     }
-    if (invitation.status !== "Pending") {
-      throw new ConflictException("Invitation already responded to");
+    if (invitation.status !== 'Pending') {
+      throw new ConflictException('Invitation already responded to');
     }
 
-    const status = dto.action === "accept" ? "Accepted" : "Rejected";
+    const status = dto.action === 'accept' ? 'Accepted' : 'Rejected';
 
     await this.prisma.projectInvitation.update({
       where: { id: invitationId },
       data: { status, respondedAt: new Date() },
     });
 
-    if (dto.action === "accept") {
+    if (dto.action === 'accept') {
       await this.prisma.projectMaker.create({
         data: {
           projectId: invitation.projectId,
@@ -1176,10 +1173,10 @@ export class ProjectService {
       where: { id: projectId },
     });
     if (!project || project.deletedAt) {
-      throw new NotFoundException("Project not found");
+      throw new NotFoundException('Project not found');
     }
     if (project.authorId !== userId) {
-      throw new ForbiddenException("Only the owner can view analytics");
+      throw new ForbiddenException('Only the owner can view analytics');
     }
 
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -1188,12 +1185,12 @@ export class ProjectService {
       this.prisma.projectView.findMany({
         where: { projectId, createdAt: { gte: thirtyDaysAgo } },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       }),
       this.prisma.projectVote.findMany({
         where: { projectId, createdAt: { gte: thirtyDaysAgo } },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       }),
       this.prisma.projectComment.findMany({
         where: {
@@ -1202,7 +1199,7 @@ export class ProjectService {
           createdAt: { gte: thirtyDaysAgo },
         },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       }),
       this.prisma.projectReview.findMany({
         where: {
@@ -1211,7 +1208,7 @@ export class ProjectService {
           createdAt: { gte: thirtyDaysAgo },
         },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       }),
     ]);
 

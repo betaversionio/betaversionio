@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { CreateProjectInput } from '@devcom/shared';
-import { ProjectStatus, ProjectPhase, ProductionType } from '@devcom/shared';
+import type { CreateProjectInput } from '@betaversionio/shared';
+import {
+  ProjectStatus,
+  ProjectPhase,
+  ProductionType,
+} from '@betaversionio/shared';
 import { AvatarUpload } from '@/components/patterns/p-file-upload-2';
 import { Input } from '@/components/ui/input';
 import {

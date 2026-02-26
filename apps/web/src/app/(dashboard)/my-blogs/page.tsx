@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BlogStatus } from '@devcom/shared';
+import { BlogStatus } from '@betaversionio/shared';
 import { useBlogs } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header';

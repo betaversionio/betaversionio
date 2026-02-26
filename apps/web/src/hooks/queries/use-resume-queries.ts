@@ -1,12 +1,11 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import type { CreateResumeInput, UpdateResumeInput } from "@devcom/shared";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import type {
+  CreateResumeInput,
+  UpdateResumeInput,
+} from '@betaversionio/shared';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 
 export interface Resume {
   id: string;
@@ -77,17 +76,18 @@ export interface PublicResumeInfo {
 }
 
 export const resumeKeys = {
-  all: ["resumes"] as const,
-  lists: () => [...resumeKeys.all, "list"] as const,
-  details: () => [...resumeKeys.all, "detail"] as const,
+  all: ['resumes'] as const,
+  lists: () => [...resumeKeys.all, 'list'] as const,
+  details: () => [...resumeKeys.all, 'detail'] as const,
   detail: (id: string) => [...resumeKeys.details(), id] as const,
-  public: (username: string) => [...resumeKeys.all, "public", username] as const,
+  public: (username: string) =>
+    [...resumeKeys.all, 'public', username] as const,
 };
 
 export function useResumes() {
   return useQuery({
     queryKey: resumeKeys.lists(),
-    queryFn: () => apiClient.get<Resume[]>("/resumes"),
+    queryFn: () => apiClient.get<Resume[]>('/resumes'),
   });
 }
 
@@ -113,7 +113,7 @@ export function useCreateResume() {
 
   return useMutation({
     mutationFn: (data: CreateResumeInput) =>
-      apiClient.post<Resume>("/resumes", data),
+      apiClient.post<Resume>('/resumes', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: resumeKeys.lists() });
     },
@@ -152,9 +152,9 @@ export function useCompileResume(id: string) {
   return useMutation({
     mutationFn: async (latexSource: string): Promise<Blob> => {
       const res = await fetch(`${API_URL}/resumes/${id}/compile`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ latexSource }),
       });
 
@@ -201,8 +201,7 @@ export function useUnsetPrimaryResume() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      apiClient.delete(`/resumes/${id}/set-primary`),
+    mutationFn: (id: string) => apiClient.delete(`/resumes/${id}/set-primary`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: resumeKeys.all });
     },

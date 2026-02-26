@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createPostSchema, PostType } from '@devcom/shared';
-import type { CreatePostInput } from '@devcom/shared';
+import { createPostSchema, PostType } from '@betaversionio/shared';
+import type { CreatePostInput } from '@betaversionio/shared';
 import { useCreatePost } from '../hooks';
 import { useAuth } from '@/providers/auth-provider';
 import { useToast } from '@/hooks/use-toast';

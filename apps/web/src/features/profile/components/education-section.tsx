@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { EducationItemInput } from '@devcom/shared';
+import type { EducationItemInput } from '@betaversionio/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -37,7 +37,9 @@ interface EducationSectionProps {
   items: EducationItem[];
 }
 
-export function EducationSection({ items: initialItems }: EducationSectionProps) {
+export function EducationSection({
+  items: initialItems,
+}: EducationSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [items, setItems] = useState<EducationItem[]>(initialItems);
@@ -72,7 +74,9 @@ export function EducationSection({ items: initialItems }: EducationSectionProps)
       toast({
         title: 'Update failed',
         description:
-          error instanceof Error ? error.message : 'Failed to update education.',
+          error instanceof Error
+            ? error.message
+            : 'Failed to update education.',
         variant: 'destructive',
       });
     },
@@ -164,7 +168,11 @@ export function EducationSection({ items: initialItems }: EducationSectionProps)
           title={item.degree}
           subtitle={item.institution}
           meta={item.fieldOfStudy ?? undefined}
-          dateRange={formatDateRange(item.startDate, item.endDate, item.current)}
+          dateRange={formatDateRange(
+            item.startDate,
+            item.endDate,
+            item.current,
+          )}
           description={item.description}
           onEdit={() => openEdit(index)}
           onDelete={() => handleDelete(index)}
@@ -191,7 +199,10 @@ export function EducationSection({ items: initialItems }: EducationSectionProps)
           </Field>
           <Field>
             <FieldLabel>Degree</FieldLabel>
-            <Input placeholder="B.S. Computer Science" {...form.register('degree')} />
+            <Input
+              placeholder="B.S. Computer Science"
+              {...form.register('degree')}
+            />
           </Field>
         </div>
 

@@ -2,9 +2,9 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { GitHubAppService } from "./github-app.service";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { GitHubAppService } from './github-app.service';
 
 interface GitHubRepoItem {
   full_name: string;
@@ -18,7 +18,7 @@ interface GitHubRepoItem {
 interface GitHubContentItem {
   name: string;
   path: string;
-  type: "file" | "dir";
+  type: 'file' | 'dir';
   sha: string;
   size: number;
 }
@@ -47,14 +47,14 @@ export class GitHubService {
       {
         headers: {
           Authorization: `Bearer ${jwt}`,
-          Accept: "application/vnd.github+json",
-          "User-Agent": "DevCom",
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'BetaVersion.IO',
         },
       },
     );
 
     if (!res.ok) {
-      throw new BadRequestException("Invalid GitHub App installation");
+      throw new BadRequestException('Invalid GitHub App installation');
     }
 
     const installation = (await res.json()) as {
@@ -99,18 +99,18 @@ export class GitHubService {
 
     // Installation token endpoint returns only repos the user granted access to
     const res = await fetch(
-      "https://api.github.com/installation/repositories?per_page=100",
+      'https://api.github.com/installation/repositories?per_page=100',
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json",
-          "User-Agent": "DevCom",
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'BetaVersion.IO',
         },
       },
     );
 
     if (!res.ok) {
-      throw new BadRequestException("Failed to list GitHub repositories");
+      throw new BadRequestException('Failed to list GitHub repositories');
     }
 
     const data = (await res.json()) as { repositories: GitHubRepoItem[] };
@@ -125,20 +125,20 @@ export class GitHubService {
     }));
   }
 
-  async listContents(userId: string, owner: string, repo: string, path = "") {
+  async listContents(userId: string, owner: string, repo: string, path = '') {
     const token = await this.getInstallationToken(userId);
 
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
     const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "User-Agent": "DevCom",
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'BetaVersion.IO',
       },
     });
 
     if (!res.ok) {
-      throw new BadRequestException("Failed to list repository contents");
+      throw new BadRequestException('Failed to list repository contents');
     }
 
     const items = (await res.json()) as GitHubContentItem[];
@@ -164,18 +164,18 @@ export class GitHubService {
     const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "User-Agent": "DevCom",
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'BetaVersion.IO',
       },
     });
 
     if (!res.ok) {
-      throw new BadRequestException("Failed to fetch file content");
+      throw new BadRequestException('Failed to fetch file content');
     }
 
     const file = (await res.json()) as GitHubFileResponse;
 
-    const content = Buffer.from(file.content, "base64").toString("utf8");
+    const content = Buffer.from(file.content, 'base64').toString('utf8');
 
     return {
       content,
@@ -199,7 +199,7 @@ export class GitHubService {
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
     const body: Record<string, string> = {
       message,
-      content: Buffer.from(content, "utf8").toString("base64"),
+      content: Buffer.from(content, 'utf8').toString('base64'),
     };
 
     if (sha) {
@@ -207,12 +207,12 @@ export class GitHubService {
     }
 
     const res = await fetch(url, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "application/vnd.github+json",
-        "User-Agent": "DevCom",
+        'Content-Type': 'application/json',
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'BetaVersion.IO',
       },
       body: JSON.stringify(body),
     });
@@ -222,7 +222,7 @@ export class GitHubService {
         message?: string;
       };
       throw new BadRequestException(
-        err.message || "Failed to push file to GitHub",
+        err.message || 'Failed to push file to GitHub',
       );
     }
 
@@ -247,7 +247,7 @@ export class GitHubService {
 
     if (!user.githubInstallationId) {
       throw new UnauthorizedException(
-        "GitHub is not connected. Please connect your GitHub account first.",
+        'GitHub is not connected. Please connect your GitHub account first.',
       );
     }
 

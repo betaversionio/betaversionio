@@ -1,5 +1,5 @@
 {
-  "name": "@devcom/web",
+  "name": "@betaversionio/web",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@devcom/shared": "workspace:*",
+    "@betaversionio/shared": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^3.1.1",
     "@hugeicons/react": "^1.1.5",
@@ -79,7 +79,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@devcom/typescript-config": "workspace:*",
+    "@betaversionio/typescript-config": "workspace:*",
     "@types/node": "^25.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

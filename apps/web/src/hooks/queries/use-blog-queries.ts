@@ -1,16 +1,12 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 import type {
   CreateBlogInput,
   UpdateBlogInput,
   ToggleBlogVoteInput,
   CreateBlogCommentInput,
   UpdateBlogCommentInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 export interface BlogAuthor {
   id: string;
@@ -75,13 +71,12 @@ interface BlogFilters {
 }
 
 export const blogKeys = {
-  all: ["blogs"] as const,
-  lists: () => [...blogKeys.all, "list"] as const,
+  all: ['blogs'] as const,
+  lists: () => [...blogKeys.all, 'list'] as const,
   list: (filters: BlogFilters) => [...blogKeys.lists(), filters] as const,
-  details: () => [...blogKeys.all, "detail"] as const,
+  details: () => [...blogKeys.all, 'detail'] as const,
   detail: (slug: string) => [...blogKeys.details(), slug] as const,
-  comments: (blogId: string) =>
-    [...blogKeys.all, "comments", blogId] as const,
+  comments: (blogId: string) => [...blogKeys.all, 'comments', blogId] as const,
 };
 
 // ─── Core Queries ────────────────────────────────────────────────────────────
@@ -93,8 +88,11 @@ export function useBlogs(
   return useQuery({
     queryKey: blogKeys.list(filters),
     queryFn: () =>
-      apiClient.get<PaginatedBlogs>("/blogs", {
-        params: filters as Record<string, string | number | boolean | undefined>,
+      apiClient.get<PaginatedBlogs>('/blogs', {
+        params: filters as Record<
+          string,
+          string | number | boolean | undefined
+        >,
       } as never),
     enabled: options?.enabled,
   });
@@ -111,8 +109,7 @@ export function useBlog(slug: string) {
 export function useCreateBlog() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateBlogInput) =>
-      apiClient.post<Blog>("/blogs", data),
+    mutationFn: (data: CreateBlogInput) => apiClient.post<Blog>('/blogs', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
     },
@@ -180,10 +177,7 @@ export function useCreateBlogComment(blogId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateBlogCommentInput) =>
-      apiClient.post<BlogComment>(
-        `/blogs/${blogId}/comments`,
-        data,
-      ),
+      apiClient.post<BlogComment>(`/blogs/${blogId}/comments`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: blogKeys.comments(blogId),

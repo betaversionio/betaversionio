@@ -114,7 +114,7 @@ export function FeedSidebar() {
       <div className="px-1">
         <p className="text-[10px] leading-relaxed text-muted-foreground/50">
           About &middot; Help &middot; Privacy &middot; Terms &middot;
-          Advertising &middot; DevCom &copy; {new Date().getFullYear()}
+          Advertising &middot; BetaVersion.IO &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

@@ -22,14 +22,14 @@ import {
   createBlogCommentSchema,
   updateBlogCommentSchema,
   PAGINATION,
-} from '@devcom/shared';
+} from '@betaversionio/shared';
 import type {
   CreateBlogInput,
   UpdateBlogInput,
   ToggleBlogVoteInput,
   CreateBlogCommentInput,
   UpdateBlogCommentInput,
-} from '@devcom/shared';
+} from '@betaversionio/shared';
 
 @Controller('blogs')
 @UseGuards(JwtAuthGuard)

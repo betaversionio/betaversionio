@@ -1,72 +1,67 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from '@/providers/auth-provider';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import { PageHeader } from '@/components/shared/page-header';
-import {
-  FolderKanban,
-  Eye,
-  Rss,
-  TrendingUp,
-} from "lucide-react";
+import { FolderKanban, Eye, Rss, TrendingUp } from 'lucide-react';
 
 const stats = [
   {
-    title: "Projects",
-    value: "4",
-    description: "Active projects",
+    title: 'Projects',
+    value: '4',
+    description: 'Active projects',
     icon: FolderKanban,
   },
   {
-    title: "Resume Views",
-    value: "128",
-    description: "Last 30 days",
+    title: 'Resume Views',
+    value: '128',
+    description: 'Last 30 days',
     icon: Eye,
   },
   {
-    title: "Posts",
-    value: "12",
-    description: "Published posts",
+    title: 'Posts',
+    value: '12',
+    description: 'Published posts',
     icon: Rss,
   },
 ];
 
 const recentActivity = [
   {
-    id: "1",
-    action: "Published a new post",
-    description: "How I built a real-time collaboration tool",
-    timestamp: "2 hours ago",
+    id: '1',
+    action: 'Published a new post',
+    description: 'How I built a real-time collaboration tool',
+    timestamp: '2 hours ago',
   },
   {
-    id: "2",
-    action: "Updated project",
-    description: "DevCom - Added new features section",
-    timestamp: "5 hours ago",
+    id: '2',
+    action: 'Updated project',
+    description: 'BetaVersion.IO - Added new features section',
+    timestamp: '5 hours ago',
   },
   {
-    id: "3",
-    action: "Received 5 upvotes",
-    description: "On your idea: AI-powered code review tool",
-    timestamp: "1 day ago",
+    id: '3',
+    action: 'Received 5 upvotes',
+    description: 'On your idea: AI-powered code review tool',
+    timestamp: '1 day ago',
   },
   {
-    id: "4",
-    action: "Resume viewed",
-    description: "Your resume was viewed 12 times today",
-    timestamp: "1 day ago",
+    id: '4',
+    action: 'Resume viewed',
+    description: 'Your resume was viewed 12 times today',
+    timestamp: '1 day ago',
   },
   {
-    id: "5",
-    action: "New follower",
-    description: "jane_dev started following you",
-    timestamp: "2 days ago",
+    id: '5',
+    action: 'New follower',
+    description: 'jane_dev started following you',
+    timestamp: '2 days ago',
   },
 ];
 

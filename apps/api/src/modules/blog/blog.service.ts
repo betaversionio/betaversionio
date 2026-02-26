@@ -3,15 +3,15 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateBlogInput,
   UpdateBlogInput,
   ToggleBlogVoteInput,
   CreateBlogCommentInput,
   UpdateBlogCommentInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 const AUTHOR_SELECT = {
   id: true,
@@ -30,7 +30,7 @@ export class BlogService {
     });
 
     if (existing) {
-      throw new ConflictException("A blog with this slug already exists");
+      throw new ConflictException('A blog with this slug already exists');
     }
 
     return this.prisma.blog.create({
@@ -70,8 +70,8 @@ export class BlogService {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { content: { contains: search, mode: "insensitive" } },
+        { title: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -83,28 +83,28 @@ export class BlogService {
       // Owner viewing their own blogs: show all statuses
     } else {
       // Public browsing: exclude Draft and Archived
-      where.status = { notIn: ["Draft", "Archived"] };
+      where.status = { notIn: ['Draft', 'Archived'] };
     }
 
     if (tags) {
-      const tagList = tags.split(",").map((t) => t.trim());
+      const tagList = tags.split(',').map((t) => t.trim());
       where.tags = { hasSome: tagList };
     }
 
     let orderBy: Record<string, string> | Record<string, string>[];
     switch (sort) {
-      case "likes":
-        orderBy = { upvotesCount: "desc" };
+      case 'likes':
+        orderBy = { upvotesCount: 'desc' };
         break;
-      case "trending":
+      case 'trending':
         orderBy = [
-          { upvotesCount: "desc" },
-          { commentsCount: "desc" },
-          { createdAt: "desc" },
+          { upvotesCount: 'desc' },
+          { commentsCount: 'desc' },
+          { createdAt: 'desc' },
         ];
         break;
       default:
-        orderBy = { createdAt: "desc" };
+        orderBy = { createdAt: 'desc' };
     }
 
     const [items, total] = await Promise.all([
@@ -140,7 +140,7 @@ export class BlogService {
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     let hasVoted = false;
@@ -160,11 +160,11 @@ export class BlogService {
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     if (blog.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this blog");
+      throw new ForbiddenException('You are not the owner of this blog');
     }
 
     if (dto.slug && dto.slug !== blog.slug) {
@@ -173,7 +173,7 @@ export class BlogService {
       });
 
       if (existingSlug) {
-        throw new ConflictException("A blog with this slug already exists");
+        throw new ConflictException('A blog with this slug already exists');
       }
     }
 
@@ -200,11 +200,11 @@ export class BlogService {
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     if (blog.authorId !== userId) {
-      throw new ForbiddenException("You are not the owner of this blog");
+      throw new ForbiddenException('You are not the owner of this blog');
     }
 
     return this.prisma.blog.update({
@@ -239,17 +239,13 @@ export class BlogService {
 
   // ─── Votes ──────────────────────────────────────────────────────────────────
 
-  async toggleVote(
-    blogId: string,
-    userId: string,
-    dto: ToggleBlogVoteInput,
-  ) {
+  async toggleVote(blogId: string, userId: string, dto: ToggleBlogVoteInput) {
     const blog = await this.prisma.blog.findUnique({
       where: { id: blogId },
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     const existing = await this.prisma.blogVote.findUnique({
@@ -273,7 +269,7 @@ export class BlogService {
           data: { upvotesCount: { decrement: 1 } },
         });
 
-        return { action: "removed", value: dto.value };
+        return { action: 'removed', value: dto.value };
       } else {
         // Different vote — switch
         await this.prisma.blogVote.update({
@@ -288,7 +284,7 @@ export class BlogService {
           },
         });
 
-        return { action: "switched", value: dto.value };
+        return { action: 'switched', value: dto.value };
       }
     } else {
       // No existing vote — create it
@@ -307,7 +303,7 @@ export class BlogService {
         });
       }
 
-      return { action: "added", value: dto.value };
+      return { action: 'added', value: dto.value };
     }
   }
 
@@ -323,7 +319,7 @@ export class BlogService {
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     if (dto.parentId) {
@@ -333,7 +329,7 @@ export class BlogService {
 
       if (!parentComment || parentComment.blogId !== blogId) {
         throw new NotFoundException(
-          "Parent comment not found or does not belong to this blog",
+          'Parent comment not found or does not belong to this blog',
         );
       }
     }
@@ -369,11 +365,11 @@ export class BlogService {
     });
 
     if (!comment || comment.deletedAt || comment.blogId !== blogId) {
-      throw new NotFoundException("Comment not found");
+      throw new NotFoundException('Comment not found');
     }
 
     if (comment.authorId !== userId) {
-      throw new ForbiddenException("You can only edit your own comments");
+      throw new ForbiddenException('You can only edit your own comments');
     }
 
     return this.prisma.blogComment.update({
@@ -388,21 +384,17 @@ export class BlogService {
     });
   }
 
-  async deleteComment(
-    blogId: string,
-    commentId: string,
-    userId: string,
-  ) {
+  async deleteComment(blogId: string, commentId: string, userId: string) {
     const comment = await this.prisma.blogComment.findUnique({
       where: { id: commentId },
     });
 
     if (!comment || comment.deletedAt || comment.blogId !== blogId) {
-      throw new NotFoundException("Comment not found");
+      throw new NotFoundException('Comment not found');
     }
 
     if (comment.authorId !== userId) {
-      throw new ForbiddenException("You can only delete your own comments");
+      throw new ForbiddenException('You can only delete your own comments');
     }
 
     await this.prisma.blogComment.update({
@@ -422,7 +414,7 @@ export class BlogService {
     });
 
     if (!blog || blog.deletedAt) {
-      throw new NotFoundException("Blog not found");
+      throw new NotFoundException('Blog not found');
     }
 
     const total = await this.prisma.blogComment.count({
@@ -453,7 +445,7 @@ export class BlogService {
       include: {
         author: { select: AUTHOR_SELECT },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: 'asc' },
     });
 
     type CommentNode = (typeof allComments)[number] & {

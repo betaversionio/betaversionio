@@ -1,12 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
-import { ContainerTextFlip } from "@/components/ui/container-text-flip";
-import { FeatureSection, TestimonialsSection, FaqsSection } from "@/features/home";
-import { Logo } from "@/components/shared/logo";
-import { HugeiconsIcon } from "@hugeicons/react";
+import Link from 'next/link';
+import { motion } from 'motion/react';
+import { Button } from '@/components/ui/button';
+import { ContainerTextFlip } from '@/components/ui/container-text-flip';
+import {
+  FeatureSection,
+  TestimonialsSection,
+  FaqsSection,
+} from '@/features/home';
+import { Logo } from '@/components/shared/logo';
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
   UserIcon,
   CodeFolderIcon,
@@ -18,7 +22,7 @@ import {
   Settings01Icon,
   StarIcon,
   CheckmarkCircle02Icon,
-} from "@hugeicons/core-free-icons";
+} from '@hugeicons/core-free-icons';
 
 /* ─── animation helpers ─── */
 
@@ -75,28 +79,28 @@ function DashboardPreview() {
           <div className="hidden w-44 flex-shrink-0 border-r border-border/30 bg-muted/10 p-3 sm:block">
             <div className="mb-5 flex items-center gap-2 px-1.5">
               <Logo className="h-4 w-4 text-foreground" />
-              <span className="text-[11px] font-semibold">DevCom</span>
+              <span className="text-[11px] font-semibold">BetaVersion.IO</span>
             </div>
             <div className="space-y-0.5">
               {[
                 {
                   icon: DashboardSquare01Icon,
-                  label: "Dashboard",
+                  label: 'Dashboard',
                   active: true,
                 },
-                { icon: UserIcon, label: "Profile" },
-                { icon: CodeFolderIcon, label: "Projects" },
-                { icon: File01Icon, label: "Resume" },
-                { icon: RssIcon, label: "Feed" },
-                { icon: Idea01Icon, label: "Ideas" },
-                { icon: Settings01Icon, label: "Settings" },
+                { icon: UserIcon, label: 'Profile' },
+                { icon: CodeFolderIcon, label: 'Projects' },
+                { icon: File01Icon, label: 'Resume' },
+                { icon: RssIcon, label: 'Feed' },
+                { icon: Idea01Icon, label: 'Ideas' },
+                { icon: Settings01Icon, label: 'Settings' },
               ].map((item) => (
                 <div
                   key={item.label}
                   className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] transition-colors ${
-                    "active" in item && item.active
-                      ? "bg-foreground/[0.06] font-medium text-foreground"
-                      : "text-muted-foreground"
+                    'active' in item && item.active
+                      ? 'bg-foreground/[0.06] font-medium text-foreground'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   <HugeiconsIcon icon={item.icon} size={12} />
@@ -119,7 +123,7 @@ function DashboardPreview() {
             </div>
 
             <div className="mb-4 flex flex-wrap gap-1">
-              {["React", "TypeScript", "Node.js", "PostgreSQL", "Next.js"].map(
+              {['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Next.js'].map(
                 (t) => (
                   <span
                     key={t}
@@ -136,9 +140,9 @@ function DashboardPreview() {
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {[
-                { n: "DevCom", d: "Developer identity" },
-                { n: "CodeSync", d: "Real-time collab" },
-                { n: "ResumeKit", d: "PDF generator" },
+                { n: 'BetaVersion.IO', d: 'Developer identity' },
+                { n: 'CodeSync', d: 'Real-time collab' },
+                { n: 'ResumeKit', d: 'PDF generator' },
               ].map((p) => (
                 <div
                   key={p.n}
@@ -150,7 +154,11 @@ function DashboardPreview() {
                   </div>
                   <div className="mt-1.5 flex items-center gap-0.5 text-[9px] text-muted-foreground">
                     <HugeiconsIcon icon={StarIcon} size={9} />
-                    {p.n === "DevCom" ? 64 : p.n === "CodeSync" ? 42 : 31}
+                    {p.n === 'BetaVersion.IO'
+                      ? 64
+                      : p.n === 'CodeSync'
+                        ? 42
+                        : 31}
                   </div>
                 </div>
               ))}
@@ -182,7 +190,7 @@ export default function LandingPage() {
               linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
               linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px)
             `,
-            backgroundSize: "4rem 4rem",
+            backgroundSize: '4rem 4rem',
           }}
         />
 
@@ -212,9 +220,9 @@ export default function LandingPage() {
             Where developers are
             <br />
             <span className="mt-2 inline-flex items-center gap-3">
-              known for{" "}
+              known for{' '}
               <ContainerTextFlip
-                words={["building", "shipping", "creating", "crafting"]}
+                words={['building', 'shipping', 'creating', 'crafting']}
                 interval={2500}
                 textClassName="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
                 animationDuration={500}
@@ -241,9 +249,7 @@ export default function LandingPage() {
             className="mt-6 inline-flex items-center rounded-lg border border-border/40 bg-muted/20 px-5 py-2.5 font-mono text-sm backdrop-blur-sm"
           >
             <span className="text-muted-foreground/60">yourname</span>
-            <span className="font-medium text-foreground">
-              .betaversion.io
-            </span>
+            <span className="font-medium text-foreground">.betaversion.io</span>
           </motion.div>
 
           {/* CTA Buttons */}
@@ -281,9 +287,9 @@ export default function LandingPage() {
             className="mt-16 flex flex-wrap items-center justify-center gap-8 text-center"
           >
             {[
-              { value: "10K+", label: "Developers" },
-              { value: "25K+", label: "Projects" },
-              { value: "50K+", label: "Resumes built" },
+              { value: '10K+', label: 'Developers' },
+              { value: '25K+', label: 'Projects' },
+              { value: '50K+', label: 'Resumes built' },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -307,7 +313,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 32, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.7, ease }}
           >
             <DashboardPreview />
@@ -320,20 +326,20 @@ export default function LandingPage() {
         <FeatureSection />
       </div>
 
-      {/* ═══ WHY DEVCOM ═══ */}
+      {/* ═══ WHY betaversionio ═══ */}
       <section className="border-t border-border/40 bg-muted/10 py-24 md:py-32">
         <div className="mx-auto max-w-5xl px-4">
           <motion.div
             className="mx-auto mb-16 max-w-lg text-center"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, margin: '-80px' }}
           >
             <motion.p
               variants={fadeUp}
               className="mb-3 text-[13px] font-medium uppercase tracking-widest text-muted-foreground"
             >
-              Why DevCom
+              Why BetaVersion.IO
             </motion.p>
             <motion.h2
               variants={fadeUp}
@@ -343,8 +349,8 @@ export default function LandingPage() {
             </motion.h2>
             <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
               Stop maintaining five different profiles across five different
-              platforms. DevCom is one source of truth for your developer
-              identity.
+              platforms. BetaVersion.IO is one source of truth for your
+              developer identity.
             </motion.p>
           </motion.div>
 
@@ -353,15 +359,15 @@ export default function LandingPage() {
             variants={stagger}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
+            viewport={{ once: true, margin: '-40px' }}
           >
             {[
-              "Your own subdomain — yourname.betaversion.io",
-              "Always-live resume PDF that auto-updates",
-              "Proof-of-work portfolio, not buzzword bingo",
-              "Developer-only feed — no recruiter spam",
-              "Find collaborators through the Idea Board",
-              "GitHub import fills your profile in minutes",
+              'Your own subdomain — yourname.betaversion.io',
+              'Always-live resume PDF that auto-updates',
+              'Proof-of-work portfolio, not buzzword bingo',
+              'Developer-only feed — no recruiter spam',
+              'Find collaborators through the Idea Board',
+              'GitHub import fills your profile in minutes',
             ].map((point) => (
               <motion.div
                 key={point}
@@ -391,7 +397,7 @@ export default function LandingPage() {
           </h2>
           <p className="mt-4 text-sm text-muted-foreground">
             Hear from developers who replaced their fragmented online presence
-            with a single DevCom profile.
+            with a single BetaVersion.IO profile.
           </p>
         </div>
         <TestimonialsSection />
@@ -412,7 +418,7 @@ export default function LandingPage() {
               linear-gradient(to right, hsl(var(--foreground) / 0.03) 1px, transparent 1px),
               linear-gradient(to bottom, hsl(var(--foreground) / 0.03) 1px, transparent 1px)
             `,
-            backgroundSize: "3rem 3rem",
+            backgroundSize: '3rem 3rem',
           }}
         />
 
@@ -424,7 +430,7 @@ export default function LandingPage() {
           className="relative z-10 mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center md:py-32"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: '-80px' }}
         >
           <motion.p
             variants={fadeUp}
@@ -443,7 +449,7 @@ export default function LandingPage() {
             className="mt-5 max-w-sm text-muted-foreground"
           >
             Your code speaks. Let your profile do the same. Join thousands of
-            developers building their presence on DevCom.
+            developers building their presence on BetaVersion.IO.
           </motion.p>
           <motion.div variants={fadeUp} className="mt-10 flex gap-3">
             <Button

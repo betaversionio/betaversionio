@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ProjectStatus } from '@devcom/shared';
+import { ProjectStatus } from '@betaversionio/shared';
 import { useProjects } from '@/hooks/queries';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header';

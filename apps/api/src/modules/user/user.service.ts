@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
@@ -11,10 +11,10 @@ import type {
   EducationItemInput,
   ExperienceItemInput,
   ServiceItemInput,
-} from "@devcom/shared";
-import { PAGINATION } from "@devcom/shared";
+} from '@betaversionio/shared';
+import { PAGINATION } from '@betaversionio/shared';
 
-import { PrismaService } from "../../prisma/prisma.service";
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class UserService {
@@ -27,12 +27,12 @@ export class UserService {
         profile: true,
         socialLinks: true,
         techStack: true,
-        education: { orderBy: { startDate: "desc" } },
-        experiences: { orderBy: { startDate: "desc" } },
+        education: { orderBy: { startDate: 'desc' } },
+        experiences: { orderBy: { startDate: 'desc' } },
         services: true,
         projects: {
-          where: { deletedAt: null, status: "Active" },
-          orderBy: { createdAt: "desc" },
+          where: { deletedAt: null, status: 'Active' },
+          orderBy: { createdAt: 'desc' },
           take: 10,
           select: {
             id: true,
@@ -49,7 +49,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     return this.excludePassword(user);
@@ -68,19 +68,19 @@ export class UserService {
         profile: true,
         socialLinks: true,
         techStack: true,
-        education: { orderBy: { startDate: "desc" } },
-        experiences: { orderBy: { startDate: "desc" } },
+        education: { orderBy: { startDate: 'desc' } },
+        experiences: { orderBy: { startDate: 'desc' } },
         services: true,
         projects: {
           where: { deletedAt: null },
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
           take: 10,
         },
       },
     });
 
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     return this.excludePassword(user);
@@ -109,11 +109,11 @@ export class UserService {
     const where = query
       ? {
           OR: [
-            { username: { contains: query, mode: "insensitive" as const } },
-            { name: { contains: query, mode: "insensitive" as const } },
+            { username: { contains: query, mode: 'insensitive' as const } },
+            { name: { contains: query, mode: 'insensitive' as const } },
             {
               profile: {
-                headline: { contains: query, mode: "insensitive" as const },
+                headline: { contains: query, mode: 'insensitive' as const },
               },
             },
           ],
@@ -129,7 +129,7 @@ export class UserService {
         },
         skip,
         take: safeLimit,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.user.count({ where }),
     ]);
@@ -189,7 +189,7 @@ export class UserService {
 
       return tx.socialLink.findMany({
         where: { userId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       });
     });
   }
@@ -214,7 +214,7 @@ export class UserService {
 
       return tx.techStackItem.findMany({
         where: { userId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       });
     });
   }
@@ -242,7 +242,7 @@ export class UserService {
 
       return tx.education.findMany({
         where: { userId },
-        orderBy: { startDate: "desc" },
+        orderBy: { startDate: 'desc' },
       });
     });
   }
@@ -271,7 +271,7 @@ export class UserService {
 
       return tx.experience.findMany({
         where: { userId },
-        orderBy: { startDate: "desc" },
+        orderBy: { startDate: 'desc' },
       });
     });
   }
@@ -294,16 +294,16 @@ export class UserService {
 
       return tx.service.findMany({
         where: { userId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       });
     });
   }
 
   private excludePassword<T extends Record<string, unknown>>(
     user: T,
-  ): Omit<T, "passwordHash" | "refreshToken"> {
+  ): Omit<T, 'passwordHash' | 'refreshToken'> {
     const { passwordHash, refreshToken, ...userWithoutSensitive } =
       user as T & { passwordHash?: unknown; refreshToken?: unknown };
-    return userWithoutSensitive as Omit<T, "passwordHash" | "refreshToken">;
+    return userWithoutSensitive as Omit<T, 'passwordHash' | 'refreshToken'>;
   }
 }

@@ -2,8 +2,8 @@
 
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateServicesSchema } from '@devcom/shared';
-import type { UpdateServicesInput } from '@devcom/shared';
+import { updateServicesSchema } from '@betaversionio/shared';
+import type { UpdateServicesInput } from '@betaversionio/shared';
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
@@ -50,9 +50,7 @@ export function ServicesForm() {
       toast({
         title: 'Update failed',
         description:
-          error instanceof Error
-            ? error.message
-            : 'Failed to update services.',
+          error instanceof Error ? error.message : 'Failed to update services.',
         variant: 'destructive',
       });
     },

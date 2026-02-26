@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from 'react';
 
 type LogoProps = SVGProps<SVGSVGElement>;
 
@@ -7,7 +7,7 @@ export function Logo({ className, ...props }: LogoProps) {
     <svg
       viewBox="0 0 1224 1224"
       role="img"
-      aria-label="DevCom logo"
+      aria-label="BetaVersion.IO logo"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}

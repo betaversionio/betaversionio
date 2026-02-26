@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { createSign } from "crypto";
-import { readFileSync } from "fs";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createSign } from 'crypto';
+import { readFileSync } from 'fs';
 
 @Injectable()
 export class GitHubAppService {
@@ -9,20 +9,20 @@ export class GitHubAppService {
   private readonly privateKey: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.appId = this.configService.getOrThrow<string>("GITHUB_APP_ID");
+    this.appId = this.configService.getOrThrow<string>('GITHUB_APP_ID');
 
     // Support file path or inline PEM (with \n escapes)
     const keyPath = this.configService.get<string>(
-      "GITHUB_APP_PRIVATE_KEY_PATH",
+      'GITHUB_APP_PRIVATE_KEY_PATH',
     );
 
     if (keyPath) {
-      this.privateKey = readFileSync(keyPath, "utf8");
+      this.privateKey = readFileSync(keyPath, 'utf8');
     } else {
       const raw = this.configService.getOrThrow<string>(
-        "GITHUB_APP_PRIVATE_KEY",
+        'GITHUB_APP_PRIVATE_KEY',
       );
-      this.privateKey = raw.replace(/\\n/g, "\n");
+      this.privateKey = raw.replace(/\\n/g, '\n');
     }
   }
 
@@ -34,8 +34,8 @@ export class GitHubAppService {
     const now = Math.floor(Date.now() / 1000);
 
     const header = Buffer.from(
-      JSON.stringify({ alg: "RS256", typ: "JWT" }),
-    ).toString("base64url");
+      JSON.stringify({ alg: 'RS256', typ: 'JWT' }),
+    ).toString('base64url');
 
     const payload = Buffer.from(
       JSON.stringify({
@@ -43,11 +43,11 @@ export class GitHubAppService {
         exp: now + 300,
         iss: this.appId,
       }),
-    ).toString("base64url");
+    ).toString('base64url');
 
-    const signature = createSign("RSA-SHA256")
+    const signature = createSign('RSA-SHA256')
       .update(`${header}.${payload}`)
-      .sign(this.privateKey, "base64url");
+      .sign(this.privateKey, 'base64url');
 
     return `${header}.${payload}.${signature}`;
   }
@@ -62,11 +62,11 @@ export class GitHubAppService {
     const res = await fetch(
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${jwt}`,
-          Accept: "application/vnd.github+json",
-          "User-Agent": "DevCom",
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'BetaVersion.IO',
         },
       },
     );

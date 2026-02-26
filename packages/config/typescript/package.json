@@ -1,6 +1,10 @@
 {
-  "name": "@devcom/typescript-config",
+  "name": "@betaversionio/typescript-config",
   "version": "0.0.0",
   "private": true,
-  "files": ["base.json", "next.json", "nest.json"]
+  "files": [
+    "base.json",
+    "next.json",
+    "nest.json"
+  ]
 }

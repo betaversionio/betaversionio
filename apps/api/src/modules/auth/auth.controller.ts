@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import { registerSchema } from '@devcom/shared';
-import type { RegisterInput } from '@devcom/shared';
+import { registerSchema } from '@betaversionio/shared';
+import type { RegisterInput } from '@betaversionio/shared';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -181,7 +181,11 @@ export class AuthController {
   }
 
   private clearTokenCookies(res: Response) {
-    const shared = { secure: this.isSecure, sameSite: 'lax' as const, path: '/' };
+    const shared = {
+      secure: this.isSecure,
+      sameSite: 'lax' as const,
+      path: '/',
+    };
     res.clearCookie(ACCESS_TOKEN_COOKIE, { ...shared, httpOnly: false });
     res.clearCookie(REFRESH_TOKEN_COOKIE, { ...shared, httpOnly: true });
   }

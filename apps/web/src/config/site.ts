@@ -17,7 +17,7 @@ export const siteConfig = {
     'project showcase',
     'developer feed',
     'BetaVersion.IO',
-    'DevCom',
+    'BetaVersion.IO',
   ],
   authors: [
     {

@@ -3,13 +3,13 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-} from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+} from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
 import type {
   CreatePostInput,
   CreateCommentInput,
   ToggleReactionInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 interface PostAuthor {
   id: string;
@@ -60,10 +60,10 @@ interface PostDetail extends Post {
 }
 
 export const feedKeys = {
-  all: ["feed"] as const,
-  lists: () => [...feedKeys.all, "list"] as const,
-  userPosts: (authorId: string) => [...feedKeys.all, "user", authorId] as const,
-  details: () => [...feedKeys.all, "detail"] as const,
+  all: ['feed'] as const,
+  lists: () => [...feedKeys.all, 'list'] as const,
+  userPosts: (authorId: string) => [...feedKeys.all, 'user', authorId] as const,
+  details: () => [...feedKeys.all, 'detail'] as const,
   detail: (id: string) => [...feedKeys.details(), id] as const,
 };
 
@@ -71,7 +71,7 @@ export function useFeed() {
   return useInfiniteQuery({
     queryKey: feedKeys.lists(),
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
-      apiClient.get<CursorPaginatedPosts>("/posts/feed", {
+      apiClient.get<CursorPaginatedPosts>('/posts/feed', {
         params: {
           cursor: pageParam,
           limit: 20,
@@ -79,7 +79,9 @@ export function useFeed() {
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.hasMore ? lastPage.meta.nextCursor ?? undefined : undefined,
+      lastPage.meta.hasMore
+        ? (lastPage.meta.nextCursor ?? undefined)
+        : undefined,
   });
 }
 
@@ -87,7 +89,7 @@ export function useUserPosts(authorId: string) {
   return useQuery({
     queryKey: feedKeys.userPosts(authorId),
     queryFn: () =>
-      apiClient.get<CursorPaginatedPosts>("/posts/feed", {
+      apiClient.get<CursorPaginatedPosts>('/posts/feed', {
         params: { authorId, limit: 10 },
       }),
     enabled: !!authorId,
@@ -106,8 +108,7 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreatePostInput) =>
-      apiClient.post<Post>("/posts", data),
+    mutationFn: (data: CreatePostInput) => apiClient.post<Post>('/posts', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: feedKeys.lists() });
     },

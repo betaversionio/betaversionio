@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { createInvitationSchema } from '@devcom/shared';
+import { createInvitationSchema } from '@betaversionio/shared';
 import type { ProjectMaker } from '@/hooks/queries/use-project-queries';
 import {
   useCreateInvitation,
@@ -283,8 +283,14 @@ function InviteDialog({
                 </FieldDescription>
                 {selectedUsername ? (
                   <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2">
-                    <TickCircle size={16} color="currentColor" className="text-primary" />
-                    <span className="text-sm font-medium">@{selectedUsername}</span>
+                    <TickCircle
+                      size={16}
+                      color="currentColor"
+                      className="text-primary"
+                    />
+                    <span className="text-sm font-medium">
+                      @{selectedUsername}
+                    </span>
                     <button
                       type="button"
                       onClick={clearUser}

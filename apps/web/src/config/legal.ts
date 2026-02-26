@@ -8,7 +8,7 @@ export const legalContent = {
     contactEmail: 'privacy@betaversion.io',
     contactLabel: 'Contact Us',
     content: `
-We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy describes how we collect, use, and safeguard your data when you use DevCom.
+We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy describes how we collect, use, and safeguard your data when you use BetaVersion.IO.
 
 ## 1. Information We Collect
 
@@ -79,7 +79,7 @@ We are committed to protecting your privacy and ensuring the security of your pe
     contactEmail: 'legal@betaversion.io',
     contactLabel: 'Questions?',
     content: `
-Welcome to DevCom by BetaVersion.IO. These Terms of Service govern your use of our platform and services. Please read them carefully.
+Welcome to BetaVersion.IO by BetaVersion.IO. These Terms of Service govern your use of our platform and services. Please read them carefully.
 
 ## 1. Acceptance of Terms
 
@@ -113,7 +113,7 @@ Welcome to DevCom by BetaVersion.IO. These Terms of Service govern your use of o
 
 ## 5. Intellectual Property
 
-- The DevCom platform, including its design, code, and branding, is the intellectual property of BetaVersion.IO.
+- The BetaVersion.IO platform, including its design, code, and branding, is the intellectual property of BetaVersion.IO.
 - You are granted a limited, non-exclusive license to use the platform for its intended purpose.
 - You may not reproduce, modify, or create derivative works from our platform without permission.
 
@@ -201,7 +201,7 @@ Help us understand how visitors interact with our platform.
 
 - Most browsers allow you to control cookies through their settings.
 - You can delete existing cookies from your browser at any time.
-- Blocking essential cookies will prevent you from signing in to DevCom.
+- Blocking essential cookies will prevent you from signing in to BetaVersion.IO.
 - Use your browser's "private" or "incognito" mode to limit cookie storage.
 
 ## 6. Cookie Retention

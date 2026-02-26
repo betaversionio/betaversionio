@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { CreateProjectInput } from '@devcom/shared';
+import type { CreateProjectInput } from '@betaversionio/shared';
 import { useSearchUsers } from '@/hooks/queries';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -160,9 +160,7 @@ export function MakersSection({ form, initialMakerUsers }: MakersSectionProps) {
       {/* Makers list */}
       {makers.length > 0 ? (
         <Field>
-          <FieldTitle>
-            Team ({makers.length})
-          </FieldTitle>
+          <FieldTitle>Team ({makers.length})</FieldTitle>
           <div className="space-y-2">
             {makers.map((maker) => {
               const display = makerDisplayMap[maker.userId];

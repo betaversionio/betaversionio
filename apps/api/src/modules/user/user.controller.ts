@@ -1,12 +1,5 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Body,
-  Param,
-  Query,
-} from "@nestjs/common";
-import { ProjectService } from "../project/project.service";
+import { Controller, Get, Patch, Body, Param, Query } from '@nestjs/common';
+import { ProjectService } from '../project/project.service';
 import {
   updateProfileSchema,
   updateSocialLinksSchema,
@@ -16,7 +9,7 @@ import {
   updateServicesSchema,
   paginationSchema,
   respondInvitationSchema,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
@@ -24,83 +17,87 @@ import type {
   UpdateEducationInput,
   UpdateExperienceInput,
   UpdateServicesInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
-import { Public } from "../../common/decorators/public.decorator";
-import { CurrentUser } from "../../common/decorators/current-user.decorator";
-import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe";
+import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 
-import { UserService } from "./user.service";
+import { UserService } from './user.service';
 
-@Controller("users")
+@Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly projectService: ProjectService,
   ) {}
 
-  @Get("me")
-  async getMe(@CurrentUser("id") userId: string) {
+  @Get('me')
+  async getMe(@CurrentUser('id') userId: string) {
     return this.userService.findById(userId);
   }
 
-  @Patch("me/profile")
+  @Patch('me/profile')
   async updateProfile(
-    @CurrentUser("id") userId: string,
+    @CurrentUser('id') userId: string,
     @Body(new ZodValidationPipe(updateProfileSchema)) dto: UpdateProfileInput,
   ) {
     return this.userService.updateProfile(userId, dto);
   }
 
-  @Patch("me/social-links")
+  @Patch('me/social-links')
   async updateSocialLinks(
-    @CurrentUser("id") userId: string,
-    @Body(new ZodValidationPipe(updateSocialLinksSchema)) dto: UpdateSocialLinksInput,
+    @CurrentUser('id') userId: string,
+    @Body(new ZodValidationPipe(updateSocialLinksSchema))
+    dto: UpdateSocialLinksInput,
   ) {
     return this.userService.updateSocialLinks(userId, dto);
   }
 
-  @Patch("me/tech-stack")
+  @Patch('me/tech-stack')
   async updateTechStack(
-    @CurrentUser("id") userId: string,
-    @Body(new ZodValidationPipe(updateTechStackSchema)) dto: UpdateTechStackInput,
+    @CurrentUser('id') userId: string,
+    @Body(new ZodValidationPipe(updateTechStackSchema))
+    dto: UpdateTechStackInput,
   ) {
     return this.userService.updateTechStack(userId, dto);
   }
 
-  @Patch("me/education")
+  @Patch('me/education')
   async updateEducation(
-    @CurrentUser("id") userId: string,
-    @Body(new ZodValidationPipe(updateEducationSchema)) dto: UpdateEducationInput,
+    @CurrentUser('id') userId: string,
+    @Body(new ZodValidationPipe(updateEducationSchema))
+    dto: UpdateEducationInput,
   ) {
     return this.userService.updateEducation(userId, dto);
   }
 
-  @Patch("me/experience")
+  @Patch('me/experience')
   async updateExperience(
-    @CurrentUser("id") userId: string,
-    @Body(new ZodValidationPipe(updateExperienceSchema)) dto: UpdateExperienceInput,
+    @CurrentUser('id') userId: string,
+    @Body(new ZodValidationPipe(updateExperienceSchema))
+    dto: UpdateExperienceInput,
   ) {
     return this.userService.updateExperience(userId, dto);
   }
 
-  @Patch("me/services")
+  @Patch('me/services')
   async updateServices(
-    @CurrentUser("id") userId: string,
+    @CurrentUser('id') userId: string,
     @Body(new ZodValidationPipe(updateServicesSchema)) dto: UpdateServicesInput,
   ) {
     return this.userService.updateServices(userId, dto);
   }
 
-  @Get("me/invitations")
-  async getMyInvitations(@CurrentUser("id") userId: string) {
+  @Get('me/invitations')
+  async getMyInvitations(@CurrentUser('id') userId: string) {
     return this.projectService.getReceivedInvitations(userId);
   }
 
-  @Patch("me/invitations/:invitationId")
+  @Patch('me/invitations/:invitationId')
   async respondToInvitation(
-    @CurrentUser("id") userId: string,
-    @Param("invitationId") invitationId: string,
+    @CurrentUser('id') userId: string,
+    @Param('invitationId') invitationId: string,
     @Body() body: { action: string },
   ) {
     const dto = respondInvitationSchema.parse(body);
@@ -108,18 +105,18 @@ export class UserController {
   }
 
   @Public()
-  @Get(":username")
-  async getPublicProfile(@Param("username") username: string) {
+  @Get(':username')
+  async getPublicProfile(@Param('username') username: string) {
     return this.userService.findByUsername(username);
   }
 
   @Public()
   @Get()
   async searchUsers(
-    @Query("q") query: string = "",
-    @Query("page", new ZodValidationPipe(paginationSchema.shape.page))
+    @Query('q') query: string = '',
+    @Query('page', new ZodValidationPipe(paginationSchema.shape.page))
     page: number,
-    @Query("limit", new ZodValidationPipe(paginationSchema.shape.limit))
+    @Query('limit', new ZodValidationPipe(paginationSchema.shape.limit))
     limit: number,
   ) {
     return this.userService.searchUsers(query, page, limit);

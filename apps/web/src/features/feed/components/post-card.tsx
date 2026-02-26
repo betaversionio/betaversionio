@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ReactionType } from '@devcom/shared';
+import { ReactionType } from '@betaversionio/shared';
 import { useToggleReaction, useCreateComment, usePost } from '../hooks';
 import { useAuth } from '@/providers/auth-provider';
 import { cn } from '@/lib/utils';
@@ -38,7 +38,9 @@ function PostComments({
       {/* Existing comments */}
       {isLoading ? (
         <div className="flex justify-center py-4">
-          <span className="text-xs text-muted-foreground">Loading comments...</span>
+          <span className="text-xs text-muted-foreground">
+            Loading comments...
+          </span>
         </div>
       ) : comments.length > 0 ? (
         <div className="space-y-3 px-4 pt-3">

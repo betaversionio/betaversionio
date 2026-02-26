@@ -3,14 +3,14 @@ import {
   ConflictException,
   UnauthorizedException,
   ForbiddenException,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import type { RegisterInput } from "@devcom/shared";
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import type { RegisterInput } from '@betaversionio/shared';
 
-import { PrismaService } from "../../prisma/prisma.service";
-import { UserService } from "../user/user.service";
+import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
     // Check for existing email
     const existingEmail = await this.userService.findByEmail(dto.email);
     if (existingEmail) {
-      throw new ConflictException("Email is already registered");
+      throw new ConflictException('Email is already registered');
     }
 
     // Check for existing username
@@ -37,7 +37,7 @@ export class AuthService {
       where: { username: dto.username },
     });
     if (existingUsername) {
-      throw new ConflictException("Username is already taken");
+      throw new ConflictException('Username is already taken');
     }
 
     // Hash password
@@ -75,7 +75,12 @@ export class AuthService {
 
   // ── Login ─────────────────────────────────────────────────────────────────
 
-  async login(user: { id: string; email: string; username: string; name: string }) {
+  async login(user: {
+    id: string;
+    email: string;
+    username: string;
+    name: string;
+  }) {
     const tokens = await this.generateTokens(user.id, user.email);
 
     return {
@@ -122,7 +127,7 @@ export class AuthService {
     });
 
     if (!user || !user.refreshToken) {
-      throw new ForbiddenException("Access denied");
+      throw new ForbiddenException('Access denied');
     }
 
     // Verify the refresh token hash matches
@@ -132,7 +137,7 @@ export class AuthService {
     );
 
     if (!isRefreshTokenValid) {
-      throw new ForbiddenException("Access denied");
+      throw new ForbiddenException('Access denied');
     }
 
     // Rotate tokens
@@ -169,16 +174,18 @@ export class AuthService {
   async githubLogin(code: string) {
     // Exchange the authorization code for an access token
     const tokenRes = await fetch(
-      "https://github.com/login/oauth/access_token",
+      'https://github.com/login/oauth/access_token',
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
         body: JSON.stringify({
-          client_id: this.configService.getOrThrow<string>("GITHUB_CLIENT_ID"),
-          client_secret: this.configService.getOrThrow<string>("GITHUB_CLIENT_SECRET"),
+          client_id: this.configService.getOrThrow<string>('GITHUB_CLIENT_ID'),
+          client_secret: this.configService.getOrThrow<string>(
+            'GITHUB_CLIENT_SECRET',
+          ),
           code,
         }),
       },
@@ -190,21 +197,21 @@ export class AuthService {
     };
 
     if (!tokenData.access_token) {
-      throw new UnauthorizedException("Invalid GitHub code");
+      throw new UnauthorizedException('Invalid GitHub code');
     }
 
     // Fetch GitHub user profile
     const [profileRes, emailsRes] = await Promise.all([
-      fetch("https://api.github.com/user", {
+      fetch('https://api.github.com/user', {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
       }),
-      fetch("https://api.github.com/user/emails", {
+      fetch('https://api.github.com/user/emails', {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
       }),
     ]);
 
     if (!profileRes.ok) {
-      throw new UnauthorizedException("Failed to fetch GitHub profile");
+      throw new UnauthorizedException('Failed to fetch GitHub profile');
     }
 
     const profile = (await profileRes.json()) as {
@@ -254,7 +261,7 @@ export class AuthService {
 
       user = await this.prisma.user.create({
         data: {
-          email: primaryEmail || `${githubId}@github.devcom`,
+          email: primaryEmail || `${githubId}@github.betaversionio`,
           username: finalUsername,
           name,
           githubId,
@@ -284,13 +291,12 @@ export class AuthService {
 
   async googleLogin(accessToken: string) {
     // Fetch user info from Google using the access token
-    const res = await fetch(
-      "https://www.googleapis.com/oauth2/v3/userinfo",
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
     if (!res.ok) {
-      throw new UnauthorizedException("Invalid Google token");
+      throw new UnauthorizedException('Invalid Google token');
     }
 
     const payload = (await res.json()) as {
@@ -302,7 +308,7 @@ export class AuthService {
 
     const googleId = payload.sub;
     const email = payload.email || null;
-    const name = payload.name || "Google User";
+    const name = payload.name || 'Google User';
     const avatarUrl = payload.picture || null;
 
     // Try to find an existing user by Google ID
@@ -324,9 +330,7 @@ export class AuthService {
     }
 
     if (!user) {
-      let username = email
-        ? email.split("@")[0]!
-        : `google-${googleId}`;
+      let username = email ? email.split('@')[0]! : `google-${googleId}`;
 
       const existingUsername = await this.prisma.user.findUnique({
         where: { username },
@@ -338,7 +342,7 @@ export class AuthService {
 
       user = await this.prisma.user.create({
         data: {
-          email: email || `${googleId}@google.devcom`,
+          email: email || `${googleId}@google.betaversionio`,
           username,
           name,
           googleId,
@@ -371,15 +375,18 @@ export class AuthService {
       this.jwtService.signAsync(
         { sub: userId, email } as Record<string, unknown>,
         {
-          secret: this.configService.getOrThrow<string>("JWT_SECRET"),
-          expiresIn: (this.configService.get<string>("JWT_ACCESS_EXPIRATION") || "7d") as any,
+          secret: this.configService.getOrThrow<string>('JWT_SECRET'),
+          expiresIn: (this.configService.get<string>('JWT_ACCESS_EXPIRATION') ||
+            '7d') as any,
         },
       ),
       this.jwtService.signAsync(
         { sub: userId, email } as Record<string, unknown>,
         {
-          secret: this.configService.getOrThrow<string>("JWT_REFRESH_SECRET"),
-          expiresIn: (this.configService.get<string>("JWT_REFRESH_EXPIRATION") || "15d") as any,
+          secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+          expiresIn: (this.configService.get<string>(
+            'JWT_REFRESH_EXPIRATION',
+          ) || '15d') as any,
         },
       ),
     ]);

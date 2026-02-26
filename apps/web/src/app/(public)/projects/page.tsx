@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
-import { ProjectPhase, ProductionType } from '@devcom/shared';
+import { ProjectPhase, ProductionType } from '@betaversionio/shared';
 import { useProjects } from '@/hooks/queries/use-project-queries';
 import { ProjectCard } from '@/features/projects';
 import { Input } from '@/components/ui/input';
@@ -75,9 +75,7 @@ export default function ProjectsPage() {
             <Input
               placeholder="Search projects..."
               value={search}
-              onChange={(e) =>
-                setParams({ search: e.target.value, page: 1 })
-              }
+              onChange={(e) => setParams({ search: e.target.value, page: 1 })}
               className="rounded-full pl-10 h-12"
             />
           </div>
@@ -108,9 +106,7 @@ export default function ProjectsPage() {
 
               <Select
                 value={productionType}
-                onValueChange={(v) =>
-                  setParams({ productionType: v, page: 1 })
-                }
+                onValueChange={(v) => setParams({ productionType: v, page: 1 })}
               >
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Type" />
@@ -177,7 +173,9 @@ export default function ProjectsPage() {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() => setParams({ page: Math.max(1, page - 1) })}
+                        onClick={() =>
+                          setParams({ page: Math.max(1, page - 1) })
+                        }
                         className={
                           page <= 1
                             ? 'pointer-events-none opacity-50'

@@ -3,15 +3,15 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { LatexService } from "./latex.service";
-import { StorageService } from "../storage/storage.service";
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { LatexService } from './latex.service';
+import { StorageService } from '../storage/storage.service';
 import type {
   CreateResumeInput,
   UpdateResumeInput,
   CompileLatexInput,
-} from "@devcom/shared";
+} from '@betaversionio/shared';
 
 @Injectable()
 export class ResumeService {
@@ -46,10 +46,10 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
         },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -59,17 +59,17 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
         },
       },
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     return resume;
@@ -81,11 +81,11 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     return this.prisma.resume.update({
@@ -104,7 +104,7 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
         },
       },
     });
@@ -119,18 +119,18 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     const result = await this.latexService.compile(dto.latexSource);
 
     if (!result.success) {
       throw new BadRequestException({
-        message: "LaTeX compilation failed",
+        message: 'LaTeX compilation failed',
         errors: result.errors,
         log: result.log.slice(-2000),
       });
@@ -148,22 +148,22 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     if (!resume.latexSource) {
-      throw new BadRequestException("No LaTeX source to compile");
+      throw new BadRequestException('No LaTeX source to compile');
     }
 
     const result = await this.latexService.compile(resume.latexSource);
 
     if (!result.success) {
       throw new BadRequestException({
-        message: "LaTeX compilation failed",
+        message: 'LaTeX compilation failed',
         errors: result.errors,
       });
     }
@@ -172,7 +172,7 @@ export class ResumeService {
     const pdfUrl = await this.storageService.uploadBuffer(
       key,
       result.pdf,
-      "application/pdf",
+      'application/pdf',
     );
 
     const version = await this.prisma.resumeVersion.create({
@@ -194,11 +194,11 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     await this.prisma.resume.update({
@@ -213,11 +213,11 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     // Unset all other resumes as non-primary for this user
@@ -233,7 +233,7 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
         },
       },
     });
@@ -245,11 +245,11 @@ export class ResumeService {
     });
 
     if (!resume || resume.deletedAt) {
-      throw new NotFoundException("Resume not found");
+      throw new NotFoundException('Resume not found');
     }
 
     if (resume.userId !== userId) {
-      throw new ForbiddenException("You do not own this resume");
+      throw new ForbiddenException('You do not own this resume');
     }
 
     return this.prisma.resume.update({
@@ -258,7 +258,7 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
         },
       },
     });
@@ -271,7 +271,7 @@ export class ResumeService {
     });
 
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     // Prefer the primary resume; fall back to any public one
@@ -284,15 +284,15 @@ export class ResumeService {
       include: {
         template: true,
         versions: {
-          orderBy: { generatedAt: "desc" },
+          orderBy: { generatedAt: 'desc' },
           take: 1,
         },
       },
-      orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }],
+      orderBy: [{ isPrimary: 'desc' }, { updatedAt: 'desc' }],
     });
 
     if (!resume) {
-      throw new NotFoundException("No public resume found for this user");
+      throw new NotFoundException('No public resume found for this user');
     }
 
     return resume;
