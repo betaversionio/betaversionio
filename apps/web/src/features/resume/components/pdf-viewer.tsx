@@ -97,10 +97,11 @@ export function PdfViewer({ url, isCompiling }: PdfViewerProps) {
       </div>
 
       {/* PDF pages */}
-      <div ref={containerRef} className="flex-1 overflow-auto bg-muted/20 p-4">
+      <div ref={containerRef} className="flex-1 overflow-auto p-4">
         <Document
           file={url}
           onLoadSuccess={({ numPages: n }) => setNumPages(n)}
+          className="flex flex-col items-center"
           loading={
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -120,7 +121,7 @@ export function PdfViewer({ url, isCompiling }: PdfViewerProps) {
               key={i}
               pageNumber={i + 1}
               scale={zoom}
-              className="mx-auto mb-4 overflow-hidden rounded shadow-md"
+              className="mb-4 overflow-hidden rounded shadow-md"
               renderTextLayer={false}
             />
           ))}

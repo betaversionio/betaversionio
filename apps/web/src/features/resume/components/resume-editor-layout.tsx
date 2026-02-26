@@ -12,6 +12,11 @@ import { PdfViewer } from "./pdf-viewer";
 import { CompilationErrorPanel } from "./compilation-error-panel";
 import { ResumeToolbar } from "./resume-toolbar";
 import { Code2, Eye } from "lucide-react";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import { GitHubImportDialog } from "./github-import-dialog";
 import { GitHubPushDialog } from "./github-push-dialog";
 
@@ -19,6 +24,7 @@ interface ResumeEditorLayoutProps {
   resumeId: string;
   title: string;
   initialSource: string;
+  initialPdfUrl?: string | null;
   initialGithubRepo?: string | null;
   initialGithubPath?: string | null;
   initialGithubSha?: string | null;
@@ -28,6 +34,7 @@ export function ResumeEditorLayout({
   resumeId,
   title,
   initialSource,
+  initialPdfUrl,
   initialGithubRepo,
   initialGithubPath,
   initialGithubSha,
@@ -48,6 +55,24 @@ export function ResumeEditorLayout({
   const compileResume = useCompileResume(resumeId);
   const generatePdf = useGeneratePdf(resumeId);
   const { toast } = useToast();
+
+  // Load last published PDF as blob to avoid CORS issues with R2
+  useEffect(() => {
+    if (!initialPdfUrl) return;
+    let cancelled = false;
+
+    fetch(initialPdfUrl)
+      .then((res) => (res.ok ? res.blob() : null))
+      .then((blob) => {
+        if (cancelled || !blob) return;
+        const url = URL.createObjectURL(blob);
+        pdfUrlRef.current = url;
+        setPdfUrl(url);
+      })
+      .catch(() => {});
+
+    return () => { cancelled = true; };
+  }, [initialPdfUrl]);
 
   // Cleanup blob URL on unmount
   useEffect(() => {
@@ -204,47 +229,53 @@ export function ResumeEditorLayout({
         onGitHubPush={() => setShowPush(true)}
       />
 
-      <div className="flex min-h-0 flex-1">
+      <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
         {/* Left: Editor */}
-        <div className="flex w-1/2 flex-col border-r">
-          {/* Panel header */}
-          <div className="flex h-8 items-center gap-1.5 border-b bg-muted/40 px-3">
-            <Code2 className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              Editor
-            </span>
-          </div>
-          <div className="min-h-0 flex-1">
-            <LatexEditor
-              value={latexSource}
-              onChange={handleChange}
-              onCompile={handleCompile}
-              onSave={handleSave}
+        <ResizablePanel defaultSize={50} minSize={25}>
+          <div className="flex h-full flex-col">
+            {/* Panel header */}
+            <div className="flex h-8 items-center gap-1.5 border-b bg-muted/40 px-3">
+              <Code2 className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">
+                Editor
+              </span>
+            </div>
+            <div className="min-h-0 flex-1">
+              <LatexEditor
+                value={latexSource}
+                onChange={handleChange}
+                onCompile={handleCompile}
+                onSave={handleSave}
+              />
+            </div>
+            <CompilationErrorPanel
+              errors={errors}
+              onDismiss={() => setErrors([])}
             />
           </div>
-          <CompilationErrorPanel
-            errors={errors}
-            onDismiss={() => setErrors([])}
-          />
-        </div>
+        </ResizablePanel>
+
+        <ResizableHandle withHandle />
 
         {/* Right: PDF Preview */}
-        <div className="flex w-1/2 flex-col">
-          {/* Panel header */}
-          <div className="flex h-8 items-center gap-1.5 border-b bg-muted/40 px-3">
-            <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              Preview
-            </span>
+        <ResizablePanel defaultSize={50} minSize={25}>
+          <div className="flex h-full flex-col">
+            {/* Panel header */}
+            <div className="flex h-8 items-center gap-1.5 border-b bg-muted/40 px-3">
+              <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">
+                Preview
+              </span>
+            </div>
+            <div className="min-h-0 flex-1">
+              <PdfViewer
+                url={pdfUrl}
+                isCompiling={compileResume.isPending}
+              />
+            </div>
           </div>
-          <div className="min-h-0 flex-1">
-            <PdfViewer
-              url={pdfUrl}
-              isCompiling={compileResume.isPending}
-            />
-          </div>
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <GitHubImportDialog
         open={showImport}

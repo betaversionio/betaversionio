@@ -27,6 +27,7 @@ export default function ResumeEditorPage({
         resumeId={resume.id}
         title={resume.title}
         initialSource={resume.latexSource ?? ""}
+        initialPdfUrl={resume.versions?.[0]?.pdfUrl ?? null}
         initialGithubRepo={resume.githubRepo}
         initialGithubPath={resume.githubPath}
         initialGithubSha={resume.githubSha}
