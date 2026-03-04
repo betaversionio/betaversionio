@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useForgotPassword } from "@/features/auth";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,21 +19,27 @@ import { ArrowLeft, Loader2, Mail } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const forgotMutation = useForgotPassword();
+  const { toast } = useToast();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    forgotMutation.mutate(email, {
+      onError: (error) => {
+        toast({
+          title: "Request failed",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
   }
 
-  if (isSubmitted) {
+  if (forgotMutation.isSuccess) {
     return (
       <Card>
         <CardHeader className="text-center">
@@ -80,8 +88,12 @@ export default function ForgotPasswordPage() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={forgotMutation.isPending}
+          >
+            {forgotMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Sending...

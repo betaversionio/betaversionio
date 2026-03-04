@@ -86,6 +86,7 @@ model User {
   blogComments          BlogComment[]
   followers             Follow[]              @relation("UserFollowing")
   following             Follow[]              @relation("UserFollowers")
+  verificationTokens    VerificationToken[]
 
   @@map("users")
 }
@@ -188,4 +189,19 @@ model Service {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("services")
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  type      String   // "EMAIL_VERIFY" or "PASSWORD_RESET"
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId, type])
+  @@map("verification_tokens")
 }

@@ -9,6 +9,7 @@ import { GoogleProvider } from '@/providers/google-oauth-provider';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { GoogleAnalytics } from '@/components/shared/google-analytics';
 import { OrganizationJsonLd, WebsiteJsonLd } from '@/components/shared/json-ld';
+import { Toaster } from '@/components/ui/toaster';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -107,6 +108,7 @@ export default function RootLayout({
             <GoogleProvider>
               <AuthProvider>
                 <NuqsAdapter>{children}</NuqsAdapter>
+                <Toaster />
               </AuthProvider>
             </GoogleProvider>
           </QueryProvider>

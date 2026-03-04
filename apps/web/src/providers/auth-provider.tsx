@@ -24,6 +24,7 @@ export interface User {
   username: string;
   name: string | null;
   avatarUrl: string | null;
+  hasPassword: boolean;
 }
 
 interface AuthContextValue {

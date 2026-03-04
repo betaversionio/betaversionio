@@ -89,7 +89,9 @@ async function request<T>(
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
+    // API wraps errors in { success: false, error: { message, code } }
     const message =
+      (errorBody as { error?: { message?: string } }).error?.message ??
       (errorBody as { message?: string }).message ??
       `Request failed with status ${res.status}`;
     throw new Error(message);

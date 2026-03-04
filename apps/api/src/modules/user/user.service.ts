@@ -31,7 +31,7 @@ export class UserService {
         experiences: { orderBy: { startDate: 'desc' } },
         services: true,
         projects: {
-          where: { deletedAt: null, status: 'Active' },
+          where: { deletedAt: null, status: 'Published' },
           orderBy: { createdAt: 'desc' },
           take: 10,
           select: {
@@ -301,9 +301,12 @@ export class UserService {
 
   private excludePassword<T extends Record<string, unknown>>(
     user: T,
-  ): Omit<T, 'passwordHash' | 'refreshToken'> {
+  ): Omit<T, 'passwordHash' | 'refreshToken'> & { hasPassword: boolean } {
     const { passwordHash, refreshToken, ...userWithoutSensitive } =
       user as T & { passwordHash?: unknown; refreshToken?: unknown };
-    return userWithoutSensitive as Omit<T, 'passwordHash' | 'refreshToken'>;
+    return {
+      ...userWithoutSensitive,
+      hasPassword: !!passwordHash,
+    } as Omit<T, 'passwordHash' | 'refreshToken'> & { hasPassword: boolean };
   }
 }

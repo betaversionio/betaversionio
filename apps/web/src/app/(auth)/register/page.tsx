@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema } from '@betaversionio/shared';
 import type { RegisterInput } from '@betaversionio/shared';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/providers/auth-provider';
+import { useCheckUsername, useResendVerification } from '@/features/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,22 +19,30 @@ import { Separator } from '@/components/ui/separator';
 import { LogoWithText } from '@/components/shared/logo-with-text';
 import { siteConfig } from '@/config/site';
 import { GoogleIcon, GithubIcon } from '@/features/auth';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
+import { useRegister } from '@/features/auth';
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
-  const {
-    register: registerUser,
-    loginWithGithub,
-    loginWithGoogle,
-  } = useAuth();
+  const { loginWithGithub, loginWithGoogle } = useAuth();
+  const registerMutation = useRegister();
+  const resendMutation = useResendVerification();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   async function handleGithubLogin() {
     try {
       await loginWithGithub();
-      router.push('/dashboard');
+      router.push('/feed');
     } catch {
       toast({
         title: 'Registration failed',
@@ -47,7 +56,7 @@ export default function RegisterPage() {
     onSuccess: async (tokenResponse) => {
       try {
         await loginWithGoogle(tokenResponse.access_token);
-        router.push('/dashboard');
+        router.push('/feed');
       } catch {
         toast({
           title: 'Registration failed',
@@ -68,6 +77,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -79,27 +89,86 @@ export default function RegisterPage() {
     },
   });
 
+  const usernameValue = useWatch({ control, name: 'username' });
+  const debouncedUsername = useDebounce(usernameValue || '', 500);
+  const usernameQuery = useCheckUsername(debouncedUsername);
+
   async function onSubmit(data: RegisterInput) {
-    setIsSubmitting(true);
-    try {
-      await registerUser(data.email, data.password, data.username, data.name);
-      router.push('/dashboard');
-    } catch (error) {
-      toast({
-        title: 'Registration failed',
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    registerMutation.mutate(data, {
+      onSuccess: () => {
+        setRegisteredEmail(data.email);
+      },
+      onError: (error) => {
+        toast({
+          title: 'Registration failed',
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Something went wrong. Please try again.',
+          variant: 'destructive',
+        });
+      },
+    });
   }
 
+  // ── Verification email sent state ──
+  if (registeredEmail) {
+    return (
+      <div className="space-y-4 text-center">
+        <LogoWithText />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Mail className="h-6 w-6" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-wide">Check your email</h1>
+        <p className="text-muted-foreground">
+          We&apos;ve sent a verification link to{' '}
+          <strong>{registeredEmail}</strong>. Click the link to activate your
+          account.
+        </p>
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={resendMutation.isPending}
+          onClick={() =>
+            resendMutation.mutate(registeredEmail, {
+              onSuccess: () =>
+                toast({
+                  title: 'Email sent',
+                  description: 'A new verification email has been sent.',
+                }),
+            })
+          }
+        >
+          {resendMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            'Resend verification email'
+          )}
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          Already verified?{' '}
+          <Link
+            href="/login"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  // ── Username availability indicator ──
+  const showUsernameCheck =
+    debouncedUsername.length >= 3 &&
+    !errors.username &&
+    debouncedUsername === usernameValue;
+
   return (
-    <div className="space-y-4 overflow-hidden">
+    <div className="space-y-4">
       <LogoWithText />
       <div className="flex flex-col space-y-1">
         <h1 className="text-2xl font-bold tracking-wide">
@@ -164,7 +233,25 @@ export default function RegisterPage() {
             autoComplete="username"
             {...register('username')}
           />
-          <FieldError>{errors.username?.message}</FieldError>
+          {errors.username?.message ? (
+            <FieldError>{errors.username.message}</FieldError>
+          ) : showUsernameCheck ? (
+            <div className="flex items-center gap-1.5 text-xs mt-1">
+              {usernameQuery.isLoading ? (
+                <span className="text-muted-foreground">Checking...</span>
+              ) : usernameQuery.data?.available ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                  <span className="text-green-500">Username available</span>
+                </>
+              ) : usernameQuery.data ? (
+                <>
+                  <XCircle className="h-3.5 w-3.5 text-destructive" />
+                  <span className="text-destructive">Username taken</span>
+                </>
+              ) : null}
+            </div>
+          ) : null}
         </Field>
 
         <Field>
@@ -190,8 +277,12 @@ export default function RegisterPage() {
           <FieldError>{errors.password?.message}</FieldError>
         </Field>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? (
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating account...

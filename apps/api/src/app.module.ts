@@ -16,6 +16,7 @@ import { NotificationModule } from "./modules/notification/notification.module";
 import { BlogModule } from "./modules/blog/blog.module";
 import { FollowModule } from "./modules/follow/follow.module";
 import { GitHubModule } from "./modules/github/github.module";
+import { MailModule } from "./modules/mail/mail.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { GitHubModule } from "./modules/github/github.module";
     BlogModule,
     FollowModule,
     GitHubModule,
+    MailModule,
   ],
   providers: [
     {

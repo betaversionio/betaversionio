@@ -4,6 +4,13 @@ import {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+  changePasswordSchema,
+  checkUsernameSchema,
+  changeUsernameSchema,
+  setPasswordSchema,
 } from "../schemas/auth";
 
 import {
@@ -23,7 +30,7 @@ import {
 import {
   createProjectSchema,
   updateProjectSchema,
-  addMakerSchema,
+  updateMakerRoleSchema,
   createProjectCommentSchema,
   updateProjectCommentSchema,
   toggleProjectVoteSchema,
@@ -71,6 +78,13 @@ import {
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type CheckUsernameInput = z.infer<typeof checkUsernameSchema>;
+export type ChangeUsernameInput = z.infer<typeof changeUsernameSchema>;
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>;
 
 // ─── User / Profile Types ────────────────────────────────────────────────────
 
@@ -90,7 +104,7 @@ export type UpdateServicesInput = z.infer<typeof updateServicesSchema>;
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
-export type AddMakerInput = z.infer<typeof addMakerSchema>;
+export type UpdateMakerRoleInput = z.infer<typeof updateMakerRoleSchema>;
 export type CreateProjectCommentInput = z.infer<typeof createProjectCommentSchema>;
 export type UpdateProjectCommentInput = z.infer<typeof updateProjectCommentSchema>;
 export type ToggleProjectVoteInput = z.infer<typeof toggleProjectVoteSchema>;
