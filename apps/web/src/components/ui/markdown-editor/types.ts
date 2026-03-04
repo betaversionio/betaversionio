@@ -31,6 +31,7 @@ export interface EditorToolbarProps {
   editor: Editor | null
   viewMode: ViewMode
   onViewModeChange: (mode: ViewMode) => void
+  extraToolbarActions?: React.ReactNode
 }
 
 export interface MarkdownEditorProps {
@@ -46,4 +47,6 @@ export interface MarkdownEditorProps {
   maxHeight?: number
   /** Output format: 'html' (default) or 'markdown' */
   outputFormat?: OutputFormat
+  /** Extra toolbar actions rendered after the standard buttons */
+  extraToolbarActions?: React.ReactNode
 }

@@ -3,7 +3,6 @@ import { apiClient } from '@/lib/api-client';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
-  AddMakerInput,
   CreateProjectCommentInput,
   UpdateProjectCommentInput,
   ToggleProjectVoteInput,
@@ -277,11 +276,14 @@ export function useDeleteProjectComment(projectId: string) {
 
 // ─── Makers ──────────────────────────────────────────────────────────────────
 
-export function useAddMaker(projectId: string) {
+export function useUpdateMakerRole(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: AddMakerInput) =>
-      apiClient.post<ProjectMaker>(`/projects/${projectId}/makers`, data),
+    mutationFn: ({ makerUserId, role }: { makerUserId: string; role: string }) =>
+      apiClient.patch<ProjectMaker>(
+        `/projects/${projectId}/makers/${makerUserId}`,
+        { role },
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: projectKeys.all });
     },

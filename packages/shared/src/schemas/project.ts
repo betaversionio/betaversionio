@@ -54,22 +54,9 @@ export const createProjectSchema = z.object({
   demoUrl: z.string().url("Invalid demo URL").optional(),
   videoUrl: z.string().url("Invalid video URL").optional(),
   launchDate: z.string().datetime({ offset: true }).optional(),
-  makers: z
-    .array(
-      z.object({
-        userId: z.string().min(1, "User ID is required"),
-        role: z.string().min(1, "Role is required").max(100),
-      })
-    )
-    .default([]),
 });
 
 export const updateProjectSchema = createProjectSchema.partial();
-
-export const addMakerSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
-  role: z.string().min(1, "Role is required").max(100),
-});
 
 export const createProjectCommentSchema = z.object({
   content: z
@@ -134,6 +121,10 @@ export const createProjectUpdateSchema = z.object({
 });
 
 export const updateProjectUpdateSchema = createProjectUpdateSchema.partial();
+
+export const updateMakerRoleSchema = z.object({
+  role: z.string().min(1, "Role is required").max(100),
+});
 
 // ─── Invitations ──────────────────────────────────────────────────────────────
 

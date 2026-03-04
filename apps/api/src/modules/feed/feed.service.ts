@@ -103,7 +103,12 @@ export class FeedService {
    * Get the feed with cursor-based pagination.
    * Orders by createdAt desc, uses post id as cursor.
    */
-  async getFeed(cursor?: string, limit?: number, authorId?: string) {
+  async getFeed(
+    cursor?: string,
+    limit?: number,
+    authorId?: string,
+    userId?: string,
+  ) {
     const take = limit
       ? Math.min(limit, FEED.MAX_CURSOR_LIMIT)
       : FEED.DEFAULT_CURSOR_LIMIT;
@@ -111,6 +116,14 @@ export class FeedService {
     const where: Record<string, unknown> = { deletedAt: null };
     if (authorId) {
       where.authorId = authorId;
+    } else if (userId) {
+      // Show posts from followed users + own posts
+      const follows = await this.prisma.follow.findMany({
+        where: { followerId: userId },
+        select: { followingId: true },
+      });
+      const followingIds = follows.map((f) => f.followingId);
+      where.authorId = { in: [...followingIds, userId] };
     }
 
     const queryOptions: Record<string, unknown> = {
@@ -127,6 +140,12 @@ export class FeedService {
         postHashtags: {
           include: {
             hashtag: true,
+          },
+        },
+        reactions: {
+          select: {
+            type: true,
+            userId: true,
           },
         },
         _count: {
@@ -148,8 +167,37 @@ export class FeedService {
     const posts = await this.prisma.post.findMany(queryOptions as any);
 
     const hasMore = posts.length > take;
-    const items = hasMore ? posts.slice(0, take) : posts;
-    const nextCursor = hasMore ? items[items.length - 1]!.id : null;
+    const rawItems = hasMore ? posts.slice(0, take) : posts;
+    const nextCursor = hasMore ? rawItems[rawItems.length - 1]!.id : null;
+
+    // Aggregate reactions by type with hasReacted for the current user
+    const items = rawItems.map((post: any) => {
+      const reactionsByType: Record<
+        string,
+        { type: string; count: number; hasReacted: boolean }
+      > = {};
+
+      for (const r of post.reactions ?? []) {
+        if (!reactionsByType[r.type]) {
+          reactionsByType[r.type] = {
+            type: r.type,
+            count: 0,
+            hasReacted: false,
+          };
+        }
+        const entry = reactionsByType[r.type]!;
+        entry.count++;
+        if (userId && r.userId === userId) {
+          entry.hasReacted = true;
+        }
+      }
+
+      const { reactions: _raw, ...rest } = post;
+      return {
+        ...rest,
+        reactions: Object.values(reactionsByType),
+      };
+    });
 
     return {
       items,
@@ -164,7 +212,7 @@ export class FeedService {
    * Get a single post by ID with full relations:
    * author, comments (with author, nested replies), reactions, hashtags.
    */
-  async getPostById(id: string) {
+  async getPostById(id: string, userId?: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },
       include: {
@@ -204,7 +252,12 @@ export class FeedService {
           },
           orderBy: { createdAt: 'asc' },
         },
-        reactions: true,
+        reactions: {
+          select: {
+            type: true,
+            userId: true,
+          },
+        },
         postHashtags: {
           include: {
             hashtag: true,
@@ -223,12 +276,40 @@ export class FeedService {
       throw new NotFoundException('Post not found');
     }
 
-    return post;
+    // Aggregate reactions by type with hasReacted
+    const reactionsByType: Record<
+      string,
+      { type: string; count: number; hasReacted: boolean }
+    > = {};
+
+    for (const r of post.reactions) {
+      if (!reactionsByType[r.type]) {
+        reactionsByType[r.type] = {
+          type: r.type,
+          count: 0,
+          hasReacted: false,
+        };
+      }
+      const entry = reactionsByType[r.type]!;
+      entry.count++;
+      if (userId && r.userId === userId) {
+        entry.hasReacted = true;
+      }
+    }
+
+    const { reactions: _raw, ...rest } = post;
+    return {
+      ...rest,
+      reactions: Object.values(reactionsByType),
+    };
   }
 
   /**
-   * Toggle a reaction on a post: create if not exists, delete if exists.
-   * Updates the denormalized likesCount on the post.
+   * Toggle a reaction on a post.
+   * Only one reaction per user per post is allowed.
+   * - Same type as existing → remove it (un-react)
+   * - Different type → swap to the new type
+   * - No existing → add the new type
    */
   async toggleReaction(
     postId: string,
@@ -243,48 +324,50 @@ export class FeedService {
       throw new NotFoundException('Post not found');
     }
 
-    // Check if a reaction of this type already exists from this user
-    const existing = await this.prisma.reaction.findUnique({
-      where: {
-        postId_userId_type: {
-          postId,
-          userId,
-          type: dto.type as any,
-        },
-      },
+    // Find any existing reaction from this user on this post
+    const existing = await this.prisma.reaction.findFirst({
+      where: { postId, userId },
     });
 
-    if (existing) {
-      // Remove the reaction
+    if (existing && existing.type === dto.type) {
+      // Same type — remove (un-react)
       await this.prisma.reaction.delete({
         where: { id: existing.id },
       });
 
-      // Decrement denormalized likesCount
       await this.prisma.post.update({
         where: { id: postId },
         data: { likesCount: { decrement: 1 } },
       });
 
       return { action: 'removed', type: dto.type };
-    } else {
-      // Add the reaction
-      await this.prisma.reaction.create({
-        data: {
-          postId,
-          userId,
-          type: dto.type as any,
-        },
-      });
-
-      // Increment denormalized likesCount
-      await this.prisma.post.update({
-        where: { id: postId },
-        data: { likesCount: { increment: 1 } },
-      });
-
-      return { action: 'added', type: dto.type };
     }
+
+    if (existing) {
+      // Different type — swap reaction (count stays the same)
+      await this.prisma.reaction.update({
+        where: { id: existing.id },
+        data: { type: dto.type as any },
+      });
+
+      return { action: 'changed', type: dto.type };
+    }
+
+    // No existing — add new reaction
+    await this.prisma.reaction.create({
+      data: {
+        postId,
+        userId,
+        type: dto.type as any,
+      },
+    });
+
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: { likesCount: { increment: 1 } },
+    });
+
+    return { action: 'added', type: dto.type };
   }
 
   /**

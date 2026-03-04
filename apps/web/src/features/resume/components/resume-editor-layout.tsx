@@ -61,7 +61,7 @@ export function ResumeEditorLayout({
     if (!initialPdfUrl) return;
     let cancelled = false;
 
-    fetch(initialPdfUrl)
+    fetch(`/api/pdf-proxy?url=${encodeURIComponent(initialPdfUrl)}`)
       .then((res) => (res.ok ? res.blob() : null))
       .then((blob) => {
         if (cancelled || !blob) return;

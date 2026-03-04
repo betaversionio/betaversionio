@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from 'react';
 import { Message } from 'iconsax-react';
-import { PostComposer, PostCard, FeedSidebar, useFeed } from '@/features/feed';
+import { PostComposer, PostCard, useFeed, FeedSidebar } from '@/features/feed';
 import { Loader2 } from 'lucide-react';
 
 export default function FeedPage() {

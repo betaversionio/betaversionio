@@ -10,6 +10,7 @@ import {
   SidebarContext,
   useSidebar,
 } from '@/components/layout/sidebar/sidebar-context';
+import { SidebarHeader } from '@/components/layout/sidebar/sidebar-header';
 
 interface SidebarShellProps {
   children: ReactNode;
@@ -27,6 +28,7 @@ export function SidebarShell({ children }: SidebarShellProps) {
           collapsed ? 'w-16' : 'w-64',
         )}
       >
+        <SidebarHeader />
         {children}
 
         {/* Floating collapse toggle */}
@@ -60,6 +62,7 @@ export function SidebarShell({ children }: SidebarShellProps) {
             }}
           >
             <aside className="bg-sidebar flex h-full flex-col">
+              <SidebarHeader />
               {children}
             </aside>
           </SidebarContext.Provider>

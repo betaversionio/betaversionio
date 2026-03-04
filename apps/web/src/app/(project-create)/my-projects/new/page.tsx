@@ -19,7 +19,6 @@ import {
   ProjectCreationSidebar,
   MainInfoSection,
   ImagesMediaSection,
-  MakersSection,
   type ProjectFormTab,
 } from '@/features/projects';
 
@@ -36,11 +35,6 @@ const tabMeta: Record<
     step: 2,
     title: 'Images & Media',
     description: 'Add screenshots and visuals to showcase your project',
-  },
-  makers: {
-    step: 3,
-    title: 'Makers',
-    description: 'Add the people who helped bring this project to life',
   },
 };
 
@@ -68,7 +62,6 @@ export default function CreateProjectPage() {
       status: ProjectStatus.Draft,
       phase: ProjectPhase.Idea,
       productionType: ProductionType.Hobby,
-      makers: [],
     },
   });
 
@@ -120,7 +113,7 @@ export default function CreateProjectPage() {
                     {meta.step}
                   </span>
                   <span className="text-xs font-medium text-muted-foreground">
-                    Step {meta.step} of 3
+                    Step {meta.step} of 2
                   </span>
                 </div>
                 <h1 className="text-2xl font-semibold tracking-tight">
@@ -133,7 +126,6 @@ export default function CreateProjectPage() {
 
               {activeTab === 'main' && <MainInfoSection form={form} />}
               {activeTab === 'media' && <ImagesMediaSection form={form} />}
-              {activeTab === 'makers' && <MakersSection form={form} />}
             </div>
           </main>
         </div>

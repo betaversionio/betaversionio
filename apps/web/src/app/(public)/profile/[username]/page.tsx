@@ -93,7 +93,7 @@ export default function PublicProfilePage({
   const website = profile.profile?.website;
 
   const projects = (projectsData?.items ?? []).filter(
-    (p) => p.status === 'Active' || p.status === 'Completed',
+    (p) => p.status === 'Published',
   );
   const blogs = blogsData?.items ?? [];
   const posts = postsData?.items ?? [];

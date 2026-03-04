@@ -14,30 +14,21 @@ import {
   ProjectCreationSidebar,
   MainInfoSection,
   ImagesMediaSection,
-  MakersSection,
   type ProjectFormTab,
-  type FoundUser,
 } from '@/features/projects';
 import { Loader2 } from 'lucide-react';
 
 const tabMeta: Record<
   ProjectFormTab,
-  { step: number; title: string; description: string }
+  { title: string; description: string }
 > = {
   main: {
-    step: 1,
     title: 'Main Information',
     description: 'Update your project identity and core details',
   },
   media: {
-    step: 2,
     title: 'Images & Media',
     description: 'Manage screenshots and visuals for your project',
-  },
-  makers: {
-    step: 3,
-    title: 'Makers',
-    description: 'Manage the people who helped bring this project to life',
   },
 };
 
@@ -81,17 +72,6 @@ interface ProjectData {
   status: string;
   phase: string;
   productionType: string;
-  makers: Array<{
-    id: string;
-    userId: string;
-    role: string;
-    user: {
-      id: string;
-      username: string;
-      name: string | null;
-      avatarUrl: string | null;
-    };
-  }>;
 }
 
 function EditProjectForm({ project }: { project: ProjectData }) {
@@ -119,23 +99,8 @@ function EditProjectForm({ project }: { project: ProjectData }) {
       phase: project.phase as CreateProjectInput['phase'],
       productionType:
         project.productionType as CreateProjectInput['productionType'],
-      makers: project.makers.map((m) => ({ userId: m.userId, role: m.role })),
     },
   });
-
-  const initialMakerUsers = project.makers.reduce<Record<string, FoundUser>>(
-    (acc, m) => {
-      acc[m.userId] = {
-        id: m.user.id,
-        username: m.user.username,
-        name: m.user.name,
-        avatarUrl: m.user.avatarUrl,
-        profile: null,
-      };
-      return acc;
-    },
-    {},
-  );
 
   async function onSubmit() {
     const isValid = await form.trigger();
@@ -181,14 +146,6 @@ function EditProjectForm({ project }: { project: ProjectData }) {
             <div className="mx-auto max-w-3xl">
               {/* Tab header */}
               <div className="mb-8">
-                <div className="mb-3 flex items-center gap-2.5">
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
-                    {meta.step}
-                  </span>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Step {meta.step} of 3
-                  </span>
-                </div>
                 <h1 className="text-2xl font-semibold tracking-tight">
                   {meta.title}
                 </h1>
@@ -199,12 +156,6 @@ function EditProjectForm({ project }: { project: ProjectData }) {
 
               {activeTab === 'main' && <MainInfoSection form={form} />}
               {activeTab === 'media' && <ImagesMediaSection form={form} />}
-              {activeTab === 'makers' && (
-                <MakersSection
-                  form={form}
-                  initialMakerUsers={initialMakerUsers}
-                />
-              )}
             </div>
           </main>
         </div>

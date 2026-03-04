@@ -11,7 +11,7 @@ export {
   useToggleProjectVote,
   useProjectComments,
   useCreateProjectComment,
-  useAddMaker,
+  useUpdateMakerRole,
   useRemoveMaker,
   projectKeys,
 } from "./use-project-queries";

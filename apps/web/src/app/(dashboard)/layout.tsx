@@ -1,40 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
+import { AuthGuard } from '@/components/layout/auth-guard';
 import { DashboardLayout } from '@/components/layout';
-import { Loader2 } from 'lucide-react';
 
 export default function DashboardRouteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading, logout } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(
-        '/login?callbackUrl=' + encodeURIComponent(window.location.pathname),
-      );
-    }
-  }, [isLoading, isAuthenticated, router]);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-dvh items-center justify-center">
-        <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  const { logout } = useAuth();
 
   return (
-    <DashboardLayout onLogout={() => logout()}>{children}</DashboardLayout>
+    <AuthGuard>
+      <DashboardLayout onLogout={() => logout()}>{children}</DashboardLayout>
+    </AuthGuard>
   );
 }

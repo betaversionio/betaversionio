@@ -2,8 +2,7 @@
 
 enum ProjectStatus {
   Draft
-  Active
-  Completed
+  Published
   Archived
 }
 

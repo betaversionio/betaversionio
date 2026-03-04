@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   User as UserIcon,
-  Category,
   Document,
   Send2,
   Setting2,
@@ -41,27 +40,24 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
+        <DropdownMenuLabel className="p-0 font-normal">
+          <Link
+            href={`/@${user.username}`}
+            className="flex flex-col space-y-1 rounded-sm px-2 py-1.5 transition-colors hover:bg-accent"
+          >
             <p className="text-sm font-medium leading-none">
               {user.name ?? user.username}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
-          </div>
+          </Link>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={`/@${user.username}`}>
+          <Link href="/profile">
             <UserIcon size={15} color="currentColor" className="mr-2" />
             Profile
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard">
-            <Category size={15} color="currentColor" className="mr-2" />
-            Dashboard
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

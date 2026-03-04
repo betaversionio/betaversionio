@@ -8,7 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateProjectInput,
   UpdateProjectInput,
-  AddMakerInput,
+  UpdateMakerRoleInput,
   CreateProjectCommentInput,
   UpdateProjectCommentInput,
   ToggleProjectVoteInput,
@@ -68,18 +68,9 @@ export class ProjectService {
       });
 
       // Auto-add author as maker with role "Creator"
-      const makerEntries = [
-        { projectId: project.id, userId, role: 'Creator' },
-        ...(dto.makers ?? [])
-          .filter((m) => m.userId !== userId)
-          .map((m) => ({
-            projectId: project.id,
-            userId: m.userId,
-            role: m.role,
-          })),
-      ];
-
-      await tx.projectMaker.createMany({ data: makerEntries });
+      await tx.projectMaker.create({
+        data: { projectId: project.id, userId, role: 'Creator' },
+      });
 
       return tx.project.findUnique({
         where: { id: project.id },
@@ -314,9 +305,14 @@ export class ProjectService {
   }
 
   /**
-   * Add a maker to a project. Only the author can add makers.
+   * Update a maker's role. Only the author can update maker roles.
    */
-  async addMaker(projectId: string, userId: string, dto: AddMakerInput) {
+  async updateMakerRole(
+    projectId: string,
+    userId: string,
+    makerUserId: string,
+    dto: UpdateMakerRoleInput,
+  ) {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
     });
@@ -329,25 +325,22 @@ export class ProjectService {
       throw new ForbiddenException('You are not the owner of this project');
     }
 
-    const existing = await this.prisma.projectMaker.findUnique({
+    const maker = await this.prisma.projectMaker.findUnique({
       where: {
         projectId_userId: {
           projectId,
-          userId: dto.userId,
+          userId: makerUserId,
         },
       },
     });
 
-    if (existing) {
-      throw new ConflictException('User is already a maker on this project');
+    if (!maker) {
+      throw new NotFoundException('Maker not found on this project');
     }
 
-    return this.prisma.projectMaker.create({
-      data: {
-        projectId,
-        userId: dto.userId,
-        role: dto.role,
-      },
+    return this.prisma.projectMaker.update({
+      where: { id: maker.id },
+      data: { role: dto.role },
       include: {
         user: { select: AUTHOR_SELECT },
       },

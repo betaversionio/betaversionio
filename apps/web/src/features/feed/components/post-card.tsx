@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Markdown } from '@/components/ui/markdown';
 import { UserAvatar } from '@/components/shared/user-avatar';
-import { Heart, Message, Send2, More } from 'iconsax-react';
+import { Heart, Message, Send2, More, ExportSquare } from 'iconsax-react';
+import { useToast } from '@/hooks/use-toast';
 import type { PostData } from '../types';
 import { timeAgo, formatCount } from '@/lib/format';
 import { reactionConfig, postTypeLabels } from '../config';
@@ -115,12 +116,15 @@ export function PostCard({ post }: { post: PostData }) {
   const [showAllReactions, setShowAllReactions] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const { toast } = useToast();
 
   const reactions = post.reactions ?? [];
   const totalReactions = reactions.reduce((sum, r) => sum + r.count, 0);
-  const likeReaction = reactions.find((r) => r.type === 'Like');
-  const hasLiked = likeReaction?.hasReacted ?? false;
   const activeReactions = reactions.filter((r) => r.count > 0);
+  const userReaction = reactions.find((r) => r.hasReacted);
+  const userReactionConfig = userReaction
+    ? reactionConfig[userReaction.type]
+    : null;
 
   async function handleSubmitComment() {
     const trimmed = commentText.trim();
@@ -243,36 +247,42 @@ export function PostCard({ post }: { post: PostData }) {
       {/* Action bar */}
       <div className="border-t">
         <div className="flex items-center px-2 py-1">
-          {/* Like button */}
-          <div className="relative flex-1">
+          {/* Reaction button */}
+          <div
+            className="relative flex-1"
+            onMouseEnter={() => setShowAllReactions(true)}
+            onMouseLeave={() => setShowAllReactions(false)}
+          >
             <Button
               variant="ghost"
               className={cn(
                 'h-10 w-full gap-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground',
-                hasLiked && 'text-red-500 hover:text-red-600',
+                userReactionConfig && userReactionConfig.activeColor,
               )}
-              onClick={() => toggleReaction.mutate({ type: ReactionType.Like })}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setShowAllReactions(!showAllReactions);
+              onClick={() => {
+                if (userReaction) {
+                  toggleReaction.mutate({ type: userReaction.type as ReactionType });
+                } else {
+                  toggleReaction.mutate({ type: ReactionType.Like });
+                }
               }}
             >
-              <Heart
-                size={18}
-                color="currentColor"
-                variant={hasLiked ? 'Bold' : 'Linear'}
-              />
-              Like &middot; {post.likesCount}
+              {userReactionConfig ? (
+                <userReactionConfig.icon
+                  size={18}
+                  color="currentColor"
+                  variant="Bulk"
+                />
+              ) : (
+                <Heart size={18} color="currentColor" variant="Linear" />
+              )}
+              {userReactionConfig?.label ?? 'Like'}
             </Button>
 
-            {/* Reaction picker on right-click */}
+            {/* Reaction picker on hover */}
             {showAllReactions && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowAllReactions(false)}
-                />
-                <div className="absolute -top-12 left-0 z-50 flex gap-1 rounded-full border bg-card p-1.5 shadow-lg">
+              <div className="absolute bottom-full left-0 z-50 pb-2">
+                <div className="flex gap-1 rounded-full border bg-card p-1.5 shadow-lg">
                   {Object.values(ReactionType).map((type) => {
                     const config = reactionConfig[type];
                     if (!config) return null;
@@ -295,13 +305,13 @@ export function PostCard({ post }: { post: PostData }) {
                         <Icon
                           size={20}
                           color="currentColor"
-                          variant={isActive ? 'Bold' : 'Linear'}
+                          variant={isActive ? 'Bulk' : 'Linear'}
                         />
                       </button>
                     );
                   })}
                 </div>
-              </>
+              </div>
             )}
           </div>
 
@@ -318,13 +328,30 @@ export function PostCard({ post }: { post: PostData }) {
             Comment &middot; {post.commentsCount}
           </Button>
 
-          {/* Send / Share button */}
+          {/* Share button */}
           <Button
             variant="ghost"
             className="h-10 flex-1 gap-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground"
+            onClick={async () => {
+              const url = `${window.location.origin}/feed/${post.id}`;
+              const shareData = {
+                title: post.title || `Post by ${post.author.name ?? post.author.username}`,
+                url,
+              };
+              if (navigator.share) {
+                try {
+                  await navigator.share(shareData);
+                } catch {
+                  // user cancelled
+                }
+              } else {
+                await navigator.clipboard.writeText(url);
+                toast({ title: 'Link copied to clipboard' });
+              }
+            }}
           >
-            <Send2 size={18} color="currentColor" />
-            Send
+            <ExportSquare size={18} color="currentColor" />
+            Share
           </Button>
         </div>
       </div>

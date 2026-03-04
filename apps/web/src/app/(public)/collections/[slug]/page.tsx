@@ -18,6 +18,7 @@ import {
   type CollectionFormValues,
 } from '@/features/collections';
 import { Button } from '@/components/ui/button';
+import { HeroBackground } from '@/components/ui/hero-background';
 
 function Spinner() {
   return (
@@ -98,20 +99,28 @@ export default function CollectionDetailPage({
   }
 
   return (
-    <div className="container px-4 pb-8 pt-20 md:pb-12">
-      <div className="mx-auto max-w-6xl">
-        <CollectionHeader
-          collection={collection}
-          isOwner={isOwner}
-          onEdit={() => setShowEdit(true)}
-          onDelete={handleDelete}
-        />
+    <>
+      <HeroBackground className="pb-8 pt-20">
+        <div className="container px-4">
+          <div className="mx-auto max-w-6xl">
+            <CollectionHeader
+              collection={collection}
+              isOwner={isOwner}
+              onEdit={() => setShowEdit(true)}
+              onDelete={handleDelete}
+            />
+          </div>
+        </div>
+      </HeroBackground>
 
-        <CollectionItemGrid
-          items={collection.items ?? []}
-          isOwner={isOwner}
-          onRemoveItem={handleRemoveItem}
-        />
+      <div className="container px-4 pb-8 md:pb-12">
+        <div className="mx-auto max-w-6xl">
+          <CollectionItemGrid
+            items={collection.items ?? []}
+            isOwner={isOwner}
+            onRemoveItem={handleRemoveItem}
+          />
+        </div>
       </div>
 
       <CollectionFormDialog
@@ -123,6 +132,6 @@ export default function CollectionDetailPage({
         isPending={updateCollection.isPending}
         onSubmit={handleUpdate}
       />
-    </div>
+    </>
   );
 }

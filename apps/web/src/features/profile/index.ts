@@ -10,5 +10,4 @@ export { ExperienceSection } from './components/experience-section';
 export { EducationSection } from './components/education-section';
 export { ServicesSection } from './components/services-section';
 export { ProfileEditSidebar } from './components/profile-edit-sidebar';
-export type { ProfileEditTab } from './components/profile-edit-sidebar';
 export { ItemCard } from './components/item-card';

@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { memo, useEffect, useId, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
@@ -106,7 +107,7 @@ interface MarkdownProps {
   size?: 'default' | 'sm';
 }
 
-export function Markdown({
+export const Markdown = memo(function Markdown({
   content,
   className,
   size = 'default',
@@ -122,7 +123,7 @@ export function Markdown({
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={{
           h1: ({ children }) => (
             <h1
@@ -235,6 +236,21 @@ export function Markdown({
           td: ({ children }) => (
             <td className="px-4 py-2 text-muted-foreground">{children}</td>
           ),
+          iframe: ({
+            src,
+            ...props
+          }: React.IframeHTMLAttributes<HTMLIFrameElement>) => {
+            if (!src?.startsWith('/embed/')) return null;
+            return (
+              <iframe
+                src={src}
+                className="my-4 w-full rounded-lg border-none"
+                height={160}
+                loading="lazy"
+                {...props}
+              />
+            );
+          },
           pre: ({ children, node }) => {
             // Detect mermaid code blocks from the hast AST
             const codeChild = node?.children?.[0];
@@ -272,4 +288,4 @@ export function Markdown({
       </ReactMarkdown>
     </div>
   );
-}
+});

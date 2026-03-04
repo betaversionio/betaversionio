@@ -46,8 +46,7 @@ export const ProficiencySchema = z.nativeEnum(Proficiency);
 
 export enum ProjectStatus {
   Draft = "Draft",
-  Active = "Active",
-  Completed = "Completed",
+  Published = "Published",
   Archived = "Archived",
 }
 

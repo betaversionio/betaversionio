@@ -2,7 +2,6 @@
 
 import { SidebarShell } from '@/components/ui/sidebar';
 import { SidebarFooter } from './sidebar-footer';
-import { SidebarHeader } from './sidebar-header';
 import { SidebarNav } from './sidebar-nav';
 
 interface SidebarProps {
@@ -12,7 +11,6 @@ interface SidebarProps {
 export function Sidebar({ onLogout }: SidebarProps) {
   return (
     <SidebarShell>
-      <SidebarHeader />
       <SidebarNav />
       <SidebarFooter onLogout={onLogout} />
     </SidebarShell>

@@ -37,7 +37,7 @@ export function BlogCard({ blog }: BlogCardProps) {
     <Card className="group relative flex h-full flex-col transition-shadow hover:shadow-md">
       <Link
         href={`/blogs/${blog.slug}`}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-10"
       />
 
       {blog.coverImage && (

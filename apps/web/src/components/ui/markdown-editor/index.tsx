@@ -16,6 +16,7 @@ import { Textarea } from '../textarea';
 import { MathBlock } from './extensions/math-block';
 import { MathInline } from './extensions/math-inline';
 import { MermaidBlock } from './extensions/mermaid-block';
+import { EmbedIframe } from './extensions/embed-iframe';
 import { EditorToolbar } from './toolbar';
 import type { MarkdownEditorProps, ViewMode } from './types';
 import { htmlToMarkdown, lowlight, markdownToHtml } from './utils';
@@ -32,6 +33,7 @@ export function MarkdownEditor({
   height = 200,
   maxHeight,
   outputFormat = 'html',
+  extraToolbarActions,
 }: MarkdownEditorProps) {
   const [viewMode, setViewMode] = React.useState<ViewMode>('wysiwyg');
 
@@ -96,6 +98,7 @@ export function MarkdownEditor({
       MathInline,
       MathBlock,
       MermaidBlock,
+      EmbedIframe,
     ],
     content: initialContent,
     editable: !disabled,
@@ -200,6 +203,7 @@ export function MarkdownEditor({
         editor={editor}
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
+        extraToolbarActions={extraToolbarActions}
       />
       {viewMode === 'wysiwyg' ? (
         <div

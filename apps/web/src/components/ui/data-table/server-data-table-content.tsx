@@ -7,11 +7,24 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
 import { Loader2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../table';
 import { DraggableRow } from './draggable-row';
 
 interface ServerDataTableContentProps<TData> {
@@ -110,7 +123,7 @@ export function ServerDataTableContent<TData>({
         distance: 8,
       },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   // Get row IDs for sortable context
@@ -141,7 +154,10 @@ export function ServerDataTableContent<TData>({
               style={{
                 minWidth: cell.column.getSize(),
                 ...(hasMaxSize
-                  ? { maxWidth: cell.column.columnDef.maxSize, overflow: 'hidden' }
+                  ? {
+                      maxWidth: cell.column.columnDef.maxSize,
+                      overflow: 'hidden',
+                    }
                   : {}),
               }}
             >
@@ -155,12 +171,17 @@ export function ServerDataTableContent<TData>({
   // Draggable table row rendering
   const renderDraggableRows = () =>
     rows.map((row) => (
-      <DraggableRow key={row.id} row={row} rowId={getRowId(row.original)} rowHeight={rowHeight} />
+      <DraggableRow
+        key={row.id}
+        row={row}
+        rowId={getRowId(row.original)}
+        rowHeight={rowHeight}
+      />
     ));
 
   const tableContent = (
     <Table>
-      <TableHeader className="bg-card h-12">
+      <TableHeader className="bg-muted dark:bg-card h-10">
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id} className="hover:bg-foreground/5">
             {/* Add empty header for drag handle column */}
@@ -173,7 +194,10 @@ export function ServerDataTableContent<TData>({
               >
                 {header.isPlaceholder
                   ? null
-                  : flexRender(header.column.columnDef.header, header.getContext())}
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
                 {header.column.getCanResize() && (
                   <ColumnResizeHandle
                     onMouseDown={header.getResizeHandler()}
@@ -213,7 +237,10 @@ export function ServerDataTableContent<TData>({
           onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis, restrictToParentElement]}
         >
-          <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={rowIds}
+            strategy={verticalListSortingStrategy}
+          >
             {tableContent}
           </SortableContext>
         </DndContext>

@@ -8,12 +8,24 @@ import type { CreatePostInput } from '@betaversionio/shared';
 import { useCreatePost } from '../hooks';
 import { useAuth } from '@/providers/auth-provider';
 import { useToast } from '@/hooks/use-toast';
+import { useProjects } from '@/hooks/queries/use-project-queries';
+import { useBlogs } from '@/hooks/queries/use-blog-queries';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/shared/user-avatar';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   Select,
   SelectContent,
@@ -28,7 +40,10 @@ import {
   VideoPlay,
   Code1,
   Send2,
+  Kanban,
+  Document,
 } from 'iconsax-react';
+import { Search } from 'lucide-react';
 import { postTypeLabels } from '../config';
 
 const quickActions: {
@@ -73,6 +88,184 @@ function QuickActionButton({
   );
 }
 
+function AttachProjectPopover({
+  onSelect,
+}: {
+  onSelect: (title: string, slug: string) => void;
+}) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const { data } = useProjects(
+    { authorId: user?.id, limit: 50, status: 'Published' },
+    { enabled: open && !!user?.id },
+  );
+
+  const items = data?.items ?? [];
+  const filtered = search
+    ? items.filter((p) =>
+        p.title.toLowerCase().includes(search.toLowerCase()),
+      )
+    : items;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8"
+            >
+              <Kanban size={16} color="currentColor" />
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Attach Project</TooltipContent>
+      </Tooltip>
+      <PopoverContent align="start" className="w-72 p-0">
+        <div className="p-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search projects..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 pl-8 text-xs"
+            />
+          </div>
+        </div>
+        <div className="max-h-48 overflow-y-auto px-1 pb-1">
+          {filtered.length === 0 ? (
+            <p className="px-3 py-4 text-center text-xs text-muted-foreground">
+              No projects found
+            </p>
+          ) : (
+            filtered.map((project) => (
+              <button
+                key={project.id}
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                onClick={() => {
+                  onSelect(project.title, project.slug);
+                  setOpen(false);
+                  setSearch('');
+                }}
+              >
+                {project.logo ? (
+                  <img
+                    src={project.logo}
+                    alt=""
+                    className="h-5 w-5 shrink-0 rounded object-cover"
+                  />
+                ) : (
+                  <Kanban
+                    size={16}
+                    color="currentColor"
+                    className="shrink-0 text-muted-foreground"
+                  />
+                )}
+                <span className="truncate">{project.title}</span>
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function AttachBlogPopover({
+  onSelect,
+}: {
+  onSelect: (title: string, slug: string) => void;
+}) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const { data } = useBlogs(
+    { authorId: user?.id, limit: 50, status: 'Published' },
+    { enabled: open && !!user?.id },
+  );
+
+  const items = data?.items ?? [];
+  const filtered = search
+    ? items.filter((b) =>
+        b.title.toLowerCase().includes(search.toLowerCase()),
+      )
+    : items;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8"
+            >
+              <Document size={16} color="currentColor" />
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Attach Blog</TooltipContent>
+      </Tooltip>
+      <PopoverContent align="start" className="w-72 p-0">
+        <div className="p-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search blogs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 pl-8 text-xs"
+            />
+          </div>
+        </div>
+        <div className="max-h-48 overflow-y-auto px-1 pb-1">
+          {filtered.length === 0 ? (
+            <p className="px-3 py-4 text-center text-xs text-muted-foreground">
+              No blogs found
+            </p>
+          ) : (
+            filtered.map((blog) => (
+              <button
+                key={blog.id}
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                onClick={() => {
+                  onSelect(blog.title, blog.slug);
+                  setOpen(false);
+                  setSearch('');
+                }}
+              >
+                {blog.coverImage ? (
+                  <img
+                    src={blog.coverImage}
+                    alt=""
+                    className="h-5 w-5 shrink-0 rounded object-cover"
+                  />
+                ) : (
+                  <Document
+                    size={16}
+                    color="currentColor"
+                    className="shrink-0 text-muted-foreground"
+                  />
+                )}
+                <span className="truncate">{blog.title}</span>
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function PostComposer() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -81,7 +274,6 @@ export function PostComposer() {
   const [hashtagInput, setHashtagInput] = useState('');
 
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
@@ -99,6 +291,13 @@ export function PostComposer() {
   const postType = watch('type');
   const hashtags = watch('hashtags') ?? [];
   const content = watch('content');
+
+  function appendEmbed(slug: string, prefix: string) {
+    const iframe = `<iframe src="/embed${prefix}/${slug}" width="100%" height="160" style="border:none; border-radius:8px;" loading="lazy"></iframe>`;
+    const current = content ?? '';
+    const newContent = current ? `${current}\n\n${iframe}` : iframe;
+    setValue('content', newContent);
+  }
 
   function addHashtag(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' || e.key === ',') {
@@ -134,6 +333,17 @@ export function PostComposer() {
       });
     }
   }
+
+  const extraToolbarActions = (
+    <>
+      <AttachProjectPopover
+        onSelect={(_title, slug) => appendEmbed(slug, '/projects')}
+      />
+      <AttachBlogPopover
+        onSelect={(_title, slug) => appendEmbed(slug, '/blogs')}
+      />
+    </>
+  );
 
   return (
     <Card className="rounded-xl p-4">
@@ -173,12 +383,14 @@ export function PostComposer() {
               </div>
             ) : (
               <div className="space-y-3">
-                <Textarea
+                <MarkdownEditor
+                  value={content ?? ''}
+                  onChange={(val) => setValue('content', val)}
                   placeholder="What's on your mind?"
-                  rows={3}
-                  autoFocus
-                  className="resize-none border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
-                  {...register('content')}
+                  outputFormat="markdown"
+                  height={150}
+                  maxHeight={300}
+                  extraToolbarActions={extraToolbarActions}
                 />
                 {errors.content && (
                   <p className="text-xs text-destructive">

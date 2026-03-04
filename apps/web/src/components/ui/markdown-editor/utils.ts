@@ -41,6 +41,20 @@ turndownService.addRule('mathBlock', {
   },
 })
 
+// Embed iframes: <iframe src="/embed/..."> → raw HTML preserved
+turndownService.addRule('embedIframe', {
+  filter: (node) =>
+    node.nodeName === 'IFRAME' &&
+    (node.getAttribute('src') || '').startsWith('/embed/'),
+  replacement: (_, node) => {
+    const el = node as HTMLElement
+    const src = el.getAttribute('src') || ''
+    const width = el.getAttribute('width') || '100%'
+    const height = el.getAttribute('height') || '160'
+    return `\n<iframe src="${src}" width="${width}" height="${height}" style="border:none; border-radius:8px;" loading="lazy"></iframe>\n`
+  },
+})
+
 // Mermaid: <div data-mermaid data-code="..."> → ```mermaid\n...\n```
 turndownService.addRule('mermaidBlock', {
   filter: (node) =>
@@ -102,8 +116,18 @@ function escapeHtml(str: string): string {
 }
 
 function preprocessForEditor(markdown: string): string {
+  // 0. Preserve embed iframes — extract them before marked processes them
+  const iframePlaceholders: string[] = []
+  let result = markdown.replace(
+    /<iframe\s[^>]*src="\/embed\/[^"]*"[^>]*><\/iframe>/g,
+    (match) => {
+      iframePlaceholders.push(match)
+      return `<!--EMBED_IFRAME_${iframePlaceholders.length - 1}-->`
+    }
+  )
+
   // 1. Handle mermaid fenced code blocks
-  let result = markdown.replace(/```mermaid\n([\s\S]*?)```/g, (_, code) => {
+  result = result.replace(/```mermaid\n([\s\S]*?)```/g, (_, code) => {
     const trimmed = code.trim()
     return `\n<div data-mermaid data-code="${escapeAttr(trimmed)}">${escapeHtml(trimmed)}</div>\n`
   })
@@ -120,6 +144,12 @@ function preprocessForEditor(markdown: string): string {
     (_, latex) => {
       return `<span data-math-inline data-latex="${escapeAttr(latex)}">${escapeHtml(latex)}</span>`
     }
+  )
+
+  // 4. Restore embed iframe placeholders
+  result = result.replace(
+    /<!--EMBED_IFRAME_(\d+)-->/g,
+    (_, idx) => iframePlaceholders[Number(idx)] || ''
   )
 
   return result

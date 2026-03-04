@@ -44,6 +44,7 @@ export class FeedController {
   @Public()
   @Get('feed')
   async getFeed(
+    @CurrentUser('id') userId: string | undefined,
     @Query('cursor') cursor?: string,
     @Query('limit') limit?: string,
     @Query('authorId') authorId?: string,
@@ -52,13 +53,16 @@ export class FeedController {
       ? Math.min(parseInt(limit, 10), FEED.MAX_CURSOR_LIMIT)
       : FEED.DEFAULT_CURSOR_LIMIT;
 
-    return this.feedService.getFeed(cursor, limitNum, authorId);
+    return this.feedService.getFeed(cursor, limitNum, authorId, userId);
   }
 
   @Public()
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
-    return this.feedService.getPostById(id);
+  async getPostById(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string | undefined,
+  ) {
+    return this.feedService.getPostById(id, userId);
   }
 
   @Post(':id/reactions')

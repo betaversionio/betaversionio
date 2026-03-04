@@ -18,7 +18,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import {
   createProjectSchema,
   updateProjectSchema,
-  addMakerSchema,
+  updateMakerRoleSchema,
   createProjectCommentSchema,
   updateProjectCommentSchema,
   toggleProjectVoteSchema,
@@ -32,7 +32,7 @@ import {
 import type {
   CreateProjectInput,
   UpdateProjectInput,
-  AddMakerInput,
+  UpdateMakerRoleInput,
   CreateProjectCommentInput,
   UpdateProjectCommentInput,
   ToggleProjectVoteInput,
@@ -174,15 +174,15 @@ export class ProjectController {
 
   // ─── Makers ───────────────────────────────────────────────────────────────
 
-  @Post(':id/makers')
-  @HttpCode(HttpStatus.CREATED)
-  async addMaker(
+  @Patch(':id/makers/:makerUserId')
+  async updateMakerRole(
     @Param('id') id: string,
+    @Param('makerUserId') makerUserId: string,
     @CurrentUser('id') userId: string,
-    @Body() body: AddMakerInput,
+    @Body() body: UpdateMakerRoleInput,
   ) {
-    const dto = addMakerSchema.parse(body);
-    return this.projectService.addMaker(id, userId, dto);
+    const dto = updateMakerRoleSchema.parse(body);
+    return this.projectService.updateMakerRole(id, userId, makerUserId, dto);
   }
 
   @Delete(':id/makers/:makerUserId')

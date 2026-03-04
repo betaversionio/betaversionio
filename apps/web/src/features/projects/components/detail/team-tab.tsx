@@ -5,8 +5,12 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { createInvitationSchema } from '@betaversionio/shared';
+import { createInvitationSchema, updateMakerRoleSchema } from '@betaversionio/shared';
 import type { ProjectMaker } from '@/hooks/queries/use-project-queries';
+import {
+  useUpdateMakerRole,
+  useRemoveMaker,
+} from '@/hooks/queries/use-project-queries';
 import {
   useCreateInvitation,
   useProjectInvitations,
@@ -33,7 +37,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { People, UserAdd, CloseCircle, TickCircle, Clock } from 'iconsax-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { People, UserAdd, CloseCircle, TickCircle, Clock, Edit2, Trash } from 'iconsax-react';
 
 const ROLE_SUGGESTIONS = [
   'Co-Founder',
@@ -46,7 +60,7 @@ const ROLE_SUGGESTIONS = [
   'Content Writer',
 ];
 
-type FormValues = z.input<typeof createInvitationSchema>;
+type InviteFormValues = z.input<typeof createInvitationSchema>;
 
 interface TeamTabProps {
   makers: ProjectMaker[];
@@ -56,6 +70,8 @@ interface TeamTabProps {
 
 export function TeamTab({ makers, projectId, isOwner }: TeamTabProps) {
   const [showInvite, setShowInvite] = useState(false);
+  const [editingMaker, setEditingMaker] = useState<ProjectMaker | null>(null);
+  const [removingMaker, setRemovingMaker] = useState<ProjectMaker | null>(null);
 
   return (
     <div className="mt-6 space-y-4">
@@ -92,12 +108,14 @@ export function TeamTab({ makers, projectId, isOwner }: TeamTabProps) {
           {makers.length > 0 && (
             <div className="space-y-2">
               {makers.map((maker) => (
-                <Link
+                <div
                   key={maker.id}
-                  href={`/@${maker.user.username}`}
                   className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/30"
                 >
-                  <div className="flex items-center gap-3">
+                  <Link
+                    href={`/@${maker.user.username}`}
+                    className="flex min-w-0 flex-1 items-center gap-3"
+                  >
                     <UserAvatar
                       src={maker.user.avatarUrl}
                       name={maker.user.name}
@@ -112,11 +130,33 @@ export function TeamTab({ makers, projectId, isOwner }: TeamTabProps) {
                         @{maker.user.username}
                       </p>
                     </div>
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {maker.role}
+                    </Badge>
+                    {isOwner && maker.role !== 'Creator' && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={() => setEditingMaker(maker)}
+                        >
+                          <Edit2 size={14} color="currentColor" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => setRemovingMaker(maker)}
+                        >
+                          <Trash size={14} color="currentColor" />
+                        </Button>
+                      </>
+                    )}
                   </div>
-                  <Badge variant="secondary" className="text-xs">
-                    {maker.role}
-                  </Badge>
-                </Link>
+                </div>
               ))}
             </div>
           )}
@@ -126,13 +166,186 @@ export function TeamTab({ makers, projectId, isOwner }: TeamTabProps) {
       )}
 
       {isOwner && (
-        <InviteDialog
-          projectId={projectId}
-          open={showInvite}
-          onOpenChange={setShowInvite}
-        />
+        <>
+          <InviteDialog
+            projectId={projectId}
+            open={showInvite}
+            onOpenChange={setShowInvite}
+          />
+          <EditRoleDialog
+            projectId={projectId}
+            maker={editingMaker}
+            onOpenChange={(open) => !open && setEditingMaker(null)}
+          />
+          <RemoveMakerDialog
+            projectId={projectId}
+            maker={removingMaker}
+            onOpenChange={(open) => !open && setRemovingMaker(null)}
+          />
+        </>
       )}
     </div>
+  );
+}
+
+function EditRoleDialog({
+  projectId,
+  maker,
+  onOpenChange,
+}: {
+  projectId: string;
+  maker: ProjectMaker | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { toast } = useToast();
+  const updateRole = useUpdateMakerRole(projectId);
+
+  const form = useForm<{ role: string }>({
+    resolver: zodResolver(updateMakerRoleSchema),
+    values: { role: maker?.role ?? '' },
+  });
+
+  async function onSubmit(data: { role: string }) {
+    if (!maker) return;
+    try {
+      await updateRole.mutateAsync({
+        makerUserId: maker.userId,
+        role: data.role,
+      });
+      toast({
+        title: 'Role updated',
+        description: `Updated ${maker.user.name ?? maker.user.username}'s role to ${data.role}.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: 'Failed to update role',
+        description:
+          error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  return (
+    <Dialog open={!!maker} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Role</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="flex items-center gap-3">
+            <UserAvatar
+              src={maker?.user.avatarUrl ?? null}
+              name={maker?.user.name ?? null}
+              className="h-9 w-9"
+              fallbackClassName="text-xs"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">
+                {maker?.user.name ?? maker?.user.username}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                @{maker?.user.username}
+              </p>
+            </div>
+          </div>
+          <Field>
+            <FieldLabel>Role</FieldLabel>
+            <Input
+              placeholder="e.g. Developer, Designer..."
+              {...form.register('role')}
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {ROLE_SUGGESTIONS.map((role) => (
+                <button
+                  key={role}
+                  type="button"
+                  className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  onClick={() =>
+                    form.setValue('role', role, { shouldValidate: true })
+                  }
+                >
+                  {role}
+                </button>
+              ))}
+            </div>
+            <FieldError errors={[form.formState.errors.role]} />
+          </Field>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" size="sm" isLoading={updateRole.isPending}>
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RemoveMakerDialog({
+  projectId,
+  maker,
+  onOpenChange,
+}: {
+  projectId: string;
+  maker: ProjectMaker | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { toast } = useToast();
+  const removeMaker = useRemoveMaker(projectId);
+
+  async function handleRemove() {
+    if (!maker) return;
+    try {
+      await removeMaker.mutateAsync(maker.userId);
+      toast({
+        title: 'Member removed',
+        description: `${maker.user.name ?? maker.user.username} has been removed from the project.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: 'Failed to remove member',
+        description:
+          error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  return (
+    <AlertDialog open={!!maker} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Remove team member</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to remove{' '}
+            <span className="font-medium text-foreground">
+              {maker?.user.name ?? maker?.user.username}
+            </span>{' '}
+            from this project? This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleRemove}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Remove
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -204,7 +417,7 @@ function InviteDialog({
   const [searchQuery, setSearchQuery] = useState('');
   const { data: searchResults } = useSearchUsers(searchQuery);
 
-  const form = useForm<FormValues>({
+  const form = useForm<InviteFormValues>({
     resolver: zodResolver(createInvitationSchema),
     defaultValues: {
       username: '',
@@ -233,7 +446,7 @@ function InviteDialog({
     setSearchQuery('');
   }
 
-  async function onSubmit(data: FormValues) {
+  async function onSubmit(data: InviteFormValues) {
     try {
       await createInvitation.mutateAsync({
         username: data.username,

@@ -26,7 +26,7 @@ import { TableControlsDropdown } from './table-controls'
 import { ToolbarButton } from './toolbar-button'
 import type { EditorToolbarProps } from './types'
 
-export function EditorToolbar({ editor, viewMode, onViewModeChange }: EditorToolbarProps) {
+export function EditorToolbar({ editor, viewMode, onViewModeChange, extraToolbarActions }: EditorToolbarProps) {
   const handleInsertImage = (url: string) => {
     if (editor) {
       editor.chain().focus().setImage({ src: url }).run()
@@ -232,6 +232,13 @@ export function EditorToolbar({ editor, viewMode, onViewModeChange }: EditorTool
       >
         <Redo className="h-4 w-4" />
       </ToolbarButton>
+
+      {extraToolbarActions && (
+        <>
+          <Separator orientation="vertical" className="mx-1 h-6" />
+          {extraToolbarActions}
+        </>
+      )}
     </div>
   )
 }
