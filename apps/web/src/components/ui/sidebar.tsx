@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { ArrowLeft2 } from 'iconsax-react';
+import { SidebarLeft } from 'iconsax-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -36,10 +36,10 @@ export function SidebarShell({ children }: SidebarShellProps) {
           variant="outline"
           size="icon"
           onClick={toggle}
-          className="bg-card dark:bg-card absolute top-14 -right-3 z-50 h-6 w-6 -translate-y-1/2 rounded-full border shadow-sm"
+          className="bg-card dark:bg-card absolute top-14 -right-3 z-50 h-7 w-7 -translate-y-1/2 rounded-full border shadow-sm text-muted-foreground"
         >
-          <ArrowLeft2
-            size={16}
+          <SidebarLeft
+            size={20}
             color="currentColor"
             className={cn('transition-transform', collapsed && 'rotate-180')}
           />

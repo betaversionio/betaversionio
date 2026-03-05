@@ -1,4 +1,5 @@
 import {
+  Brush2,
   DocumentText,
   Document,
   Home2,
@@ -35,6 +36,7 @@ export const navGroups: NavGroup[] = [
       { icon: Document, label: 'Blogs', href: '/my-blogs' },
       { icon: Library as never, label: 'Collections', href: '/my-collections' },
       { icon: DocumentText, label: 'Resume', href: '/resume' },
+      { icon: Brush2, label: 'Templates', href: '/my-templates' },
     ],
   },
   {

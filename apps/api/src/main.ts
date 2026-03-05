@@ -29,7 +29,8 @@ async function bootstrap() {
       if (/^http:\/\/[\w-]+\.localhost(:\d+)?$/.test(origin)) {
         return callback(null, true);
       }
-      callback(new Error('Not allowed by CORS'));
+      // Allow all origins for public portfolio API (community templates fetch from any domain)
+      return callback(null, true);
     },
     credentials: true,
   });

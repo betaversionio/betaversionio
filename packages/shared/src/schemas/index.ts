@@ -7,3 +7,4 @@ export * from "./feed";
 export * from "./collection";
 export * from "./blog";
 export * from "./github";
+export * from "./portfolio-template";

@@ -96,7 +96,7 @@ const platform = [
 
 const company = [
   { title: 'About', href: '/about' },
-  { title: 'Blog', href: '/blog' },
+  { title: 'Blog', href: '/blogs' },
   { title: 'Privacy Policy', href: '/privacy' },
   { title: 'Terms of Service', href: '/terms' },
   { title: 'Cookie Policy', href: '/cookies' },

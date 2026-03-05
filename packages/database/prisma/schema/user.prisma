@@ -87,23 +87,26 @@ model User {
   followers             Follow[]              @relation("UserFollowing")
   following             Follow[]              @relation("UserFollowers")
   verificationTokens    VerificationToken[]
+  portfolioTemplates    PortfolioTemplate[]
 
   @@map("users")
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  bio       String?  @db.VarChar(500)
-  headline  String?  @db.VarChar(200)
-  location  String?
-  website   String?
-  resumeUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  bio                 String?  @db.VarChar(500)
+  headline            String?  @db.VarChar(200)
+  location            String?
+  website             String?
+  resumeUrl           String?
+  portfolioTemplateId String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioTemplate PortfolioTemplate? @relation(fields: [portfolioTemplateId], references: [id])
 
   @@map("profiles")
 }

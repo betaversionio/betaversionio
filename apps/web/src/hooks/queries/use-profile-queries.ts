@@ -12,6 +12,7 @@ export interface FullProfile {
     headline: string | null;
     location: string | null;
     website: string | null;
+    portfolioTemplateId: string | null;
   } | null;
   socialLinks: Array<{ platform: string; url: string }>;
   techStack: Array<{

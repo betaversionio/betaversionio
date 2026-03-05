@@ -6,6 +6,8 @@
     "dev": "turbo dev",
     "dev:api": "turbo dev --filter @betaversionio/api",
     "dev:web": "turbo dev --filter @betaversionio/web",
+    "dev:template-nextjs": "turbo dev --filter @betaversionio/template-nextjs",
+    "dev:template-vite": "turbo dev --filter @betaversionio/template-vite",
     "build": "turbo build",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
@@ -16,7 +18,8 @@
     "db:migrate": "pnpm --filter @betaversionio/database db:migrate",
     "db:seed": "pnpm --filter @betaversionio/database db:seed",
     "db:studio": "pnpm --filter @betaversionio/database db:studio",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "publish:portfolio-sdk": "pnpm --filter @betaversionio/portfolio-sdk build && pnpm --filter @betaversionio/portfolio-sdk publish --access public"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

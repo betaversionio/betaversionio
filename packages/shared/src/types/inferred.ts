@@ -73,6 +73,12 @@ import {
   pushFileSchema,
 } from "../schemas/github";
 
+import {
+  createPortfolioTemplateSchema,
+  updatePortfolioTemplateSchema,
+  selectPortfolioTemplateSchema,
+} from "../schemas/portfolio-template";
+
 // ─── Auth Types ──────────────────────────────────────────────────────────────
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -145,3 +151,9 @@ export type UpdateBlogCommentInput = z.infer<typeof updateBlogCommentSchema>;
 
 export type ConnectGithubInput = z.infer<typeof connectGithubSchema>;
 export type PushFileInput = z.infer<typeof pushFileSchema>;
+
+// ─── Portfolio Template Types ───────────────────────────────────────────────
+
+export type CreatePortfolioTemplateInput = z.infer<typeof createPortfolioTemplateSchema>;
+export type UpdatePortfolioTemplateInput = z.infer<typeof updatePortfolioTemplateSchema>;
+export type SelectPortfolioTemplateInput = z.infer<typeof selectPortfolioTemplateSchema>;

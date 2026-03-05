@@ -17,6 +17,8 @@ import { BlogModule } from "./modules/blog/blog.module";
 import { FollowModule } from "./modules/follow/follow.module";
 import { GitHubModule } from "./modules/github/github.module";
 import { MailModule } from "./modules/mail/mail.module";
+import { PortfolioModule } from "./modules/portfolio/portfolio.module";
+import { PortfolioTemplateModule } from "./modules/portfolio-template/portfolio-template.module";
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { MailModule } from "./modules/mail/mail.module";
     FollowModule,
     GitHubModule,
     MailModule,
+    PortfolioModule,
+    PortfolioTemplateModule,
   ],
   providers: [
     {

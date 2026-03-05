@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
   return (
@@ -16,9 +16,6 @@ export default function NotFound() {
         <div className="mt-8 flex items-center justify-center gap-4">
           <Button asChild>
             <Link href="/">Go Home</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/dashboard">Dashboard</Link>
           </Button>
         </div>
       </div>

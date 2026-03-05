@@ -1,0 +1,31 @@
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum PortfolioTemplateStatus {
+  Draft
+  Published
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model PortfolioTemplate {
+  id           String                  @id @default(cuid())
+  name         String
+  description  String                  @db.Text
+  previewImage String
+  previewUrl   String?
+  baseUrl      String
+  repoUrl      String?
+  authorId     String
+  tags         String[]                @default([])
+  featured     Boolean                 @default(false)
+  installCount Int                     @default(0)
+  status       PortfolioTemplateStatus @default(Draft)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  // Relations
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  profiles Profile[]
+
+  @@map("portfolio_templates")
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +9,8 @@ import { changePasswordSchema, changeUsernameSchema, setPasswordSchema } from "@
 import type { ChangePasswordInput, ChangeUsernameInput, SetPasswordInput } from "@betaversionio/shared";
 import { useChangePassword, useSetPassword, useChangeUsername, useCheckUsername } from "@/features/auth";
 import { useAuth } from "@/providers/auth-provider";
+import { useMyFullProfile } from "@/hooks/queries/use-profile-queries";
+import { useTemplate, useSelectTemplate } from "@/hooks/queries/use-template-queries";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +26,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/shared/page-header";
-import { Monitor, Moon, Sun, CheckCircle2, XCircle } from "lucide-react";
+import { Monitor, Moon, Sun, CheckCircle2, XCircle, Copy, Check, X } from "lucide-react";
 import { useEffect } from "react";
 import { useWatch } from "react-hook-form";
 
@@ -45,6 +48,41 @@ export default function SettingsPage() {
   const changeUsernameMutation = useChangeUsername();
   const { toast } = useToast();
   const hasPassword = user?.hasPassword ?? true;
+
+  const { data: fullProfile } = useMyFullProfile();
+  const selectedTemplateId = fullProfile?.profile?.portfolioTemplateId ?? null;
+  const { data: selectedTemplate } = useTemplate(selectedTemplateId ?? "");
+  const selectTemplateMutation = useSelectTemplate();
+  const [copied, setCopied] = useState(false);
+
+  const portfolioUrl = user?.username
+    ? `${user.username}.betaversion.io`
+    : "";
+
+  const copyPortfolioUrl = useCallback(() => {
+    navigator.clipboard.writeText(portfolioUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [portfolioUrl]);
+
+  function handleRemoveTemplate() {
+    selectTemplateMutation.mutate(null, {
+      onSuccess: () => {
+        toast({
+          title: "Template removed",
+          description: "Your portfolio template has been removed.",
+        });
+      },
+      onError: (err) => {
+        toast({
+          title: "Failed to remove template",
+          description:
+            err instanceof Error ? err.message : "Something went wrong.",
+          variant: "destructive",
+        });
+      },
+    });
+  }
 
   const {
     register,
@@ -160,6 +198,7 @@ export default function SettingsPage() {
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
         </TabsList>
 
         {/* Account Tab */}
@@ -415,6 +454,94 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground">
                   Notification settings coming soon
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Portfolio Tab */}
+        <TabsContent value="portfolio" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio Template</CardTitle>
+              <CardDescription>
+                Choose a community template for your portfolio site
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {selectedTemplateId && selectedTemplate ? (
+                <div className="flex items-start gap-4 rounded-lg border p-4">
+                  {selectedTemplate.previewImage ? (
+                    <img
+                      src={selectedTemplate.previewImage}
+                      alt={selectedTemplate.name}
+                      className="h-20 w-32 rounded-md object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-20 w-32 items-center justify-center rounded-md bg-muted">
+                      <span className="text-xs text-muted-foreground">
+                        No preview
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 space-y-1">
+                    <p className="font-medium">{selectedTemplate.name}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">
+                      {selectedTemplate.description}
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href="/templates">Change</Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveTemplate}
+                        disabled={selectTemplateMutation.isPending}
+                      >
+                        <X className="mr-1 h-3.5 w-3.5" />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8">
+                  <p className="text-sm text-muted-foreground">
+                    No template selected
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-3" asChild>
+                    <Link href="/templates">Browse Templates</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio URL</CardTitle>
+              <CardDescription>
+                Your personal portfolio is available at this address
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 rounded-md border bg-muted px-3 py-2 text-sm">
+                  {portfolioUrl}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={copyPortfolioUrl}
+                  disabled={!portfolioUrl}
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>

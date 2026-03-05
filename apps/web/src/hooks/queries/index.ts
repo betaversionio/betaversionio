@@ -83,3 +83,14 @@ export {
   useDeleteBlogComment,
   blogKeys,
 } from "./use-blog-queries";
+export {
+  useTemplates,
+  useTemplate,
+  useMyTemplates,
+  useSelectTemplate,
+  useCreateTemplate,
+  useUpdateTemplate,
+  useDeleteTemplate,
+  templateKeys,
+} from "./use-template-queries";
+export type { PortfolioTemplate, TemplateFilters, MyTemplateFilters } from "./use-template-queries";
