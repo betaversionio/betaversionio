@@ -140,6 +140,7 @@ export class PortfolioTemplateService {
     return this.prisma.portfolioTemplate.create({
       data: {
         ...dto,
+        status: dto.status ?? 'Published',
         authorId,
       },
       include: {
@@ -203,13 +204,34 @@ export class PortfolioTemplateService {
       }
     }
 
+    // Get the user's current template before changing it
+    const existingProfile = await this.prisma.profile.findUnique({
+      where: { userId },
+      select: { portfolioTemplateId: true },
+    });
+
+    const oldTemplateId = existingProfile?.portfolioTemplateId ?? null;
+
+    // No change — same template already selected
+    if (oldTemplateId === portfolioTemplateId) {
+      return existingProfile;
+    }
+
     const profile = await this.prisma.profile.upsert({
       where: { userId },
       update: { portfolioTemplateId },
       create: { userId, portfolioTemplateId },
     });
 
-    // Update install count
+    // Decrement old template's count
+    if (oldTemplateId) {
+      await this.prisma.portfolioTemplate.update({
+        where: { id: oldTemplateId },
+        data: { installCount: { decrement: 1 } },
+      });
+    }
+
+    // Increment new template's count
     if (portfolioTemplateId) {
       await this.prisma.portfolioTemplate.update({
         where: { id: portfolioTemplateId },

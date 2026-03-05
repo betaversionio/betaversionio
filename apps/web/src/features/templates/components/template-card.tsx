@@ -22,7 +22,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
     <Card className="group relative flex h-full flex-col overflow-hidden transition-shadow hover:shadow-md">
       <Link
         href={`/templates/${template.id}`}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-10"
       />
 
       {/* Preview image */}

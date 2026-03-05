@@ -15,6 +15,8 @@ import { CircleAlert, Loader2, User, X } from 'lucide-react';
 interface AvatarUploadProps {
   maxSize?: number;
   className?: string;
+  /** Override the preview area dimensions (default: "h-48 w-48") */
+  previewClassName?: string;
   rounded?: 'full' | 'md';
   onFileChange?: (file: FileWithPreview | null) => void;
   defaultAvatar?: string;
@@ -27,6 +29,7 @@ interface AvatarUploadProps {
 export function AvatarUpload({
   maxSize = 2 * 1024 * 1024, // 2MB
   className,
+  previewClassName,
   rounded = 'full',
   onFileChange,
   defaultAvatar,
@@ -87,7 +90,8 @@ export function AvatarUpload({
       <div className="relative">
         <div
           className={cn(
-            'group/avatar relative h-48 w-48 cursor-pointer overflow-hidden border border-dashed transition-colors',
+            'group/avatar relative cursor-pointer overflow-hidden border border-dashed transition-colors',
+            previewClassName ?? 'h-48 w-48',
             rounded === 'full' ? 'rounded-full' : 'rounded-lg',
             isDragging
               ? 'border-primary bg-primary/5'

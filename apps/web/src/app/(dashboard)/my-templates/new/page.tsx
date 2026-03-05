@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { Badge } from '@/components/ui/badge';
 import { AvatarUpload } from '@/components/patterns/p-file-upload-2';
 import {
@@ -77,7 +77,7 @@ export default function NewTemplatePage() {
       await createTemplate.mutateAsync(data);
       toast({
         title: 'Template created',
-        description: 'Your template has been saved as a draft. Publish it when ready.',
+        description: 'Your template is now live in the marketplace.',
       });
       router.push('/my-templates');
     } catch {
@@ -102,9 +102,14 @@ export default function NewTemplatePage() {
             <FieldGroup>
               {/* Preview Image */}
               <Field data-invalid={!!errors.previewImage}>
+                <FieldLabel>Preview Image</FieldLabel>
+                <FieldDescription>
+                  Landscape screenshot of your template (16:9 recommended).
+                </FieldDescription>
                 <AvatarUpload
                   maxSize={2 * 1024 * 1024}
                   rounded="md"
+                  previewClassName="aspect-video w-[480px]"
                   defaultAvatar={previewImage || undefined}
                   uploadFolder="templates/previews"
                   onUpload={(url) => setValue('previewImage', url ?? '')}
@@ -125,12 +130,14 @@ export default function NewTemplatePage() {
 
               {/* Description */}
               <Field data-invalid={!!errors.description}>
-                <FieldLabel htmlFor="description">Description</FieldLabel>
-                <Textarea
-                  id="description"
+                <FieldLabel>Description</FieldLabel>
+                <MarkdownEditor
+                  value={watch('description')}
+                  onChange={(val) => setValue('description', val)}
                   placeholder="Describe what makes your template unique..."
-                  rows={4}
-                  {...register('description')}
+                  outputFormat="markdown"
+                  height={200}
+                  maxHeight={400}
                 />
                 <FieldError>{errors.description?.message}</FieldError>
               </Field>

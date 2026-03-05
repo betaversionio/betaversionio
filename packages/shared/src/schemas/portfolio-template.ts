@@ -4,7 +4,7 @@ export const portfolioTemplateStatusSchema = z.enum(["Draft", "Published"]);
 
 export const createPortfolioTemplateSchema = z.object({
   name: z.string().min(1).max(100),
-  description: z.string().min(1).max(2000),
+  description: z.string().min(1).max(10000),
   previewImage: z.string().url(),
   previewUrl: z.string().url().optional(),
   baseUrl: z.string().url(),
