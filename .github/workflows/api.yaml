@@ -44,8 +44,7 @@ jobs:
       - name: Set up Environment File
         env:
           PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
-        run: |
-          echo "${{ env.PROD_ENV_FILE }}" | sed 's/\\n/\n/g' > .env
+        run: echo "$PROD_ENV_FILE" > .env
 
       - name: Set up GitHub App Private Key
         env:
@@ -55,12 +54,17 @@ jobs:
           chmod 600 github-app.pem
           echo 'GITHUB_APP_PRIVATE_KEY_PATH="'$(pwd)'/github-app.pem"' >> .env
 
-      - name: Build Application
-        run: |
-          pnpm db:generate
-          pnpm --filter @betaversionio/database build
-          pnpm --filter @betaversionio/shared build
-          pnpm --filter @betaversionio/api build
+      - name: Generate Prisma Client
+        run: pnpm db:generate
+
+      - name: Build Database Package
+        run: pnpm --filter @betaversionio/database build
+
+      - name: Build Shared Package
+        run: pnpm --filter @betaversionio/shared build
+
+      - name: Build API
+        run: pnpm --filter @betaversionio/api build
 
       - name: Push Database Schema
         run: pnpm db:push
