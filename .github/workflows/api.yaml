@@ -10,6 +10,7 @@ on:
       - 'packages/shared/**'
       - 'packages/config/typescript/**'
       - 'pnpm-lock.yaml'
+      - '.github/workflows/api.yaml'
 
 permissions:
   contents: read
