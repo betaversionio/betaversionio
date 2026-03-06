@@ -1,7 +1,7 @@
 {
   "name": "betaversionio",
   "private": true,
-  "packageManager": "pnpm@10.29.3",
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "dev": "turbo dev",
     "dev:api": "turbo dev --filter @betaversionio/api",
@@ -22,8 +22,8 @@
     "publish:portfolio-sdk": "pnpm --filter @betaversionio/portfolio-sdk build && pnpm --filter @betaversionio/portfolio-sdk publish --access public"
   },
   "devDependencies": {
-    "turbo": "^2.5.0",
-    "prettier": "^3.5.0"
+    "turbo": "^2.8.14",
+    "prettier": "^3.8.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
