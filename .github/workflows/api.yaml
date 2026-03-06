@@ -35,7 +35,7 @@ jobs:
             pnpm-workspace.yaml
             pnpm-lock.yaml
             package.json
-            turbo.json
+            .npmrc
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile --filter=@betaversionio/api...
@@ -55,7 +55,11 @@ jobs:
           echo 'GITHUB_APP_PRIVATE_KEY_PATH="'$(pwd)'/github-app.pem"' >> .env
 
       - name: Build Application
-        run: pnpm turbo build --filter=@betaversionio/api...
+        run: |
+          pnpm db:generate
+          pnpm --filter @betaversionio/database build
+          pnpm --filter @betaversionio/shared build
+          pnpm --filter @betaversionio/api build
 
       - name: Push Database Schema
         run: pnpm db:push
