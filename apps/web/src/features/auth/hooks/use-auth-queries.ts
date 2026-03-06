@@ -28,12 +28,12 @@ export const authKeys = {
 
 // ── Queries ──
 
-export function useMe() {
+export function useMe(enabled = true) {
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: () =>
       apiClient.get<User>("/auth/me", { skipAuthRefresh: true }),
-    enabled: hasAccessTokenCookie(),
+    enabled,
     retry: false,
     staleTime: 5 * 60 * 1000,
   });

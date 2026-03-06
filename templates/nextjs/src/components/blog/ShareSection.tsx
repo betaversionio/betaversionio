@@ -101,7 +101,7 @@ export function ShareSection({ title, url }: ShareSectionProps) {
   const enabledPlatforms = Object.entries(socialSharing.platforms)
     .filter(([_, enabled]) => enabled && _ !== 'copyLink')
     .map(([platformKey]) => ({ key: platformKey, ...socialPlatforms[platformKey] }))
-    .filter(platform => platform.name); // Filter out platforms that don't exist in our definitions
+    .filter((platform): platform is typeof platform & { generateUrl: (t: string, u: string) => string } => !!platform.generateUrl);
 
   return (
     <Row fillWidth center gap="16" marginTop="32" marginBottom="16">

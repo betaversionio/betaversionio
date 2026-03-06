@@ -83,7 +83,7 @@ function extractText(node: ReactNode): string {
   if (!node) return "";
   if (Array.isArray(node)) return node.map(extractText).join("");
   if (typeof node === "object" && "props" in node) {
-    return extractText((node as React.ReactElement).props.children);
+    return extractText((node as React.ReactElement<{ children?: ReactNode }>).props.children);
   }
   return "";
 }
@@ -181,7 +181,7 @@ function createHR() {
   );
 }
 
-const components = {
+const components: Record<string, any> = {
   p: createParagraph as any,
   h1: createHeading("h1") as any,
   h2: createHeading("h2") as any,

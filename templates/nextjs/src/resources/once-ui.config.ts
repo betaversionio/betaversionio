@@ -192,7 +192,7 @@ const schema: SchemaConfig = {
 };
 
 // social links
-const sameAs: SameAsConfig = {};
+const sameAs = {} as SameAsConfig;
 
 // social sharing configuration for blog posts
 const socialSharing: SocialSharingConfig = {

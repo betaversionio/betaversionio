@@ -22,20 +22,22 @@ import { toPerson, toSocial, toHome } from "@/lib/portfolio";
 export async function generateMetadata() {
   try {
     const data = await fetchPortfolio();
-    const person = toPerson(data);
-    const home = toHome(data);
-    return {
-      ...Meta.generate({
-        title: home.title,
-        description: home.description,
-        baseURL: baseURL,
-        path: home.path,
-        image: home.image,
-      }),
-      icons: {
-        icon: person.avatar || "/favicon.ico",
-      },
-    };
+    if (data) {
+      const person = toPerson(data);
+      const home = toHome(data);
+      return {
+        ...Meta.generate({
+          title: home.title,
+          description: home.description,
+          baseURL: baseURL,
+          path: home.path,
+          image: home.image,
+        }),
+        icons: {
+          icon: person.avatar || "/favicon.ico",
+        },
+      };
+    }
   } catch {
     return Meta.generate({
       title: "Portfolio",
@@ -55,8 +57,10 @@ export default async function RootLayout({
   let social = defaultSocial;
   try {
     const data = await fetchPortfolio();
-    person = toPerson(data);
-    social = toSocial(data);
+    if (data) {
+      person = toPerson(data);
+      social = toSocial(data);
+    }
   } catch {}
 
   return (

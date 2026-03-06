@@ -88,19 +88,25 @@ function openGithubPopup(): Promise<string> {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [canFetchMe, setCanFetchMe] = useState(() => hasAccessTokenCookie());
 
   // On mount, restore the session:
   // 1. If the access_token cookie exists, the browser will send it automatically — ready.
   // 2. Otherwise fall back to a /auth/refresh call to get new cookies.
+  // Note: after refresh, the cookie belongs to the API domain and won't appear
+  // in document.cookie on cross-origin deployments, so we track success via state.
   useEffect(() => {
     if (hasAccessTokenCookie()) {
       setIsInitialized(true);
       return;
     }
-    refreshAccessToken().finally(() => setIsInitialized(true));
+    refreshAccessToken().then((success) => {
+      if (success) setCanFetchMe(true);
+      setIsInitialized(true);
+    });
   }, []);
 
-  const meQuery = useMe();
+  const meQuery = useMe(canFetchMe);
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const logoutMutation = useLogout();

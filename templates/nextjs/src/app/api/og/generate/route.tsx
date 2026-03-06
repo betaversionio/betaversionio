@@ -14,10 +14,12 @@ export async function GET(request: Request) {
   let personAvatar = "";
   try {
     const data = await fetchPortfolio();
-    const person = toPerson(data);
-    personName = person.name || personName;
-    personRole = person.role;
-    personAvatar = person.avatar;
+    if (data) {
+      const person = toPerson(data);
+      personName = person.name || personName;
+      personRole = person.role;
+      personAvatar = person.avatar;
+    }
   } catch {}
 
   async function loadGoogleFont(font: string) {
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
     const css = await (await fetch(url)).text();
     const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
 
-    if (resource) {
+    if (resource?.[1]) {
       const response = await fetch(resource[1]);
       if (response.status == 200) {
         return await response.arrayBuffer();

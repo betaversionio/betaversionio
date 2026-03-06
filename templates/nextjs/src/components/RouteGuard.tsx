@@ -44,7 +44,7 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       };
 
       const routeEnabled = checkRouteEnabled();
-      setIsRouteEnabled(routeEnabled);
+      setIsRouteEnabled(routeEnabled ?? false);
 
       if (protectedRoutes[pathname as keyof typeof protectedRoutes]) {
         setIsPasswordRequired(true);

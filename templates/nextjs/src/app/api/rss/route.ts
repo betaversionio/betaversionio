@@ -10,10 +10,12 @@ export async function GET() {
   let personAvatar = "/images/avatar.jpg";
   try {
     const data = await fetchPortfolio();
-    const person = toPerson(data);
-    personName = person.name || personName;
-    personEmail = person.email || personEmail;
-    personAvatar = person.avatar || personAvatar;
+    if (data) {
+      const person = toPerson(data);
+      personName = person.name || personName;
+      personEmail = person.email || personEmail;
+      personAvatar = person.avatar || personAvatar;
+    }
   } catch {}
 
   const posts = getPosts(["src", "app", "blog", "posts"]);

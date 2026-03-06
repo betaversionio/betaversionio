@@ -7,14 +7,16 @@ import { toPerson } from "@/lib/portfolio";
 export async function generateMetadata() {
   try {
     const data = await fetchPortfolio();
-    const person = toPerson(data);
-    return Meta.generate({
-      title: `${gallery.title} — ${person.name}`,
-      description: gallery.description,
-      baseURL: baseURL,
-      image: `/api/og/generate?title=${encodeURIComponent(gallery.title)}`,
-      path: gallery.path,
-    });
+    if (data) {
+      const person = toPerson(data);
+      return Meta.generate({
+        title: `${gallery.title} — ${person.name}`,
+        description: gallery.description,
+        baseURL: baseURL,
+        image: `/api/og/generate?title=${encodeURIComponent(gallery.title)}`,
+        path: gallery.path,
+      });
+    }
   } catch {
     return Meta.generate({
       title: gallery.title,
@@ -31,9 +33,11 @@ export default async function Gallery() {
   let personAvatar = "";
   try {
     const data = await fetchPortfolio();
-    const person = toPerson(data);
-    personName = person.name;
-    personAvatar = person.avatar;
+    if (data) {
+      const person = toPerson(data);
+      personName = person.name;
+      personAvatar = person.avatar;
+    }
   } catch {}
 
   return (
