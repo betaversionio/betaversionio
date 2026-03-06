@@ -1,5 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+
+export interface CustomDomain {
+  id: string;
+  domain: string;
+  verified: boolean;
+  createdAt: string;
+}
 
 export interface FullProfile {
   id: string;
@@ -56,6 +63,7 @@ export interface FullProfile {
     techStack: string[];
     isOpenSource: boolean;
   }>;
+  customDomains: CustomDomain[];
 }
 
 export const profileKeys = {
@@ -67,5 +75,40 @@ export function useMyFullProfile() {
   return useQuery({
     queryKey: profileKeys.me(),
     queryFn: () => apiClient.get<FullProfile>('/users/me'),
+  });
+}
+
+export function useAddCustomDomain() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (domain: string) =>
+      apiClient.post<CustomDomain>('/users/me/domains', { domain }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
+    },
+  });
+}
+
+export function useVerifyCustomDomain() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (domainId: string) =>
+      apiClient.post<{ verified: boolean; domain: string }>(
+        `/users/me/domains/${domainId}/verify`,
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
+    },
+  });
+}
+
+export function useRemoveCustomDomain() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (domainId: string) =>
+      apiClient.delete(`/users/me/domains/${domainId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
+    },
   });
 }

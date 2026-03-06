@@ -19,13 +19,13 @@ export class PortfolioController {
    *   1. x-portfolio-username header (local dev / proxy)
    *   2. Origin header subdomain (satyam.betaversion.io → satyam)
    *   3. Referer header subdomain (fallback)
-   *   4. Future: custom domain lookup
+   *   4. Custom domain lookup (verified domains)
    */
   @Get()
   async getPortfolioAuto(
     @Req() req: { headers: Record<string, string | string[] | undefined> },
   ) {
-    const username = this.resolveUsername(req.headers);
+    const username = await this.resolveUsername(req.headers);
     return this.portfolioService.getPortfolio(username);
   }
 
@@ -50,20 +50,31 @@ export class PortfolioController {
     return { baseUrl };
   }
 
-  private resolveUsername(
+  private async resolveUsername(
     headers: Record<string, string | string[] | undefined>,
-  ): string {
+  ): Promise<string> {
     // 1. Explicit header (local dev / proxy)
     const header = headers['x-portfolio-username'];
     if (typeof header === 'string') return header;
     if (Array.isArray(header) && header[0]) return header[0];
 
-    // 2. Origin / Referer header (browser cross-origin requests)
+    // 2. Origin / Referer header — subdomain check
     const subdomain =
       this.extractSubdomain(headers['origin']) ??
       this.extractSubdomain(headers['referer']);
 
     if (subdomain) return subdomain;
+
+    // 3. Custom domain lookup — extract hostname from Origin/Referer
+    const hostname =
+      this.extractHostname(headers['origin']) ??
+      this.extractHostname(headers['referer']);
+
+    if (hostname) {
+      const username =
+        await this.portfolioService.resolveCustomDomain(hostname);
+      if (username) return username;
+    }
 
     throw new BadRequestException(
       'Could not resolve portfolio username. ' +
@@ -87,5 +98,16 @@ export class PortfolioController {
       // invalid URL
     }
     return null;
+  }
+
+  private extractHostname(
+    url: string | string[] | undefined,
+  ): string | null {
+    if (!url || Array.isArray(url)) return null;
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return null;
+    }
   }
 }

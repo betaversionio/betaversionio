@@ -138,12 +138,6 @@ export function useDeleteBlog() {
   });
 }
 
-export function useRecordBlogView(blogId: string) {
-  return useMutation({
-    mutationFn: () => apiClient.post(`/blogs/${blogId}/view`),
-  });
-}
-
 // ─── Votes ───────────────────────────────────────────────────────────────────
 
 export function useToggleBlogVote(blogId: string) {

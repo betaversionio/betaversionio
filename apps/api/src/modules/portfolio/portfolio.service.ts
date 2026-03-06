@@ -6,6 +6,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class PortfolioService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async resolveCustomDomain(hostname: string): Promise<string | null> {
+    const record = await this.prisma.customDomain.findFirst({
+      where: { domain: hostname.toLowerCase(), verified: true },
+      include: { user: { select: { username: true } } },
+    });
+    return record?.user.username ?? null;
+  }
+
   async getPortfolio(username: string) {
     const user = await this.prisma.user.findUnique({
       where: { username, deletedAt: null },

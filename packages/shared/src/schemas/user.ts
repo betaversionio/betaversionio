@@ -86,3 +86,16 @@ export const serviceItemSchema = z.object({
 export const updateServicesSchema = z.object({
   items: z.array(serviceItemSchema),
 });
+
+// ─── Custom Domains ─────────────────────────────────────────────────────────
+
+const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+export const addCustomDomainSchema = z.object({
+  domain: z
+    .string()
+    .min(1, "Domain is required")
+    .max(253, "Domain is too long")
+    .transform((d) => d.toLowerCase().replace(/^https?:\/\//, "").replace(/\/+$/, ""))
+    .refine((d) => domainRegex.test(d), "Invalid domain format (e.g. portfolio.example.com)"),
+});

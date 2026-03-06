@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  Ip,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -82,8 +83,9 @@ export class BlogController {
   async findBySlug(
     @Param('slug') slug: string,
     @CurrentUser('id') userId: string | undefined,
+    @Ip() ip: string,
   ) {
-    return this.blogService.findBySlug(slug, userId);
+    return this.blogService.findBySlug(slug, userId, ip);
   }
 
   @Patch(':slug')
@@ -100,16 +102,6 @@ export class BlogController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async softDelete(@Param('id') id: string, @CurrentUser('id') userId: string) {
     await this.blogService.softDelete(id, userId);
-  }
-
-  @Post(':id/view')
-  @HttpCode(HttpStatus.OK)
-  async recordView(
-    @Param('id') id: string,
-    @CurrentUser('id') userId: string | undefined,
-  ) {
-    await this.blogService.recordView(id, userId);
-    return { recorded: true };
   }
 
   // ─── Votes ──────────────────────────────────────────────────────────────────

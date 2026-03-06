@@ -3,7 +3,9 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
+  OnModuleDestroy,
 } from '@nestjs/common';
+import { createHash } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateBlogInput,
@@ -13,6 +15,9 @@ import type {
   UpdateBlogCommentInput,
 } from '@betaversionio/shared';
 
+const VIEW_THROTTLE_MS = 2 * 60 * 60 * 1000; // 2 hours
+const VIEW_CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // cleanup every 10 min
+
 const AUTHOR_SELECT = {
   id: true,
   username: true,
@@ -21,8 +26,29 @@ const AUTHOR_SELECT = {
 } as const;
 
 @Injectable()
-export class BlogService {
-  constructor(private readonly prisma: PrismaService) {}
+export class BlogService implements OnModuleDestroy {
+  /** key = "blogId:hash", value = timestamp of last counted view */
+  private readonly viewThrottle = new Map<string, number>();
+  private readonly cleanupTimer: ReturnType<typeof setInterval>;
+
+  constructor(private readonly prisma: PrismaService) {
+    this.cleanupTimer = setInterval(() => this.purgeStaleViews(), VIEW_CLEANUP_INTERVAL_MS);
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.cleanupTimer);
+  }
+
+  private purgeStaleViews() {
+    const cutoff = Date.now() - VIEW_THROTTLE_MS;
+    for (const [key, ts] of this.viewThrottle) {
+      if (ts < cutoff) this.viewThrottle.delete(key);
+    }
+  }
+
+  private hashIp(ip: string): string {
+    return createHash('sha256').update(ip).digest('hex').slice(0, 16);
+  }
 
   async create(userId: string, dto: CreateBlogInput) {
     const existing = await this.prisma.blog.findUnique({
@@ -131,7 +157,7 @@ export class BlogService {
     };
   }
 
-  async findBySlug(slug: string, userId?: string) {
+  async findBySlug(slug: string, userId?: string, ip?: string) {
     const blog = await this.prisma.blog.findUnique({
       where: { slug },
       include: {
@@ -141,6 +167,19 @@ export class BlogService {
 
     if (!blog || blog.deletedAt) {
       throw new NotFoundException('Blog not found');
+    }
+
+    // ── Throttled view counting (fire-and-forget) ────────────────────────
+    const identifier = userId ?? (ip ? this.hashIp(ip) : null);
+    if (identifier) {
+      const key = `${blog.id}:${identifier}`;
+      const lastSeen = this.viewThrottle.get(key);
+      if (!lastSeen || Date.now() - lastSeen >= VIEW_THROTTLE_MS) {
+        this.viewThrottle.set(key, Date.now());
+        this.prisma.blog
+          .update({ where: { id: blog.id }, data: { viewsCount: { increment: 1 } } })
+          .catch(() => {});
+      }
     }
 
     let hasVoted = false;
@@ -210,30 +249,6 @@ export class BlogService {
     return this.prisma.blog.update({
       where: { id },
       data: { deletedAt: new Date() },
-    });
-  }
-
-  async recordView(blogId: string, userId?: string) {
-    const blog = await this.prisma.blog.findUnique({
-      where: { id: blogId },
-    });
-    if (!blog || blog.deletedAt) return;
-
-    // Dedup: skip if same user viewed in last 24h
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    if (userId) {
-      const recent = await this.prisma.blogView.findFirst({
-        where: { blogId, userId, createdAt: { gte: since } },
-      });
-      if (recent) return;
-    }
-
-    await this.prisma.blogView.create({
-      data: { blogId, userId },
-    });
-    await this.prisma.blog.update({
-      where: { id: blogId },
-      data: { viewsCount: { increment: 1 } },
     });
   }
 

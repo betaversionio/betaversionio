@@ -1,8 +1,8 @@
 'use client';
 
-import { use, useEffect } from 'react';
+import { use } from 'react';
 import Link from 'next/link';
-import { useBlog, useRecordBlogView } from '@/hooks/queries/use-blog-queries';
+import { useBlog } from '@/hooks/queries/use-blog-queries';
 import { BlogFloatingBar } from '@/features/blogs/components/detail/blog-sidebar';
 import {
   BlogCommentsTab,
@@ -29,14 +29,6 @@ export default function BlogDetailPage({
 }) {
   const { slug } = use(params);
   const { data: blog, isLoading, error } = useBlog(slug);
-  const recordView = useRecordBlogView(blog?.id ?? '');
-
-  useEffect(() => {
-    if (blog?.id) {
-      recordView.mutate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blog?.id]);
 
   if (isLoading) {
     return (

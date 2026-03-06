@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
+import { promises as dns } from 'dns';
 import type {
   UpdateProfileInput,
   UpdateSocialLinksInput,
@@ -11,6 +16,7 @@ import type {
   EducationItemInput,
   ExperienceItemInput,
   ServiceItemInput,
+  AddCustomDomainInput,
 } from '@betaversionio/shared';
 import { PAGINATION } from '@betaversionio/shared';
 
@@ -30,6 +36,7 @@ export class UserService {
         education: { orderBy: { startDate: 'desc' } },
         experiences: { orderBy: { startDate: 'desc' } },
         services: true,
+        customDomains: { orderBy: { createdAt: 'asc' } },
         projects: {
           where: { deletedAt: null, status: 'Published' },
           orderBy: { createdAt: 'desc' },
@@ -297,6 +304,95 @@ export class UserService {
         orderBy: { createdAt: 'asc' },
       });
     });
+  }
+
+  // ─── Custom Domains ──────────────────────────────────────────────────────────
+
+  private static readonly ROOT_DOMAIN = process.env.ROOT_DOMAIN || 'betaversion.io';
+
+  async addCustomDomain(userId: string, dto: AddCustomDomainInput) {
+    const existing = await this.prisma.customDomain.findUnique({
+      where: { domain: dto.domain },
+    });
+
+    if (existing) {
+      throw new ConflictException('This domain is already registered');
+    }
+
+    return this.prisma.customDomain.create({
+      data: {
+        userId,
+        domain: dto.domain,
+      },
+    });
+  }
+
+  async removeCustomDomain(userId: string, domainId: string) {
+    const domain = await this.prisma.customDomain.findUnique({
+      where: { id: domainId },
+    });
+
+    if (!domain || domain.userId !== userId) {
+      throw new NotFoundException('Domain not found');
+    }
+
+    await this.prisma.customDomain.delete({ where: { id: domainId } });
+  }
+
+  async verifyCustomDomain(userId: string, domainId: string) {
+    const record = await this.prisma.customDomain.findUnique({
+      where: { id: domainId },
+      include: { user: { select: { username: true } } },
+    });
+
+    if (!record || record.userId !== userId) {
+      throw new NotFoundException('Domain not found');
+    }
+
+    if (record.verified) {
+      return { verified: true, domain: record.domain };
+    }
+
+    const targetCname = `${record.user.username}.${UserService.ROOT_DOMAIN}`;
+
+    // 1. Check CNAME
+    try {
+      const cnames = await dns.resolveCname(record.domain);
+      const match = cnames.some(
+        (c) => c.replace(/\.$/, '').toLowerCase() === targetCname.toLowerCase(),
+      );
+      if (match) {
+        await this.prisma.customDomain.update({
+          where: { id: domainId },
+          data: { verified: true },
+        });
+        return { verified: true, domain: record.domain };
+      }
+    } catch {
+      // No CNAME found, try A record fallback
+    }
+
+    // 2. Check A record — resolve both the custom domain and our target,
+    //    then compare IPs
+    try {
+      const [domainIps, targetIps] = await Promise.all([
+        dns.resolve4(record.domain),
+        dns.resolve4(targetCname),
+      ]);
+      const targetSet = new Set(targetIps);
+      const match = domainIps.some((ip) => targetSet.has(ip));
+      if (match) {
+        await this.prisma.customDomain.update({
+          where: { id: domainId },
+          data: { verified: true },
+        });
+        return { verified: true, domain: record.domain };
+      }
+    } catch {
+      // DNS resolution failed
+    }
+
+    return { verified: false, domain: record.domain };
   }
 
   private excludePassword<T extends Record<string, unknown>>(

@@ -39,9 +39,12 @@ export {
 } from "@/features/feed";
 export {
   useMyFullProfile,
+  useAddCustomDomain,
+  useVerifyCustomDomain,
+  useRemoveCustomDomain,
   profileKeys,
 } from "./use-profile-queries";
-export type { FullProfile } from "./use-profile-queries";
+export type { FullProfile, CustomDomain } from "./use-profile-queries";
 export {
   useFollowCounts,
   useFollowStatus,
@@ -75,7 +78,6 @@ export {
   useCreateBlog,
   useUpdateBlog,
   useDeleteBlog,
-  useRecordBlogView,
   useToggleBlogVote,
   useBlogComments,
   useCreateBlogComment,

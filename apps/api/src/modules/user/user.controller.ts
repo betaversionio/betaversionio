@@ -1,4 +1,15 @@
-import { Controller, Get, Patch, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ProjectService } from '../project/project.service';
 import {
   updateProfileSchema,
@@ -7,6 +18,7 @@ import {
   updateEducationSchema,
   updateExperienceSchema,
   updateServicesSchema,
+  addCustomDomainSchema,
   paginationSchema,
   respondInvitationSchema,
 } from '@betaversionio/shared';
@@ -17,6 +29,7 @@ import type {
   UpdateEducationInput,
   UpdateExperienceInput,
   UpdateServicesInput,
+  AddCustomDomainInput,
 } from '@betaversionio/shared';
 
 import { Public } from '../../common/decorators/public.decorator';
@@ -87,6 +100,35 @@ export class UserController {
     @Body(new ZodValidationPipe(updateServicesSchema)) dto: UpdateServicesInput,
   ) {
     return this.userService.updateServices(userId, dto);
+  }
+
+  // ─── Custom Domains ──────────────────────────────────────────────────────────
+
+  @Post('me/domains')
+  @HttpCode(HttpStatus.CREATED)
+  async addDomain(
+    @CurrentUser('id') userId: string,
+    @Body(new ZodValidationPipe(addCustomDomainSchema)) dto: AddCustomDomainInput,
+  ) {
+    return this.userService.addCustomDomain(userId, dto);
+  }
+
+  @Post('me/domains/:domainId/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyDomain(
+    @CurrentUser('id') userId: string,
+    @Param('domainId') domainId: string,
+  ) {
+    return this.userService.verifyCustomDomain(userId, domainId);
+  }
+
+  @Delete('me/domains/:domainId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeDomain(
+    @CurrentUser('id') userId: string,
+    @Param('domainId') domainId: string,
+  ) {
+    await this.userService.removeCustomDomain(userId, domainId);
   }
 
   @Get('me/invitations')

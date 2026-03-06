@@ -25,6 +25,7 @@ import {
   updateExperienceSchema,
   serviceItemSchema,
   updateServicesSchema,
+  addCustomDomainSchema,
 } from "../schemas/user";
 
 import {
@@ -105,6 +106,7 @@ export type ExperienceItemInput = z.infer<typeof experienceItemSchema>;
 export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>;
 export type ServiceItemInput = z.infer<typeof serviceItemSchema>;
 export type UpdateServicesInput = z.infer<typeof updateServicesSchema>;
+export type AddCustomDomainInput = z.infer<typeof addCustomDomainSchema>;
 
 // ─── Project Types ───────────────────────────────────────────────────────────
 

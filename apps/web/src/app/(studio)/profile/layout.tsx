@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { AuthGuard } from '@/components/layout/auth-guard';
 import { SidebarProvider } from '@/components/layout/sidebar/sidebar-context';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { ProfileEditSidebar } from '@/features/profile';
@@ -47,28 +46,26 @@ export default function ProfileEditLayout({
   const meta = tabMeta[pathname] ?? { title: 'Profile', description: '' };
 
   return (
-    <AuthGuard>
-      <SidebarProvider>
-        <div className="fixed inset-0 flex bg-background">
-          <ProfileEditSidebar />
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-            <DashboardHeader />
-            <main className="flex-1 overflow-y-auto px-4 pb-10 pt-20 md:px-6 md:pb-12 md:pt-20 lg:px-8 lg:pb-16 lg:pt-22">
-              <div className="mx-auto max-w-3xl">
-                <div className="mb-8">
-                  <h1 className="text-2xl font-semibold tracking-tight">
-                    {meta.title}
-                  </h1>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {meta.description}
-                  </p>
-                </div>
-                {children}
+    <SidebarProvider>
+      <div className="fixed inset-0 flex bg-background">
+        <ProfileEditSidebar />
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+          <DashboardHeader />
+          <main className="flex-1 overflow-y-auto px-4 pb-10 pt-20 md:px-6 md:pb-12 md:pt-20 lg:px-8 lg:pb-16 lg:pt-22">
+            <div className="mx-auto max-w-3xl">
+              <div className="mb-8">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  {meta.title}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {meta.description}
+                </p>
               </div>
-            </main>
-          </div>
+              {children}
+            </div>
+          </main>
         </div>
-      </SidebarProvider>
-    </AuthGuard>
+      </div>
+    </SidebarProvider>
   );
 }

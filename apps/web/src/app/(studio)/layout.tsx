@@ -2,7 +2,7 @@
 
 import { AuthGuard } from '@/components/layout/auth-guard';
 
-export default function ProjectCreateLayout({
+export default function StudioLayout({
   children,
 }: {
   children: React.ReactNode;
