@@ -2,7 +2,8 @@
 
 import { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { parseAsString, useQueryState } from 'nuqs';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@betaversionio/shared';
@@ -23,14 +24,15 @@ import { Loader2, Mail } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [callbackUrl] = useQueryState(
+    'callbackUrl',
+    parseAsString.withDefault('/feed'),
+  );
   const { loginWithGithub, loginWithGoogle } = useAuth();
   const loginMutation = useLogin();
   const resendMutation = useResendVerification();
   const { toast } = useToast();
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-
-  const callbackUrl = searchParams.get('callbackUrl') || '/feed';
 
   async function handleGithubLogin() {
     try {

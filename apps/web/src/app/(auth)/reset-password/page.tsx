@@ -2,7 +2,8 @@
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { parseAsString, useQueryState } from 'nuqs';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -31,8 +32,7 @@ type ResetFormInput = z.infer<typeof resetFormSchema>;
 
 function ResetPasswordContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const [token] = useQueryState('token', parseAsString);
   const resetMutation = useResetPassword();
   const { toast } = useToast();
 

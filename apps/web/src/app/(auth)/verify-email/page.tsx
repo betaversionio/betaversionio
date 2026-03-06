@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { parseAsString, useQueryState } from 'nuqs';
 import { useVerifyEmail, useResendVerification } from '@/features/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -11,8 +12,7 @@ import { Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
 
 function VerifyEmailContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const [token] = useQueryState('token', parseAsString);
   const verifyMutation = useVerifyEmail();
   const resendMutation = useResendVerification();
   const { toast } = useToast();

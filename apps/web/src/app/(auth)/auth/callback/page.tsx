@@ -1,14 +1,15 @@
 "use client";
 
 import { Suspense, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useQueryClient } from "@tanstack/react-query";
 import { authKeys } from "@/features/auth";
 import { Loader2 } from "lucide-react";
 
 function OAuthCallbackHandler() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [success] = useQueryState("success", parseAsString);
   const queryClient = useQueryClient();
   const hasProcessed = useRef(false);
 
@@ -18,8 +19,6 @@ function OAuthCallbackHandler() {
 
     async function handleCallback() {
       try {
-        const success = searchParams.get("success");
-
         if (!success) {
           router.push("/login?error=auth_failed");
           return;
@@ -34,7 +33,7 @@ function OAuthCallbackHandler() {
     }
 
     handleCallback();
-  }, [router, searchParams, queryClient]);
+  }, [router, success, queryClient]);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4 py-12">
