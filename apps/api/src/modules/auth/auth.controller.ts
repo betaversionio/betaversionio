@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
@@ -213,7 +214,7 @@ export class AuthController {
       (req.cookies?.[REFRESH_TOKEN_COOKIE] as string) || bodyRefreshToken;
 
     if (!refreshToken) {
-      throw new Error('Refresh token is required');
+      throw new UnauthorizedException('Refresh token is required');
     }
 
     // Decode the refresh token to extract userId
@@ -225,7 +226,7 @@ export class AuthController {
       };
       userId = payload.sub;
     } catch {
-      throw new Error('Invalid refresh token');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     const result = await this.authService.refreshTokens(refreshToken, userId);
