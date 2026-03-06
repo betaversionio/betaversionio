@@ -1,0 +1,78 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: betaversionio
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      target: api
+    restart: unless-stopped
+    expose:
+      - "4000"
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/betaversionio?schema=public
+      NODE_ENV: production
+      PORT: 4000
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+
+  nginx-api:
+    build:
+      context: ./nginx
+      args:
+        CONF_FILE: api.conf
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  nginx-web:
+    build:
+      context: ./nginx
+      args:
+        CONF_FILE: web.conf
+    restart: unless-stopped
+    ports:
+      - "81:80"
+    depends_on:
+      - web
+
+volumes:
+  pgdata:

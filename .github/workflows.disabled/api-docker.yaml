@@ -1,0 +1,38 @@
+name: API CI (Docker)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api/**'
+      - 'packages/database/**'
+      - 'packages/shared/**'
+      - 'packages/config/typescript/**'
+      - 'pnpm-lock.yaml'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, main-runner]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Environment File
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          echo "${{ env.PROD_ENV_FILE }}" | sed 's/\\n/\n/g' > .env
+
+      - name: Build and Deploy API
+        run: |
+          docker compose build api
+          docker compose up -d api
+          docker image prune -f

@@ -1,0 +1,64 @@
+name: API CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api/**'
+      - 'packages/database/**'
+      - 'packages/shared/**'
+      - 'packages/config/typescript/**'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, main-runner]
+
+    strategy:
+      matrix:
+        node-version: [23.x]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/api
+            packages/database
+            packages/shared
+            packages/config/typescript
+            pnpm-workspace.yaml
+            pnpm-lock.yaml
+            package.json
+            turbo.json
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --filter=@betaversionio/api...
+
+      - name: Set up Environment File
+        env:
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          echo "${{ env.PROD_ENV_FILE }}" | sed 's/\\n/\n/g' > .env
+
+      - name: Set up GitHub App Private Key
+        env:
+          GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+        run: |
+          echo "$GH_APP_PRIVATE_KEY" > github-app.pem
+          chmod 600 github-app.pem
+          echo 'GITHUB_APP_PRIVATE_KEY_PATH="'$(pwd)'/github-app.pem"' >> .env
+
+      - name: Build Application
+        run: pnpm turbo build --filter=@betaversionio/api...
+
+      - name: Push Database Schema
+        run: pnpm db:push
+
+      - name: Start Application
+        run: pm2 delete "betaversionio-api" || true && pm2 start pnpm --name "betaversionio-api" -- run --filter @betaversionio/api start:prod
