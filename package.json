@@ -33,7 +33,8 @@
       "bcrypt",
       "esbuild",
       "@nestjs/core",
-      "sharp"
+      "sharp",
+      "@swc/core"
     ]
   }
 }
