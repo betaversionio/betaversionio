@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
 
@@ -50,33 +50,61 @@
 }
 
 @keyframes accordion-down {
-  from { height: 0; }
-  to { height: var(--radix-accordion-content-height); }
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
 }
 
 @keyframes accordion-up {
-  from { height: var(--radix-accordion-content-height); }
-  to { height: 0; }
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
 }
 
 @keyframes spotlight {
-  0% { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
-  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
 }
 
 @keyframes fade-up {
-  0% { opacity: 0; transform: translateY(24px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* CSS custom properties for light/dark mode */
@@ -96,7 +124,7 @@
   --accent: 0 0% 96.1%;
   --accent-foreground: 0 0% 9%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: var(--color-red-800);
+  --destructive-foreground: 0 0% 100%;
   --border: 0 0% 93%;
   --input: 0 0% 89.8%;
   --ring: 222 100% 59%;
@@ -128,7 +156,7 @@
   --accent: 0 0% 14.9%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: var(--color-red-600);
+  --destructive-foreground: 0 0% 100%;
   --border: 0 0% 10%;
   --input: 0 0% 14.9%;
   --ring: 222 100% 65%;
