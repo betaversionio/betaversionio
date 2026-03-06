@@ -36,7 +36,7 @@ export default function FeedPage() {
         {/* Feed */}
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : allPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-16 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.04)]">
@@ -61,7 +61,7 @@ export default function FeedPage() {
 
             <div ref={loadMoreRef} className="py-6 text-center">
               {isFetchingNextPage ? (
-                <Loader2 className="h-16 w-16 animate-spin text-muted-foreground" />
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               ) : hasNextPage ? (
                 <p className="text-xs text-muted-foreground/60">
                   Scroll for more

@@ -12,7 +12,7 @@ import type { FullProfile } from '@/hooks/queries';
 import { formatDateRange } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldLabel } from '@/components/ui/field';
@@ -245,10 +245,12 @@ export function EducationSection({
 
         <Field>
           <FieldLabel>Description</FieldLabel>
-          <Textarea
+          <MarkdownEditor
+            value={form.watch('description') ?? ''}
+            onChange={(val) => form.setValue('description', val, { shouldDirty: true })}
             placeholder="Activities, achievements, etc."
-            rows={3}
-            {...form.register('description')}
+            height={150}
+            outputFormat="markdown"
           />
         </Field>
       </FormDialog>

@@ -20,6 +20,27 @@ import {
 import { GitHubImportDialog } from "./github-import-dialog";
 import { GitHubPushDialog } from "./github-push-dialog";
 
+// Module-level PDF cache — persists across navigations within the same session.
+// Key: "resumeId\0latexSource", Value: blob URL.
+const MAX_PDF_CACHE = 10;
+const pdfCache = new Map<string, string>();
+
+function getCachedPdf(resumeId: string, source: string): string | undefined {
+  return pdfCache.get(`${resumeId}\0${source}`);
+}
+
+function setCachedPdf(resumeId: string, source: string, url: string) {
+  const key = `${resumeId}\0${source}`;
+  // Evict oldest entry if at capacity
+  if (pdfCache.size >= MAX_PDF_CACHE && !pdfCache.has(key)) {
+    const oldest = pdfCache.keys().next().value!;
+    const oldUrl = pdfCache.get(oldest)!;
+    URL.revokeObjectURL(oldUrl);
+    pdfCache.delete(oldest);
+  }
+  pdfCache.set(key, url);
+}
+
 interface ResumeEditorLayoutProps {
   resumeId: string;
   title: string;
@@ -39,6 +60,7 @@ export function ResumeEditorLayout({
   initialGithubPath,
   initialGithubSha,
 }: ResumeEditorLayoutProps) {
+  const [resumeTitle, setResumeTitle] = useState(title);
   const [latexSource, setLatexSource] = useState(initialSource);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -56,30 +78,49 @@ export function ResumeEditorLayout({
   const generatePdf = useGeneratePdf(resumeId);
   const { toast } = useToast();
 
-  // Load last published PDF as blob to avoid CORS issues with R2
+  // Compile with module-level cache — skips server call if content unchanged
+  const compileCached = useCallback(
+    async (source: string): Promise<string> => {
+      const cached = getCachedPdf(resumeId, source);
+      if (cached) return cached;
+
+      const blob = await compileResume.mutateAsync(source);
+      const url = URL.createObjectURL(blob);
+      setCachedPdf(resumeId, source, url);
+      return url;
+    },
+    [resumeId, compileResume],
+  );
+
+  // Auto-compile current LaTeX source on mount to show the latest PDF
   useEffect(() => {
-    if (!initialPdfUrl) return;
+    if (!initialSource.trim()) return;
     let cancelled = false;
 
-    fetch(`/api/pdf-proxy?url=${encodeURIComponent(initialPdfUrl)}`)
-      .then((res) => (res.ok ? res.blob() : null))
-      .then((blob) => {
-        if (cancelled || !blob) return;
-        const url = URL.createObjectURL(blob);
+    compileCached(initialSource)
+      .then((url) => {
+        if (cancelled) return;
         pdfUrlRef.current = url;
         setPdfUrl(url);
       })
-      .catch(() => {});
+      .catch(() => {
+        // Compilation failed on load — fall back to last published PDF if available
+        if (cancelled || !initialPdfUrl) return;
+        fetch(`/api/pdf-proxy?url=${encodeURIComponent(initialPdfUrl)}`)
+          .then((res) => (res.ok ? res.blob() : null))
+          .then((blob) => {
+            if (cancelled || !blob) return;
+            const url = URL.createObjectURL(blob);
+            pdfUrlRef.current = url;
+            setPdfUrl(url);
+          })
+          .catch(() => {});
+      });
 
     return () => { cancelled = true; };
-  }, [initialPdfUrl]);
-
-  // Cleanup blob URL on unmount
-  useEffect(() => {
-    return () => {
-      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
-    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handleSave = useCallback(async () => {
     try {
@@ -115,9 +156,11 @@ export function ResumeEditorLayout({
   const handleCompile = useCallback(async () => {
     setErrors([]);
     try {
-      const blob = await compileResume.mutateAsync(latexSource);
-      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
-      const url = URL.createObjectURL(blob);
+      const url = await compileCached(latexSource);
+      // Only revoke if switching to a different blob URL (not the cached one)
+      if (pdfUrlRef.current && pdfUrlRef.current !== url) {
+        // Don't revoke — it's still in the cache for reuse
+      }
       pdfUrlRef.current = url;
       setPdfUrl(url);
     } catch (err) {
@@ -134,7 +177,7 @@ export function ResumeEditorLayout({
       }
       setErrors([msg]);
     }
-  }, [latexSource, compileResume]);
+  }, [latexSource, compileCached]);
 
   async function handlePublish() {
     // Save first if dirty
@@ -168,7 +211,7 @@ export function ResumeEditorLayout({
     if (!pdfUrl) return;
     const a = document.createElement("a");
     a.href = pdfUrl;
-    a.download = `${title || "resume"}.pdf`;
+    a.download = `${resumeTitle || "resume"}.pdf`;
     a.click();
   }
 
@@ -214,7 +257,7 @@ export function ResumeEditorLayout({
   return (
     <div className="flex h-full flex-col">
       <ResumeToolbar
-        title={title}
+        title={resumeTitle}
         isDirty={isDirty}
         isCompiling={compileResume.isPending}
         isSaving={updateResume.isPending}
@@ -225,6 +268,10 @@ export function ResumeEditorLayout({
         onSave={handleSave}
         onDownloadPdf={handleDownloadPdf}
         onPublish={handlePublish}
+        onTitleChange={(newTitle) => {
+          setResumeTitle(newTitle);
+          updateResume.mutate({ title: newTitle });
+        }}
         onGitHubImport={() => setShowImport(true)}
         onGitHubPush={() => setShowPush(true)}
       />

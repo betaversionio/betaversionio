@@ -18,6 +18,7 @@ import {
   useDeleteResume,
   useSetPrimaryResume,
   useUnsetPrimaryResume,
+  useCompileResume,
   type Resume,
 } from '@/hooks/queries';
 import { useToast } from '@/hooks/use-toast';
@@ -46,6 +47,7 @@ import {
   ExternalLink,
   Link2,
   History,
+  Download,
 } from 'lucide-react';
 
 dayjs.extend(relativeTime);
@@ -55,9 +57,28 @@ function ActionsCell({ resume }: { resume: Resume }) {
   const deleteResume = useDeleteResume();
   const setPrimary = useSetPrimaryResume();
   const unsetPrimary = useUnsetPrimaryResume();
+  const compileResume = useCompileResume(resume.id);
   const { toast } = useToast();
 
   const latestVersion = resume.versions[0];
+
+  async function handleDownloadPdf() {
+    if (!resume.latexSource) {
+      toast({ title: 'No LaTeX source to compile', variant: 'destructive' });
+      return;
+    }
+    try {
+      const blob = await compileResume.mutateAsync(resume.latexSource);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${resume.title || 'resume'}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast({ title: 'Failed to compile PDF', variant: 'destructive' });
+    }
+  }
 
   async function handleDelete() {
     try {
@@ -152,6 +173,25 @@ function ActionsCell({ resume }: { resume: Resume }) {
             </Tooltip>
           </>
         )}
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleDownloadPdf}
+              disabled={compileResume.isPending || !resume.latexSource}
+            >
+              {compileResume.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Download PDF</TooltipContent>
+        </Tooltip>
 
         {resume.versions.length > 0 && (
           <Tooltip>

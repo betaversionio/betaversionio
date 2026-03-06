@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Markdown } from '@/components/ui/markdown';
 import { Edit2, Trash } from 'iconsax-react';
 
 interface ItemCardProps {
@@ -84,9 +85,9 @@ export function ItemCard({
         )}
 
         {description && (
-          <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
-            {description}
-          </p>
+          <div className="mt-1.5 line-clamp-2">
+            <Markdown content={description} size="sm" />
+          </div>
         )}
       </div>
     </div>

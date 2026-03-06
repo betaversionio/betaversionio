@@ -1,121 +1,127 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Code1,
+  DocumentText,
+  People,
+  Setting2,
+  MessageQuestion,
+  Shield,
+} from 'iconsax-react';
 
-const trendingTopics = [
-  { tag: 'react', posts: 1243 },
-  { tag: 'nextjs', posts: 892 },
-  { tag: 'typescript', posts: 756 },
-  { tag: 'rust', posts: 534 },
-  { tag: 'ai', posts: 1891 },
+const exploreTags = [
+  'javascript',
+  'typescript',
+  'react',
+  'nextjs',
+  'nodejs',
+  'python',
+  'rust',
+  'go',
+  'devops',
+  'ai',
+  'opensource',
+  'webdev',
 ];
 
-const topArticles = [
-  {
-    title: 'Building Scalable APIs with NestJS',
-    author: 'Sarah Chen',
-    reads: '2.4k',
-  },
-  {
-    title: 'Why Rust is the Future of Systems Programming',
-    author: 'Alex Rivera',
-    reads: '1.8k',
-  },
-  {
-    title: 'Understanding React Server Components',
-    author: 'Priya Sharma',
-    reads: '3.1k',
-  },
-  {
-    title: 'The State of CSS in 2026',
-    author: 'Jordan Lee',
-    reads: '1.2k',
-  },
+const quickLinks = [
+  { label: 'My Projects', href: '/projects', icon: Code1 },
+  { label: 'My Blog', href: '/blog', icon: DocumentText },
+  { label: 'Community', href: '/community', icon: People },
+  { label: 'Settings', href: '/settings', icon: Setting2 },
 ];
 
-const suggestedDevs = [
-  { name: 'Emily Zhang', username: 'emilyzhang', role: 'Full-Stack Dev' },
-  { name: 'Marcus Cole', username: 'marcuscole', role: 'DevOps Engineer' },
-  { name: 'Aisha Patel', username: 'aishap', role: 'ML Engineer' },
+const footerLinks = [
+  { label: 'Help', href: '/help' },
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
 ];
 
 export function FeedSidebar() {
   return (
     <div className="space-y-4">
-      {/* Trending Topics */}
+      {/* Explore Tags */}
       <Card className="rounded-xl p-4">
-        <h3 className="mb-3 text-sm font-semibold">Trending Topics</h3>
-        <div className="space-y-2.5">
-          {trendingTopics.map((topic) => (
-            <div key={topic.tag} className="flex items-center justify-between">
-              <span className="text-sm font-medium text-primary">
-                #{topic.tag}
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                {topic.posts} posts
-              </span>
-            </div>
+        <h3 className="mb-3 text-sm font-semibold">Explore Topics</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {exploreTags.map((tag) => (
+            <span
+              key={tag}
+              className="cursor-pointer rounded-full border bg-muted/50 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+            >
+              #{tag}
+            </span>
           ))}
         </div>
       </Card>
 
-      {/* Top Articles */}
+      {/* Quick Links */}
       <Card className="rounded-xl p-4">
-        <h3 className="mb-3 text-sm font-semibold">Top Articles</h3>
-        <div className="space-y-3">
-          {topArticles.map((article) => (
-            <div key={article.title} className="group cursor-pointer">
-              <p className="text-sm font-medium leading-snug group-hover:text-primary">
-                {article.title}
-              </p>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
-                {article.author} &middot; {article.reads} reads
-              </p>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Suggested Developers */}
-      <Card className="rounded-xl p-4">
-        <h3 className="mb-3 text-sm font-semibold">Developers to Follow</h3>
-        <div className="space-y-3">
-          {suggestedDevs.map((dev) => (
-            <div key={dev.username} className="flex items-center gap-2.5">
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="text-[10px]">
-                  {dev.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{dev.name}</p>
-                <p className="truncate text-[11px] text-muted-foreground">
-                  {dev.role}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 shrink-0 rounded-full px-3 text-[11px]"
+        <h3 className="mb-3 text-sm font-semibold">Quick Links</h3>
+        <div className="space-y-1">
+          {quickLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
               >
-                Follow
-              </Button>
-            </div>
-          ))}
+                <Icon size={16} color="currentColor" />
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       </Card>
 
-      {/* Footer links */}
+      {/* Community Guidelines */}
+      <Card className="rounded-xl p-4">
+        <h3 className="mb-3 text-sm font-semibold">Community</h3>
+        <div className="space-y-2.5 text-xs leading-relaxed text-muted-foreground">
+          <div className="flex gap-2">
+            <MessageQuestion
+              size={14}
+              color="currentColor"
+              className="mt-0.5 shrink-0"
+            />
+            <p>
+              Share your work, ask questions, and help others grow as
+              developers.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Shield
+              size={14}
+              color="currentColor"
+              className="mt-0.5 shrink-0"
+            />
+            <p>
+              Be respectful and constructive. We&apos;re all here to learn and
+              build together.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Footer */}
       <div className="px-1">
-        <p className="text-[10px] leading-relaxed text-muted-foreground/50">
-          About &middot; Help &middot; Privacy &middot; Terms &middot;
-          Advertising &middot; BetaVersion.IO &copy; {new Date().getFullYear()}
-        </p>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          {footerLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[10px] text-muted-foreground/50 hover:text-muted-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <span className="text-[10px] text-muted-foreground/50">
+            &middot; DevCom &copy; {new Date().getFullYear()}
+          </span>
+        </div>
       </div>
     </div>
   );

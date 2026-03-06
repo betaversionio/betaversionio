@@ -86,10 +86,9 @@ export async function proxy(request: NextRequest) {
       // routes don't need /{username} in the URL path.
       const headers = new Headers(request.headers);
       headers.set('x-portfolio-username', username);
-      return NextResponse.rewrite(
-        new URL(pathname, templateBaseUrl),
-        { request: { headers } },
-      );
+      const target = new URL(pathname, templateBaseUrl);
+      target.search = request.nextUrl.search;
+      return NextResponse.rewrite(target, { request: { headers } });
     }
 
     // Fallback: built-in portfolio (only for page requests, not static assets)

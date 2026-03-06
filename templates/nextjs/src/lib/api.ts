@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { BetaVersionClient, resolveUsername } from '@betaversionio/portfolio-sdk';
+import { BetaVersionClient } from '@betaversionio/portfolio-sdk';
 
 export type {
   PortfolioUser,
@@ -14,25 +14,34 @@ const API_URL = process.env.BETAVERSION_API_URL ?? 'http://localhost:4000/v1';
 
 export const client = new BetaVersionClient({ apiUrl: API_URL });
 
-/**
- * Read the portfolio username from the x-portfolio-username header
- * set by the proxy, or fall back to PORTFOLIO_USERNAME env var for local dev.
- */
-export async function getUsername(): Promise<string> {
+async function fetchOptions(): Promise<RequestInit> {
   const hdrs = await headers();
-  return resolveUsername({
-    request: new Request('http://localhost', { headers: hdrs }),
-  });
+  const forwarded: Record<string, string> = {};
+
+  const origin = hdrs.get('origin');
+  if (origin) forwarded['origin'] = origin;
+
+  const referer = hdrs.get('referer');
+  if (referer) forwarded['referer'] = referer;
+
+  const host = hdrs.get('host');
+  if (host) forwarded['x-forwarded-host'] = host;
+
+  // Explicit header from proxy or env var fallback for local dev
+  const portfolioHeader = hdrs.get('x-portfolio-username') || process.env.PORTFOLIO_USERNAME;
+  if (portfolioHeader) forwarded['x-portfolio-username'] = portfolioHeader;
+
+  return { headers: forwarded, next: { revalidate: 300 } } as RequestInit;
 }
 
-export async function fetchPortfolio(username: string) {
-  return client.getPortfolio(username, { next: { revalidate: 300 } } as RequestInit);
+export async function fetchPortfolio() {
+  return client.getPortfolio(undefined, await fetchOptions());
 }
 
 export async function fetchProject(slug: string) {
-  return client.getProject(slug, { next: { revalidate: 300 } } as RequestInit);
+  return client.getProject(slug, await fetchOptions());
 }
 
 export async function fetchBlog(slug: string) {
-  return client.getBlog(slug, { next: { revalidate: 300 } } as RequestInit);
+  return client.getBlog(slug, await fetchOptions());
 }

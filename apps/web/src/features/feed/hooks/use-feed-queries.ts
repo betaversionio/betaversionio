@@ -128,6 +128,17 @@ export function useToggleReaction(postId: string) {
   });
 }
 
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => apiClient.delete(`/posts/${postId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: feedKeys.lists() });
+    },
+  });
+}
+
 export function useCreateComment(postId: string) {
   const queryClient = useQueryClient();
 

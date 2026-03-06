@@ -23,26 +23,27 @@ interface MyTemplateCardProps {
 
 export function MyTemplateCard({ template }: MyTemplateCardProps) {
   return (
-    <Card className="group relative flex h-full flex-col transition-shadow hover:shadow-md">
+    <Card className="group relative flex h-full flex-col overflow-hidden transition-shadow hover:shadow-md">
       <Link
         href={`/templates/${template.id}`}
         className="absolute inset-0 z-0"
       />
 
+      {template.previewImage && (
+        <div className="aspect-video w-full overflow-hidden border-b bg-muted">
+          <img
+            src={template.previewImage}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
+
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2.5">
-            {template.previewImage && (
-              <img
-                src={template.previewImage}
-                alt=""
-                className="h-8 w-8 rounded-md object-cover"
-              />
-            )}
-            <CardTitle className="line-clamp-1 text-lg">
-              {template.name}
-            </CardTitle>
-          </div>
+          <CardTitle className="line-clamp-1 text-lg">
+            {template.name}
+          </CardTitle>
           <Badge
             variant="secondary"
             className={statusColors[template.status] ?? ''}

@@ -5,5 +5,6 @@ export {
   useCreatePost,
   useToggleReaction,
   useCreateComment,
+  useDeletePost,
   feedKeys,
 } from "./use-feed-queries";

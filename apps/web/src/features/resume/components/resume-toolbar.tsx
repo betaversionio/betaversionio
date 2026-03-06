@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -38,6 +39,7 @@ interface ResumeToolbarProps {
   onSave: () => void;
   onDownloadPdf: () => void;
   onPublish: () => void;
+  onTitleChange?: (title: string) => void;
   onGitHubImport: () => void;
   onGitHubPush: () => void;
 }
@@ -54,10 +56,35 @@ export function ResumeToolbar({
   onSave,
   onDownloadPdf,
   onPublish,
+  onTitleChange,
   onGitHubImport,
   onGitHubPush,
 }: ResumeToolbarProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setEditedTitle(title);
+  }, [title]);
+
+  useEffect(() => {
+    if (isEditingTitle) {
+      titleInputRef.current?.focus();
+      titleInputRef.current?.select();
+    }
+  }, [isEditingTitle]);
+
+  function commitTitle() {
+    setIsEditingTitle(false);
+    const trimmed = editedTitle.trim();
+    if (trimmed && trimmed !== title) {
+      onTitleChange?.(trimmed);
+    } else {
+      setEditedTitle(title);
+    }
+  }
 
   useEffect(() => {
     function onFsChange() {
@@ -104,7 +131,30 @@ export function ResumeToolbar({
 
         {/* Title + status */}
         <div className="mr-auto flex items-center gap-2 overflow-hidden px-1">
-          <h2 className="truncate text-sm font-semibold">{title}</h2>
+          {isEditingTitle ? (
+            <Input
+              ref={titleInputRef}
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={commitTitle}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') commitTitle();
+                if (e.key === 'Escape') {
+                  setEditedTitle(title);
+                  setIsEditingTitle(false);
+                }
+              }}
+              className="h-7 w-48 text-sm font-semibold"
+            />
+          ) : (
+            <h2
+              className="cursor-pointer truncate text-sm font-semibold hover:text-muted-foreground"
+              onClick={() => setIsEditingTitle(true)}
+              title="Click to rename"
+            >
+              {title}
+            </h2>
+          )}
           {isDirty ? (
             <Badge
               variant="outline"

@@ -6,6 +6,7 @@ export {
   useCreatePost,
   useToggleReaction,
   useCreateComment,
+  useDeletePost,
   feedKeys,
 } from "./hooks";
 export type { PostData } from "./types";
