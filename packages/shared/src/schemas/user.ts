@@ -1,12 +1,17 @@
-import { z } from "zod";
-import { SocialPlatformSchema, TechCategorySchema, ProficiencySchema, EmploymentTypeSchema } from "../constants/enums";
-import { BIO } from "../constants/limits";
+import { z } from 'zod';
+import {
+  SocialPlatformSchema,
+  TechCategorySchema,
+  ProficiencySchema,
+  EmploymentTypeSchema,
+} from '../constants/enums';
+import { BIO } from '../constants/limits';
 
 export const updateProfileSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
-    .max(100, "Name must be at most 100 characters")
+    .min(1, 'Name is required')
+    .max(100, 'Name must be at most 100 characters')
     .optional(),
   bio: z
     .string()
@@ -14,19 +19,21 @@ export const updateProfileSchema = z.object({
     .optional(),
   headline: z
     .string()
-    .max(150, "Headline must be at most 150 characters")
+    .max(150, 'Headline must be at most 150 characters')
     .optional(),
   location: z
     .string()
-    .max(100, "Location must be at most 100 characters")
+    .max(100, 'Location must be at most 100 characters')
     .optional(),
-  avatarUrl: z.string().url("Invalid avatar URL").optional(),
-  website: z.string().url("Invalid website URL").optional(),
+  avatarUrl: z.url('Invalid avatar URL').optional(),
+  website: z
+    .union([z.url('Invalid URL'), z.literal(''), z.null()])
+    .optional(),
 });
 
 export const socialLinkSchema = z.object({
   platform: SocialPlatformSchema,
-  url: z.string().url("Invalid URL"),
+  url: z.string().url('Invalid URL'),
 });
 
 export const updateSocialLinksSchema = z.object({
@@ -34,7 +41,7 @@ export const updateSocialLinksSchema = z.object({
 });
 
 export const techStackItemSchema = z.object({
-  name: z.string().min(1, "Technology name is required").max(50),
+  name: z.string().min(1, 'Technology name is required').max(50),
   category: TechCategorySchema,
   proficiency: ProficiencySchema,
 });
@@ -46,10 +53,10 @@ export const updateTechStackSchema = z.object({
 // ─── Education ──────────────────────────────────────────────────────────────
 
 export const educationItemSchema = z.object({
-  institution: z.string().min(1, "Institution is required").max(200),
-  degree: z.string().min(1, "Degree is required").max(200),
+  institution: z.string().min(1, 'Institution is required').max(200),
+  degree: z.string().min(1, 'Degree is required').max(200),
   fieldOfStudy: z.string().max(200).optional(),
-  startDate: z.string().min(1, "Start date is required"),
+  startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().optional(),
   current: z.boolean(),
   description: z.string().max(2000).optional(),
@@ -62,11 +69,11 @@ export const updateEducationSchema = z.object({
 // ─── Experience ─────────────────────────────────────────────────────────────
 
 export const experienceItemSchema = z.object({
-  company: z.string().min(1, "Company is required").max(200),
-  position: z.string().min(1, "Position is required").max(200),
+  company: z.string().min(1, 'Company is required').max(200),
+  position: z.string().min(1, 'Position is required').max(200),
   location: z.string().max(200).optional(),
   employmentType: EmploymentTypeSchema,
-  startDate: z.string().min(1, "Start date is required"),
+  startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().optional(),
   current: z.boolean(),
   description: z.string().max(2000).optional(),
@@ -79,7 +86,7 @@ export const updateExperienceSchema = z.object({
 // ─── Services ───────────────────────────────────────────────────────────────
 
 export const serviceItemSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100),
+  title: z.string().min(1, 'Title is required').max(100),
   description: z.string().max(500).optional(),
 });
 
@@ -89,13 +96,22 @@ export const updateServicesSchema = z.object({
 
 // ─── Custom Domains ─────────────────────────────────────────────────────────
 
-const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+const domainRegex =
+  /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 export const addCustomDomainSchema = z.object({
   domain: z
     .string()
-    .min(1, "Domain is required")
-    .max(253, "Domain is too long")
-    .transform((d) => d.toLowerCase().replace(/^https?:\/\//, "").replace(/\/+$/, ""))
-    .refine((d) => domainRegex.test(d), "Invalid domain format (e.g. portfolio.example.com)"),
+    .min(1, 'Domain is required')
+    .max(253, 'Domain is too long')
+    .transform((d) =>
+      d
+        .toLowerCase()
+        .replace(/^https?:\/\//, '')
+        .replace(/\/+$/, ''),
+    )
+    .refine(
+      (d) => domainRegex.test(d),
+      'Invalid domain format (e.g. portfolio.example.com)',
+    ),
 });

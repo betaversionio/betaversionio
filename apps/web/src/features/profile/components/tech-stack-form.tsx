@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -29,8 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field } from '@/components/ui/field';
 import { Plus, Trash2 } from 'lucide-react';
+import StackIcon from 'tech-stack-icons';
+import { useTheme } from 'next-themes';
+import { ALIASES, getTechIconName } from '@/lib/tech-icons';
+
+const ALL_TECHS = Object.keys(ALIASES);
 
 interface TechStackFormProps {
   initialData?: Array<{
@@ -38,6 +43,98 @@ interface TechStackFormProps {
     category: string;
     proficiency: string;
   }>;
+}
+
+function TechNameInput({
+  value,
+  onChange,
+  onBlur,
+  name,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+  name: string;
+}) {
+  const { resolvedTheme } = useTheme();
+  const variant = resolvedTheme === 'dark' ? 'dark' : 'light';
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+
+  const suggestions = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.toLowerCase();
+    return ALL_TECHS.filter((t) => t.includes(q)).slice(0, 6);
+  }, [query]);
+
+  function selectTech(tech: string) {
+    setQuery(tech);
+    onChange(tech);
+    setOpen(false);
+    inputRef.current?.focus();
+  }
+
+  const iconName = getTechIconName(value);
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        {iconName && (
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 inline-flex h-4 w-4 shrink-0">
+            <StackIcon name={iconName} variant={variant} />
+          </span>
+        )}
+        <Input
+          ref={inputRef}
+          placeholder="React"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            onChange(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => query.trim() && setOpen(true)}
+          onBlur={() => {
+            setTimeout(() => setOpen(false), 200);
+            onBlur();
+          }}
+          className={iconName ? 'pl-9' : undefined}
+          name={name}
+        />
+      </div>
+
+      {open && suggestions.length > 0 && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover p-1 shadow-md">
+          {suggestions.map((tech) => {
+            const icon = getTechIconName(tech);
+            return (
+              <button
+                key={tech}
+                type="button"
+                className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  selectTech(tech);
+                }}
+              >
+                {icon && (
+                  <span className="inline-flex h-4 w-4 shrink-0">
+                    <StackIcon name={icon} variant={variant} />
+                  </span>
+                )}
+                {tech}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function TechStackForm({ initialData }: TechStackFormProps = {}) {
@@ -111,14 +208,14 @@ export function TechStackForm({ initialData }: TechStackFormProps = {}) {
           {techFields.map((field, index) => (
             <div key={field.id} className="flex items-end gap-3">
               <Field className="flex-1">
-                <FieldLabel>Name</FieldLabel>
-                <Input
-                  placeholder="React"
-                  {...form.register(`items.${index}.name`)}
+                <TechNameInput
+                  value={form.watch(`items.${index}.name`)}
+                  onChange={(val) => form.setValue(`items.${index}.name`, val)}
+                  onBlur={() => form.trigger(`items.${index}.name`)}
+                  name={`items.${index}.name`}
                 />
               </Field>
               <Field className="w-36">
-                <FieldLabel>Category</FieldLabel>
                 <Select
                   value={form.watch(`items.${index}.category`)}
                   onValueChange={(value) =>
@@ -141,7 +238,6 @@ export function TechStackForm({ initialData }: TechStackFormProps = {}) {
                 </Select>
               </Field>
               <Field className="w-36">
-                <FieldLabel>Proficiency</FieldLabel>
                 <Select
                   value={form.watch(`items.${index}.proficiency`)}
                   onValueChange={(value) =>

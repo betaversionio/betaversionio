@@ -16,7 +16,7 @@ export function TechBadge({ name, className, ...props }: TechBadgeProps) {
   return (
     <Badge className={className} {...props}>
       {iconName && (
-        <span className="inline-flex h-3.5 w-3.5 shrink-0">
+        <span className="mr-1 inline-flex h-3.5 w-3.5 shrink-0">
           <StackIcon
             name={iconName}
             variant={resolvedTheme === 'dark' ? 'dark' : 'light'}

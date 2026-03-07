@@ -40,7 +40,6 @@ export function ProfileForm({ initialData }: ProfileFormProps = {}) {
       name: user?.name ?? '',
       headline: '',
       location: '',
-      website: '',
     },
   });
 
@@ -56,13 +55,8 @@ export function ProfileForm({ initialData }: ProfileFormProps = {}) {
   }, [initialData, user?.name, form]);
 
   const mutation = useMutation({
-    mutationFn: (data: UpdateProfileInput) => {
-      const body: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(data)) {
-        if (value !== '') body[key] = value;
-      }
-      return apiClient.patch('/users/me/profile', body);
-    },
+    mutationFn: (data: UpdateProfileInput) =>
+      apiClient.patch('/users/me/profile', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
       queryClient.invalidateQueries({ queryKey: profileKeys.me() });
