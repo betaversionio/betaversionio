@@ -55,10 +55,9 @@ jobs:
 
       - name: Package Standalone Output
         run: |
-          tar -czf web-standalone.tar.gz \
-            -C apps/web/.next/standalone . \
-            -C ../../../apps/web/.next/static apps/web/.next/static \
-            -C ../../../../apps/web/public apps/web/public
+          cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
+          cp -r apps/web/public apps/web/.next/standalone/apps/web/public
+          tar -czf web-standalone.tar.gz -C apps/web/.next/standalone .
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
