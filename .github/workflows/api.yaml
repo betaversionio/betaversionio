@@ -18,7 +18,7 @@ permissions:
 jobs:
   build-main:
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, main-runner]
+    runs-on: [self-hosted, main-runner, api]
 
     strategy:
       matrix:
@@ -70,4 +70,4 @@ jobs:
         run: pnpm db:push
 
       - name: Start Application
-        run: pm2 delete "betaversionio-api" || true && pm2 start pnpm --name "betaversionio-api" -- run --filter @betaversionio/api start:prod
+        run: pm2 restart "betaversionio-api" || pm2 start pnpm --name "betaversionio-api" -- run --filter @betaversionio/api start:prod

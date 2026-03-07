@@ -9,6 +9,7 @@ on:
       - 'packages/shared/**'
       - 'packages/config/typescript/**'
       - 'pnpm-lock.yaml'
+      - '.github/workflows/web.yaml'
 
 permissions:
   contents: read
@@ -16,7 +17,7 @@ permissions:
 jobs:
   build-main:
     if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, main-runner]
+    runs-on: [self-hosted, main-runner, web]
 
     strategy:
       matrix:
@@ -41,12 +42,11 @@ jobs:
 
       - name: Set up Environment File
         env:
-          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
-        run: |
-          echo "${{ env.PROD_ENV_FILE }}" | sed 's/\\n/\n/g' > .env
+          WEB_ENV_FILE: ${{ secrets.WEB_ENV_FILE }}
+        run: echo "$WEB_ENV_FILE" > apps/web/.env
 
       - name: Build Application
         run: pnpm turbo build --filter=@betaversionio/web...
 
       - name: Start Application
-        run: pm2 delete "betaversionio-web" || true && pm2 start pnpm --name "betaversionio-web" -- run --filter @betaversionio/web start
+        run: pm2 restart "betaversionio-web" || pm2 start pnpm --name "betaversionio-web" -- run --filter @betaversionio/web start
