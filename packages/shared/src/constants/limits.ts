@@ -12,7 +12,7 @@ export const PROJECT_TITLE = {
 } as const;
 
 export const PROJECT_DESCRIPTION = {
-  MAX: 5000,
+  MAX: 15000,
 } as const;
 
 export const POST_CONTENT = {

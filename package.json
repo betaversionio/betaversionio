@@ -19,7 +19,7 @@
     "db:seed": "pnpm --filter @betaversionio/database db:seed",
     "db:studio": "pnpm --filter @betaversionio/database db:studio",
     "clean": "turbo clean && rm -rf node_modules",
-    "publish:portfolio-sdk": "pnpm --filter @betaversionio/portfolio-sdk build && pnpm --filter @betaversionio/portfolio-sdk publish --access public"
+    "publish:portfolio-sdk": "pnpm --filter @betaversionio/portfolio-sdk build && pnpm --filter @betaversionio/portfolio-sdk publish --access public --no-git-checks"
   },
   "devDependencies": {
     "turbo": "^2.8.14",
