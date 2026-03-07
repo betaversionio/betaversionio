@@ -466,6 +466,12 @@ importers:
       '@betaversionio/typescript-config':
         specifier: workspace:*
         version: link:../config/typescript
+      '@swc/cli':
+        specifier: ^0.8.0
+        version: 0.8.0(@swc/core@1.15.18)(chokidar@4.0.3)
+      '@swc/core':
+        specifier: ^1.15.18
+        version: 1.15.18
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

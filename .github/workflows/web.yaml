@@ -15,13 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  build-main:
-    if: github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, main-runner, web]
-
-    strategy:
-      matrix:
-        node-version: [23.x]
+  build:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -34,8 +29,15 @@ jobs:
             pnpm-workspace.yaml
             pnpm-lock.yaml
             package.json
-            turbo.json
             .npmrc
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile --filter=@betaversionio/web...
@@ -45,8 +47,42 @@ jobs:
           WEB_ENV_FILE: ${{ secrets.WEB_ENV_FILE }}
         run: echo "$WEB_ENV_FILE" > apps/web/.env
 
-      - name: Build Application
-        run: pnpm turbo build --filter=@betaversionio/web...
+      - name: Build Shared Package
+        run: pnpm --filter @betaversionio/shared build
+
+      - name: Build Web
+        run: pnpm --filter @betaversionio/web build
+
+      - name: Package Standalone Output
+        run: |
+          tar -czf web-standalone.tar.gz \
+            -C apps/web/.next/standalone . \
+            -C ../../../apps/web/.next/static apps/web/.next/static \
+            -C ../../../../apps/web/public apps/web/public
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-standalone
+          path: web-standalone.tar.gz
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, main-runner, web]
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-standalone
+
+      - name: Extract and Deploy
+        run: |
+          rm -rf ~/web-deploy
+          mkdir -p ~/web-deploy
+          tar -xzf web-standalone.tar.gz -C ~/web-deploy
 
       - name: Start Application
-        run: pm2 restart "betaversionio-web" || pm2 start pnpm --name "betaversionio-web" -- run --filter @betaversionio/web start
+        run: pm2 restart "betaversionio-web" || pm2 start node --name "betaversionio-web" -- ~/web-deploy/apps/web/server.js
