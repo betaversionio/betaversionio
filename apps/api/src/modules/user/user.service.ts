@@ -154,13 +154,17 @@ export class UserService {
 
   async updateProfile(userId: string, dto: UpdateProfileInput) {
     // Separate user-level fields from profile-level fields
-    const { name, ...profileData } = dto;
+    const { name, avatarUrl, ...profileData } = dto;
 
-    // Update name on the User model if provided
-    if (name) {
+    // Update user-level fields (name, avatarUrl)
+    const userData: Record<string, unknown> = {};
+    if (name !== undefined) userData.name = name;
+    if (avatarUrl !== undefined) userData.avatarUrl = avatarUrl;
+
+    if (Object.keys(userData).length > 0) {
       await this.prisma.user.update({
         where: { id: userId },
-        data: { name },
+        data: userData,
       });
     }
 
