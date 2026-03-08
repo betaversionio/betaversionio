@@ -15,7 +15,9 @@ import { BetaVersionClient } from '@betaversionio/portfolio-sdk';
 
 const client = new BetaVersionClient();
 
-const portfolio = await client.getPortfolio('johndoe');
+// Username is optional — when omitted, the API auto-detects the user
+// from the request Origin header / subdomain
+const portfolio = await client.getPortfolio();
 
 if (portfolio) {
   console.log(portfolio.user.name);
@@ -24,99 +26,52 @@ if (portfolio) {
 }
 ```
 
-## Resolving the username
+## Username
 
-The SDK provides a `resolveUsername()` helper that works across frameworks. It checks three sources in order:
+The `username` parameter in `getPortfolio()` is **optional**. When omitted, the API identifies the user from the Origin header or subdomain of the deployed portfolio site. This is the recommended approach for production deployments.
 
-1. `x-portfolio-username` request header (SSR)
-2. `PORTFOLIO_USERNAME` environment variable
-3. `<meta name="portfolio-username">` tag in the DOM (SPA)
-
-### Next.js / Remix / Astro (SSR)
-
-Pass the incoming `Request` object:
+For local development or when you need to explicitly specify a user, pass it directly:
 
 ```ts
-import { resolveUsername } from '@betaversionio/portfolio-sdk';
-
-// Next.js App Router
-import { headers } from 'next/headers';
-
-export async function getUsername() {
-  const hdrs = await headers();
-  return resolveUsername({
-    request: new Request('http://localhost', { headers: hdrs }),
-  });
-}
-
-// Remix loader
-export async function loader({ request }: LoaderFunctionArgs) {
-  const username = resolveUsername({ request });
-  // ...
-}
-
-// Astro
-const username = resolveUsername({ request: Astro.request });
-```
-
-### Vite / SPA
-
-Add a meta tag to your `index.html` (the proxy can inject this):
-
-```html
-<meta name="portfolio-username" content="johndoe" />
-```
-
-Then call `resolveUsername()` with no arguments:
-
-```ts
-import { resolveUsername } from '@betaversionio/portfolio-sdk';
-
-const username = resolveUsername();
-```
-
-### Custom options
-
-```ts
-resolveUsername({
-  envVar: 'MY_CUSTOM_ENV_VAR',    // override env var name
-  metaTag: 'my-custom-meta-name', // override meta tag name
-});
+const portfolio = await client.getPortfolio('johndoe');
 ```
 
 ## API
 
 ### `new BetaVersionClient(options?)`
 
-| Option   | Type     | Default                            | Description       |
-| -------- | -------- | ---------------------------------- | ----------------- |
-| `apiUrl` | `string` | `https://api.betaversion.io/v1`    | Base API URL      |
+| Option   | Type     | Default                         | Description  |
+| -------- | -------- | ------------------------------- | ------------ |
+| `apiUrl` | `string` | `https://api.betaversion.io/v1` | Base API URL |
 
 ### Methods
 
-Every method accepts an optional `fetchOptions` parameter (`RequestInit`) that gets forwarded to the underlying `fetch` call. This lets you pass framework-specific options like Next.js revalidation:
+Every method accepts an optional `fetchOptions` parameter (`RequestInit`) forwarded to the underlying `fetch` call. Use this for framework-specific options like Next.js revalidation:
 
 ```ts
 await client.getPortfolio('johndoe', { next: { revalidate: 300 } });
 ```
 
-#### `client.getPortfolio(username, fetchOptions?)`
+#### `client.getPortfolio(username?, fetchOptions?)`
 
-Returns all portfolio data for a user, or `null` if the user is not found.
+Returns all portfolio data for a user, or `null` on failure.
+
+- **With username:** `GET /portfolio/:username`
+- **Without username:** `GET /portfolio` — backend auto-detects from Origin / subdomain
 
 ```ts
-const data: PortfolioData | null = await client.getPortfolio('johndoe');
+const data: PortfolioData | null = await client.getPortfolio();
 ```
 
 The returned `PortfolioData` includes:
 
-| Field          | Type                     |
-| -------------- | ------------------------ |
-| `user`         | `PortfolioUser`          |
-| `projects`     | `PortfolioProject[]`     |
-| `blogs`        | `PortfolioBlog[]`        |
-| `resume`       | `PortfolioResume \| null`|
-| `followCounts` | `FollowCounts`           |
+| Field          | Type                      | Description                        |
+| -------------- | ------------------------- | ---------------------------------- |
+| `user`         | `PortfolioUser`           | Profile, social links, tech stack, experiences, education, services |
+| `projects`     | `PortfolioProject[]`      | Published projects with images, tech stack, links |
+| `blogs`        | `PortfolioBlog[]`         | Published blog posts               |
+| `resume`       | `PortfolioResume \| null` | Resume PDF URL if available        |
+| `followCounts` | `FollowCounts`            | Follower and following counts      |
 
 #### `client.getProject(slug, fetchOptions?)`
 
@@ -140,15 +95,67 @@ All types are exported from the package:
 
 ```ts
 import type {
+  PortfolioData,
   PortfolioUser,
   PortfolioProject,
   PortfolioBlog,
   PortfolioResume,
   FollowCounts,
-  PortfolioData,
   BetaVersionClientOptions,
-  ResolveUsernameOptions,
 } from '@betaversionio/portfolio-sdk';
+```
+
+### Key type shapes
+
+#### `PortfolioUser`
+
+```ts
+{
+  id, email, username, name, avatarUrl,
+  profile: { bio, headline, location, website },
+  socialLinks: [{ platform, url }],
+  techStack: [{ name, category, proficiency }],
+  experiences: [{ company, position, startDate, endDate, current, ... }],
+  education: [{ institution, degree, fieldOfStudy, startDate, endDate, ... }],
+  services: [{ title, description }],
+  projects: [{ id, title, slug, shortDescription, techStack, status }],
+}
+```
+
+#### `PortfolioProject`
+
+```ts
+{
+  id, title, slug, description, tagline, logo,
+  images, techStack, tags, links,
+  demoUrl, videoUrl, launchDate, phase, status, isOpenSource,
+  upvotesCount, commentsCount, viewsCount,
+  author: { id, username, name, avatarUrl },
+  createdAt, updatedAt,
+}
+```
+
+#### `PortfolioBlog`
+
+```ts
+{
+  id, title, slug, excerpt, content, coverImage,
+  tags, status,
+  upvotesCount, commentsCount, viewsCount,
+  author: { id, username, name, avatarUrl },
+  createdAt, updatedAt,
+}
+```
+
+## Error handling
+
+All API methods return `null` on failure instead of throwing, allowing graceful degradation:
+
+```ts
+const portfolio = await client.getPortfolio();
+if (!portfolio) {
+  // show fallback UI
+}
 ```
 
 ## License

@@ -1,0 +1,6 @@
+{
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter @betaversionio/portfolio-sdk build && pnpm --filter @betaversionio/template-ubuntu build",
+  "outputDirectory": ".next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../../packages/portfolio-sdk/"
+}

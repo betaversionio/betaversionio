@@ -3,10 +3,16 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { ComponentProps } from 'react';
+import React from 'react';
 
-interface Props extends ComponentProps<typeof Link> {
+interface Props {
+    href: string;
     back?: boolean;
+    className?: string;
+    children?: React.ReactNode;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
 }
 
 gsap.registerPlugin(useGSAP);
