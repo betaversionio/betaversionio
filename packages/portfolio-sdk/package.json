@@ -29,6 +29,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.mjs",
+      "require": "./dist/hooks.js"
     }
   },
   "files": [
@@ -45,9 +50,23 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run build"
   },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5",
+    "axios": ">=1",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": { "optional": true },
+    "axios": { "optional": true },
+    "react": { "optional": true }
+  },
   "devDependencies": {
     "@betaversionio/typescript-config": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
     "@types/node": "^25.3.0",
+    "@types/react": "^19.0.0",
+    "axios": "^1.7.0",
+    "react": "^19.0.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
   },

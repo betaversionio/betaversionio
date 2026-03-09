@@ -1,14 +1,21 @@
 import { BetaVersionClient, PortfolioData } from '@betaversionio/portfolio-sdk';
+import { headers } from 'next/headers';
 import { IProject } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
-const USERNAME = process.env.NEXT_PUBLIC_PORTFOLIO_USERNAME || undefined;
+const ENV_USERNAME = process.env.NEXT_PUBLIC_PORTFOLIO_USERNAME || undefined;
 
 const client = new BetaVersionClient({ apiUrl: API_URL });
 
 export async function getPortfolioData(): Promise<PortfolioData | null> {
     try {
-        return await client.getPortfolio(USERNAME);
+        // Resolve username: env var first, then x-portfolio-username header (set by proxy)
+        let username = ENV_USERNAME;
+        if (!username) {
+            const hdrs = await headers();
+            username = hdrs.get('x-portfolio-username') ?? undefined;
+        }
+        return await client.getPortfolio(username);
     } catch {
         return null;
     }

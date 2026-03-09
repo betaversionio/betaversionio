@@ -11,13 +11,16 @@ interface ApiResponse<T> {
 
 export interface BetaVersionClientOptions {
   apiUrl?: string;
+  fallbackUsername?: string;
 }
 
 export class BetaVersionClient {
   private readonly apiUrl: string;
+  private readonly fallbackUsername?: string;
 
   constructor(options?: BetaVersionClientOptions) {
     this.apiUrl = options?.apiUrl ?? 'https://api.betaversion.io/v1';
+    this.fallbackUsername = options?.fallbackUsername;
   }
 
   private async fetchApi<T>(
@@ -52,7 +55,14 @@ export class BetaVersionClient {
     fetchOptions?: RequestInit,
   ): Promise<PortfolioData | null> {
     const endpoint = username ? `/portfolio/${username}` : '/portfolio';
-    return this.fetchApi<PortfolioData>(endpoint, fetchOptions);
+    const result = await this.fetchApi<PortfolioData>(endpoint, fetchOptions);
+
+    // If no username was provided and the request failed, retry with fallbackUsername
+    if (!result && !username && this.fallbackUsername) {
+      return this.fetchApi<PortfolioData>(`/portfolio/${this.fallbackUsername}`, fetchOptions);
+    }
+
+    return result;
   }
 
   async getProject(

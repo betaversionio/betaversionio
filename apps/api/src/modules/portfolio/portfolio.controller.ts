@@ -82,9 +82,7 @@ export class PortfolioController {
     );
   }
 
-  private extractSubdomain(
-    url: string | string[] | undefined,
-  ): string | null {
+  private extractSubdomain(url: string | string[] | undefined): string | null {
     if (!url || Array.isArray(url)) return null;
     try {
       const hostname = new URL(url).hostname;
@@ -100,9 +98,7 @@ export class PortfolioController {
     return null;
   }
 
-  private extractHostname(
-    url: string | string[] | undefined,
-  ): string | null {
+  private extractHostname(url: string | string[] | undefined): string | null {
     if (!url || Array.isArray(url)) return null;
     try {
       return new URL(url).hostname;

@@ -10,8 +10,8 @@ enum PortfolioTemplateStatus {
 model PortfolioTemplate {
   id           String                  @id @default(cuid())
   name         String
-  description  String                  @db.Text
-  previewImage String
+  description  String?                 @db.Text
+  previewImage String?
   previewUrl   String?
   baseUrl      String
   repoUrl      String?

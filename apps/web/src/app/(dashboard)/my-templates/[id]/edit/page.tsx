@@ -58,8 +58,8 @@ export default function EditTemplatePage() {
     resolver: zodResolver(createPortfolioTemplateSchema) as never,
     defaultValues: {
       name: '',
-      description: '',
-      previewImage: '',
+      description: undefined,
+      previewImage: undefined,
       baseUrl: '',
       previewUrl: undefined,
       repoUrl: undefined,
