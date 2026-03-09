@@ -1,6 +1,9 @@
 # @betaversionio/portfolio-sdk
 
-SDK for fetching portfolio data from the [BetaVersion.io](https://betaversion.io) API. Framework-agnostic — works with Next.js, Remix, Astro, Vite, or any environment that provides a global `fetch`.
+SDK for fetching portfolio data from the [BetaVersion.io](https://betaversion.io) API. Ships two entry points:
+
+- **`@betaversionio/portfolio-sdk`** — framework-agnostic client using global `fetch` (works everywhere)
+- **`@betaversionio/portfolio-sdk/hooks`** — React hooks with built-in caching (powered by TanStack Query)
 
 ## Installation
 
@@ -8,7 +11,117 @@ SDK for fetching portfolio data from the [BetaVersion.io](https://betaversion.io
 npm install @betaversionio/portfolio-sdk
 ```
 
-## Quick start
+## React Hooks
+
+The hooks entry point provides a `PortfolioProvider` and three data hooks. No extra dependencies needed — TanStack Query is bundled internally.
+
+### Setup
+
+Wrap your app with `PortfolioProvider`:
+
+```tsx
+import { PortfolioProvider } from '@betaversionio/portfolio-sdk/hooks';
+
+function App() {
+  return (
+    <PortfolioProvider
+      apiUrl="https://api.betaversion.io/v1"
+      fallbackUsername="johndoe"
+    >
+      <YourApp />
+    </PortfolioProvider>
+  );
+}
+```
+
+#### `PortfolioProvider` props
+
+| Prop               | Type     | Required | Description                                                                                      |
+| ------------------ | -------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `apiUrl`           | `string` | Yes      | Base API URL (e.g. `https://api.betaversion.io/v1`)                                              |
+| `username`         | `string` | No       | Explicit username — always fetches `/portfolio/:username`                                        |
+| `fallbackUsername`  | `string` | No       | Used as a fallback when auto-detection fails (recommended for local development)                 |
+
+**Username resolution order:**
+1. `username` prop — if provided, always used directly
+2. Auto-detection — `GET /portfolio`, backend resolves user from Origin header / subdomain
+3. `fallbackUsername` — retried if auto-detection fails
+
+For production deployments behind a custom domain, omit `username` and set `fallbackUsername` as a safety net. For local development, use `fallbackUsername` with your username.
+
+### Hooks
+
+All hooks must be used inside `<PortfolioProvider>`. They return TanStack Query results (`data`, `isPending`, `isError`, `error`, etc.) with built-in caching (5 min stale time).
+
+#### `usePortfolio(options?)`
+
+Fetches the complete portfolio.
+
+```tsx
+import { usePortfolio } from '@betaversionio/portfolio-sdk/hooks';
+
+function Profile() {
+  const { data, isPending, isError } = usePortfolio();
+
+  if (isPending) return <p>Loading...</p>;
+  if (isError || !data) return <p>Failed to load</p>;
+
+  return (
+    <div>
+      <h1>{data.user.name}</h1>
+      <p>{data.user.profile.bio}</p>
+      <p>{data.projects.length} projects</p>
+    </div>
+  );
+}
+```
+
+| Option      | Type      | Default    | Description                    |
+| ----------- | --------- | ---------- | ------------------------------ |
+| `enabled`   | `boolean` | `true`     | Enable/disable the query       |
+| `staleTime` | `number`  | `300000`   | Cache duration in milliseconds |
+
+#### `useProject(slug, options?)`
+
+Fetches a single project by slug.
+
+```tsx
+import { useProject } from '@betaversionio/portfolio-sdk/hooks';
+
+function ProjectPage({ slug }: { slug: string }) {
+  const { data: project, isPending } = useProject(slug);
+
+  if (isPending) return <p>Loading...</p>;
+  if (!project) return <p>Not found</p>;
+
+  return <h1>{project.title}</h1>;
+}
+```
+
+#### `useBlog(slug, options?)`
+
+Fetches a single blog post by slug.
+
+```tsx
+import { useBlog } from '@betaversionio/portfolio-sdk/hooks';
+
+function BlogPost({ slug }: { slug: string }) {
+  const { data: blog, isPending } = useBlog(slug);
+
+  if (isPending) return <p>Loading...</p>;
+  if (!blog) return <p>Not found</p>;
+
+  return <h1>{blog.title}</h1>;
+}
+```
+
+`useProject` and `useBlog` accept the same `options` as `usePortfolio`.
+
+## Client (framework-agnostic)
+
+For non-React environments or server-side usage, use the `BetaVersionClient` directly.
+
+### Quick start
 
 ```ts
 import { BetaVersionClient } from '@betaversionio/portfolio-sdk';
@@ -26,23 +139,12 @@ if (portfolio) {
 }
 ```
 
-## Username
-
-The `username` parameter in `getPortfolio()` is **optional**. When omitted, the API identifies the user from the Origin header or subdomain of the deployed portfolio site. This is the recommended approach for production deployments.
-
-For local development or when you need to explicitly specify a user, pass it directly:
-
-```ts
-const portfolio = await client.getPortfolio('johndoe');
-```
-
-## API
-
 ### `new BetaVersionClient(options?)`
 
-| Option   | Type     | Default                         | Description  |
-| -------- | -------- | ------------------------------- | ------------ |
-| `apiUrl` | `string` | `https://api.betaversion.io/v1` | Base API URL |
+| Option             | Type     | Default                         | Description                                          |
+| ------------------ | -------- | ------------------------------- | ---------------------------------------------------- |
+| `apiUrl`           | `string` | `https://api.betaversion.io/v1` | Base API URL                                         |
+| `fallbackUsername`  | `string` | —                               | Fallback username when auto-detection fails          |
 
 ### Methods
 
@@ -57,7 +159,7 @@ await client.getPortfolio('johndoe', { next: { revalidate: 300 } });
 Returns all portfolio data for a user, or `null` on failure.
 
 - **With username:** `GET /portfolio/:username`
-- **Without username:** `GET /portfolio` — backend auto-detects from Origin / subdomain
+- **Without username:** `GET /portfolio` — backend auto-detects from Origin / subdomain. Falls back to `fallbackUsername` if the auto-detection request fails.
 
 ```ts
 const data: PortfolioData | null = await client.getPortfolio();
@@ -91,7 +193,7 @@ const blog: PortfolioBlog | null = await client.getBlog('my-post');
 
 ## Types
 
-All types are exported from the package:
+All types are exported from the main entry point:
 
 ```ts
 import type {
@@ -149,11 +251,18 @@ import type {
 
 ## Error handling
 
-All API methods return `null` on failure instead of throwing, allowing graceful degradation:
+All methods (both client and hooks) return `null` on failure instead of throwing, allowing graceful degradation:
 
 ```ts
+// Client
 const portfolio = await client.getPortfolio();
 if (!portfolio) {
+  // show fallback UI
+}
+
+// Hooks
+const { data, isError } = usePortfolio();
+if (isError || !data) {
   // show fallback UI
 }
 ```

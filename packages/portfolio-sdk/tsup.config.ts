@@ -5,5 +5,5 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   dts: true,
   clean: true,
-  external: ['react', '@tanstack/react-query', 'axios'],
+  external: ['react', '@tanstack/react-query'],
 });

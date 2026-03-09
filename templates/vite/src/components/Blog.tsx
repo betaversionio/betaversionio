@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { PortfolioBlog } from '../lib/api';
+import type { PortfolioBlog } from '@betaversionio/portfolio-sdk';
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-US', {

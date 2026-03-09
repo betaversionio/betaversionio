@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PortfolioUser, FollowCounts } from '../lib/api';
+import type { PortfolioUser, FollowCounts } from '@betaversionio/portfolio-sdk';
 
 const PLATFORM_ICONS: Record<string, string> = {
   github: 'logo-github',

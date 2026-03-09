@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { usePortfolio } from './hooks/usePortfolio';
+import { usePortfolio } from '@betaversionio/portfolio-sdk/hooks';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
 import { About } from './components/About';
@@ -18,11 +18,11 @@ const PATH_TO_PAGE: Record<string, Page> = {
 };
 
 export function App() {
-  const { data, loading, error } = usePortfolio();
+  const { data, isPending, isError, error } = usePortfolio();
   const location = useLocation();
   const activePage = PATH_TO_PAGE[location.pathname] ?? 'about';
 
-  if (loading) {
+  if (isPending) {
     return (
       <main>
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--light-gray)' }}>
@@ -32,11 +32,11 @@ export function App() {
     );
   }
 
-  if (error || !data) {
+  if (isError || !data) {
     return (
       <main>
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--bittersweet-shimmer)' }}>
-          {error ?? 'Portfolio not found'}
+          {error?.message ?? 'Portfolio not found'}
         </div>
       </main>
     );

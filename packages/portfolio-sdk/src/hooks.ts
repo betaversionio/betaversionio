@@ -1,9 +1,8 @@
 'use client';
 
-import { createContext, useContext, useMemo, createElement } from 'react';
+import { createContext, useContext, useMemo, useState, createElement } from 'react';
 import type { ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PortfolioData, PortfolioProject, PortfolioBlog } from './types';
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -26,11 +25,16 @@ export function PortfolioProvider({
   username,
   fallbackUsername,
 }: PortfolioProviderProps) {
+  const [queryClient] = useState(() => new QueryClient());
   const value = useMemo(
     () => ({ apiUrl, username, fallbackUsername }),
     [apiUrl, username, fallbackUsername],
   );
-  return createElement(PortfolioContext.Provider, { value }, children);
+  return createElement(
+    QueryClientProvider,
+    { client: queryClient },
+    createElement(PortfolioContext.Provider, { value }, children),
+  );
 }
 
 function usePortfolioConfig(): PortfolioConfig {
@@ -48,12 +52,17 @@ interface ApiResponse<T> {
   data: T;
 }
 
-function unwrap<T>(res: { data: ApiResponse<T> | T }): T {
-  const json = res.data;
+function unwrap<T>(json: ApiResponse<T> | T): T {
   if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
     return (json as ApiResponse<T>).data;
   }
   return json as T;
+}
+
+async function fetchApi<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return unwrap<T>(await res.json());
 }
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
@@ -67,17 +76,15 @@ export function usePortfolio(options: UsePortfolioOptions = {}) {
   const { apiUrl, username, fallbackUsername } = usePortfolioConfig();
   const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
 
-  const api = useMemo(() => axios.create({ baseURL: apiUrl }), [apiUrl]);
-
   return useQuery<PortfolioData | null>({
     queryKey: ['portfolio', apiUrl, username ?? fallbackUsername ?? 'auto'],
     queryFn: async () => {
       const endpoint = username ? `/portfolio/${username}` : '/portfolio';
       try {
-        return unwrap(await api.get<PortfolioData>(endpoint));
+        return await fetchApi<PortfolioData>(`${apiUrl}${endpoint}`);
       } catch {
         if (!username && fallbackUsername) {
-          return unwrap(await api.get<PortfolioData>(`/portfolio/${fallbackUsername}`));
+          return await fetchApi<PortfolioData>(`${apiUrl}/portfolio/${fallbackUsername}`);
         }
         return null;
       }
@@ -96,13 +103,11 @@ export function useProject(slug: string, options: UseProjectOptions = {}) {
   const { apiUrl } = usePortfolioConfig();
   const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
 
-  const api = useMemo(() => axios.create({ baseURL: apiUrl }), [apiUrl]);
-
   return useQuery<PortfolioProject | null>({
     queryKey: ['portfolio', 'project', slug, apiUrl],
     queryFn: async () => {
       try {
-        return unwrap(await api.get<PortfolioProject>(`/portfolio/project/${slug}`));
+        return await fetchApi<PortfolioProject>(`${apiUrl}/portfolio/project/${slug}`);
       } catch {
         return null;
       }
@@ -121,13 +126,11 @@ export function useBlog(slug: string, options: UseBlogOptions = {}) {
   const { apiUrl } = usePortfolioConfig();
   const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
 
-  const api = useMemo(() => axios.create({ baseURL: apiUrl }), [apiUrl]);
-
   return useQuery<PortfolioBlog | null>({
     queryKey: ['portfolio', 'blog', slug, apiUrl],
     queryFn: async () => {
       try {
-        return unwrap(await api.get<PortfolioBlog>(`/portfolio/blog/${slug}`));
+        return await fetchApi<PortfolioBlog>(`${apiUrl}/portfolio/blog/${slug}`);
       } catch {
         return null;
       }

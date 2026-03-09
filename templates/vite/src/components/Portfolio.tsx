@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { PortfolioProject } from '../lib/api';
+import type { PortfolioProject } from '@betaversionio/portfolio-sdk';
 
 interface PortfolioProps {
   projects: PortfolioProject[];

@@ -1,4 +1,4 @@
-import type { PortfolioUser } from '../lib/api';
+import type { PortfolioUser } from '@betaversionio/portfolio-sdk';
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-US', {

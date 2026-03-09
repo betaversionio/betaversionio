@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { client, type PortfolioProject } from '../lib/api';
+import { useProject } from '@betaversionio/portfolio-sdk/hooks';
 import { Markdown } from '../components/Markdown';
 
 function formatDate(d: string) {
@@ -13,23 +12,9 @@ function formatDate(d: string) {
 
 export function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [project, setProject] = useState<PortfolioProject | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: project, isPending, isError, error } = useProject(slug ?? '');
 
-  useEffect(() => {
-    if (!slug) return;
-    client
-      .getProject(slug)
-      .then((result) => {
-        if (result) setProject(result);
-        else setError('Project not found');
-      })
-      .catch(() => setError('Failed to load project'))
-      .finally(() => setLoading(false));
-  }, [slug]);
-
-  if (loading) {
+  if (isPending) {
     return (
       <main>
         <article className="portfolio active" style={{ maxWidth: 700, margin: '60px auto' }}>
@@ -41,12 +26,12 @@ export function ProjectDetail() {
     );
   }
 
-  if (error || !project) {
+  if (isError || !project) {
     return (
       <main>
         <article className="portfolio active" style={{ maxWidth: 700, margin: '60px auto' }}>
           <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--bittersweet-shimmer)' }}>
-            {error ?? 'Project not found'}
+            {error?.message ?? 'Project not found'}
           </div>
           <div style={{ textAlign: 'center' }}>
             <Link to="/portfolio" className="form-btn" style={{ display: 'inline-flex', width: 'auto' }}>

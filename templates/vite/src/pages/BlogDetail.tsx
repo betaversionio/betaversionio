@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { client, type PortfolioBlog } from '../lib/api';
+import { useBlog } from '@betaversionio/portfolio-sdk/hooks';
 import { Markdown } from '../components/Markdown';
 
 function formatDate(d: string) {
@@ -13,23 +12,9 @@ function formatDate(d: string) {
 
 export function BlogDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [blog, setBlog] = useState<PortfolioBlog | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: blog, isPending, isError, error } = useBlog(slug ?? '');
 
-  useEffect(() => {
-    if (!slug) return;
-    client
-      .getBlog(slug)
-      .then((result) => {
-        if (result) setBlog(result);
-        else setError('Blog post not found');
-      })
-      .catch(() => setError('Failed to load blog post'))
-      .finally(() => setLoading(false));
-  }, [slug]);
-
-  if (loading) {
+  if (isPending) {
     return (
       <main>
         <article className="blog active" style={{ maxWidth: 700, margin: '60px auto' }}>
@@ -41,12 +26,12 @@ export function BlogDetail() {
     );
   }
 
-  if (error || !blog) {
+  if (isError || !blog) {
     return (
       <main>
         <article className="blog active" style={{ maxWidth: 700, margin: '60px auto' }}>
           <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--bittersweet-shimmer)' }}>
-            {error ?? 'Blog post not found'}
+            {error?.message ?? 'Blog post not found'}
           </div>
           <div style={{ textAlign: 'center' }}>
             <Link to="/blog" className="form-btn" style={{ display: 'inline-flex', width: 'auto' }}>
