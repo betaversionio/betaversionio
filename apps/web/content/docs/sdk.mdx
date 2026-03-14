@@ -1,0 +1,108 @@
+---
+title: SDK Client
+description: BetaVersionClient reference — constructor, methods, and server-side usage.
+---
+
+The `BetaVersionClient` is a framework-agnostic client for fetching portfolio data server-side. Use it in Next.js server components, API routes, or any Node.js environment.
+
+---
+
+## Import
+
+```ts
+import { BetaVersionClient } from '@betaversionio/portfolio-sdk';
+```
+
+## Constructor
+
+```ts
+const client = new BetaVersionClient({
+  apiUrl: 'https://api.betaversion.io/v1',
+  fallbackUsername: 'your-username',
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `apiUrl` | `string` | `https://api.betaversion.io/v1` | Base API URL |
+| `fallbackUsername` | `string` | — | Used when auto-detection fails |
+
+## Methods
+
+### `getPortfolio(username?, fetchOptions?)`
+
+Fetches the complete portfolio data for a user.
+
+```ts
+// Auto-detect username from subdomain
+const portfolio = await client.getPortfolio();
+
+// Explicit username
+const portfolio = await client.getPortfolio('johndoe');
+```
+
+Returns [`PortfolioData`](/docs/types) or `null` on failure.
+
+### `getProject(slug, fetchOptions?)`
+
+```ts
+const project = await client.getProject('my-project');
+```
+
+Returns [`PortfolioProject`](/docs/types) or `null`.
+
+### `getBlog(slug, fetchOptions?)`
+
+```ts
+const blog = await client.getBlog('hello-world');
+```
+
+Returns [`PortfolioBlog`](/docs/types) or `null`.
+
+## Next.js with header forwarding
+
+When running behind the BetaVersion.IO subdomain proxy, forward the Origin and Host headers so the API can auto-detect the username:
+
+```ts title="lib/api.ts"
+import { headers } from 'next/headers';
+import { BetaVersionClient } from '@betaversionio/portfolio-sdk';
+
+const client = new BetaVersionClient({
+  apiUrl: process.env.BETAVERSION_API_URL,
+});
+
+async function fetchOptions() {
+  const hdrs = await headers();
+  const forwarded: Record<string, string> = {};
+
+  if (hdrs.get('origin')) forwarded['origin'] = hdrs.get('origin')!;
+  if (hdrs.get('host')) forwarded['x-forwarded-host'] = hdrs.get('host')!;
+
+  return { headers: forwarded, next: { revalidate: 300 } };
+}
+
+export async function fetchPortfolio() {
+  return client.getPortfolio(undefined, await fetchOptions());
+}
+
+export async function fetchProject(slug: string) {
+  return client.getProject(slug, await fetchOptions());
+}
+```
+
+<Callout type="tip">
+  The `revalidate: 300` option enables ISR — Next.js will cache the response for 5 minutes and revalidate in the background.
+</Callout>
+
+## Error handling
+
+All SDK methods return `null` on failure instead of throwing. Always handle the null case:
+
+```ts
+const portfolio = await client.getPortfolio();
+if (!portfolio) {
+  // render fallback UI or 404 page
+}
+```

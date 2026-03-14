@@ -1,0 +1,43 @@
+---
+title: Template Docs
+description: Learn how to build and publish portfolio templates for BetaVersion.IO using the portfolio-sdk.
+---
+
+Portfolio templates are **standalone web apps** that render a developer's portfolio using data from the BetaVersion.IO API.
+You build them with any framework — Next.js, Vite, Astro, Remix — and use the `@betaversionio/portfolio-sdk` to fetch user data.
+
+Once deployed, any BetaVersion.IO user can select your template and their subdomain (`username.betaversion.io`) will serve your template with their data.
+
+---
+
+## How it works
+
+1. A user picks your template on BetaVersion.IO
+2. Visitors hit `username.betaversion.io`
+3. The request is proxied to your deployed template URL
+4. The SDK auto-detects the username and fetches their portfolio data
+5. Your template renders their portfolio
+
+<Callout type="tip">
+  Head over to [Getting Started](/docs/getting-started) to scaffold your first template in under 5 minutes.
+</Callout>
+
+## What the SDK gives you
+
+The portfolio-sdk ships two entry points:
+
+- **`@betaversionio/portfolio-sdk`** — a framework-agnostic `BetaVersionClient` for server-side usage (Next.js, Node.js, etc.)
+- **`@betaversionio/portfolio-sdk/hooks`** — React hooks with built-in TanStack Query for client-side apps (Vite, CRA)
+
+Both return the same data shape: user profile, projects, blog posts, resume, social links, tech stack, and more.
+
+## Explore the docs
+
+| Section | Description |
+| --- | --- |
+| [Getting Started](/docs/getting-started) | Scaffold a template from zero to deployed |
+| [SDK Client](/docs/sdk) | `BetaVersionClient` constructor, methods, and options |
+| [React Hooks](/docs/hooks) | `PortfolioProvider`, `usePortfolio`, `useProject`, `useBlog` |
+| [Data Types](/docs/types) | Complete TypeScript type reference |
+| [Publishing](/docs/publishing) | Deploy, register, and publish your template |
+| [How It Works](/docs/how-it-works) | Subdomain proxy architecture explained |

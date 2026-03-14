@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "pages": [
+    "index",
+    "getting-started",
+    "sdk",
+    "hooks",
+    "types",
+    "publishing",
+    "how-it-works"
+  ]
+}

@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MyTemplateCard } from '@/features/templates';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, BookOpen } from 'lucide-react';
 import { Brush2 } from 'iconsax-react';
 
 const statusFilters = ['All', 'Draft', 'Published'] as const;
@@ -27,12 +27,20 @@ export default function MyTemplatesPage() {
         title="My Templates"
         description="Manage your portfolio templates."
       >
-        <Button asChild>
-          <Link href="/my-templates/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Template
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/docs" target="_blank">
+              <BookOpen className="mr-2 h-4 w-4" />
+              Docs
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/my-templates/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Template
+            </Link>
+          </Button>
+        </div>
       </PageHeader>
 
       <Tabs

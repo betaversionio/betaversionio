@@ -1,0 +1,142 @@
+---
+title: Data Types
+description: Complete TypeScript type reference for portfolio-sdk data shapes.
+---
+
+All types are exported from the main entry point.
+
+```ts
+import type {
+  PortfolioData,
+  PortfolioUser,
+  PortfolioProject,
+  PortfolioBlog,
+  PortfolioResume,
+  FollowCounts,
+} from '@betaversionio/portfolio-sdk';
+```
+
+---
+
+## PortfolioData
+
+The top-level object returned by `getPortfolio()` and `usePortfolio()`.
+
+```ts
+interface PortfolioData {
+  user: PortfolioUser;
+  projects: PortfolioProject[];
+  blogs: PortfolioBlog[];
+  resume: PortfolioResume | null;
+  followCounts: { followersCount: number; followingCount: number };
+}
+```
+
+## PortfolioUser
+
+```ts
+interface PortfolioUser {
+  id: string;
+  email: string;
+  username: string;
+  name: string;
+  avatarUrl: string | null;
+  profile: {
+    bio: string | null;
+    headline: string | null;
+    location: string | null;
+    website: string | null;
+  };
+  socialLinks: { platform: string; url: string }[];
+  techStack: {
+    name: string;
+    category: string;
+    proficiency: string;
+  }[];
+  experiences: {
+    company: string;
+    position: string;
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string | null;
+  }[];
+  education: {
+    institution: string;
+    degree: string;
+    fieldOfStudy: string;
+    startDate: string;
+    endDate: string | null;
+    description: string | null;
+  }[];
+  services: { id: string; title: string; description: string }[];
+  projects: {
+    id: string;
+    title: string;
+    slug: string;
+    shortDescription: string | null;
+    techStack: string[];
+    status: string;
+  }[];
+}
+```
+
+## PortfolioProject
+
+```ts
+interface PortfolioProject {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  tagline: string | null;
+  logo: string | null;
+  images: string[];
+  techStack: string[];
+  tags: string[];
+  links: { label: string; url: string }[];
+  demoUrl: string | null;
+  videoUrl: string | null;
+  launchDate: string | null;
+  phase: string;
+  status: string;
+  isOpenSource: boolean;
+  upvotesCount: number;
+  commentsCount: number;
+  viewsCount: number;
+  author: {
+    id: string;
+    username: string;
+    name: string;
+    avatarUrl: string | null;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+## PortfolioBlog
+
+```ts
+interface PortfolioBlog {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  coverImage: string | null;
+  tags: string[];
+  status: string;
+  upvotesCount: number;
+  commentsCount: number;
+  viewsCount: number;
+  author: {
+    id: string;
+    username: string;
+    name: string;
+    avatarUrl: string | null;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+```

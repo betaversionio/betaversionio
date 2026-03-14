@@ -48,6 +48,13 @@ async function getTemplateBaseUrl(username: string): Promise<string | null> {
 }
 
 /**
+ * Check if the request is on the docs subdomain.
+ */
+function isDocsSubdomain(host: string): boolean {
+  return host === `docs.${ROOT_DOMAIN}` || host === 'docs.localhost';
+}
+
+/**
  * Detect whether this request is on a template subdomain.
  * Returns the username if yes, null otherwise.
  */
@@ -73,6 +80,13 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // Strip port for local dev (e.g. "satyam.localhost:3000" → "satyam.localhost")
   const host = (request.headers.get('host') ?? '').split(':')[0]!;
+
+  // docs.betaversion.io → /docs (skip _next assets and paths already under /docs)
+  if (isDocsSubdomain(host) && !pathname.startsWith('/_next/') && !pathname.startsWith('/docs')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/docs${pathname === '/' ? '' : pathname}`;
+    return NextResponse.rewrite(url);
+  }
 
   const username = getSubdomainUsername(host);
 

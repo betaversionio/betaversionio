@@ -1,0 +1,47 @@
+---
+title: Publishing Your Template
+description: Deploy, register, and publish your portfolio template.
+---
+
+Once your template is built and tested locally, follow these steps to make it available to all BetaVersion.IO users.
+
+---
+
+## 1. Deploy your template
+
+Deploy your template app to any hosting provider — Vercel, Netlify, Railway, Cloudflare Pages, etc. Make sure it's accessible via a public URL.
+
+<Callout type="info">
+  Your template must be publicly accessible. The BetaVersion.IO proxy will forward requests to your deployed URL.
+</Callout>
+
+## 2. Register on BetaVersion.IO
+
+Go to [Dashboard → My Templates](/my-templates) and click **New Template**. Fill in:
+
+- **Name** — a descriptive name for your template
+- **Base URL** — the deployed URL where the template is hosted (e.g. `https://my-template.vercel.app`)
+- **Preview Image** — a screenshot of the template (16:9, max 2MB)
+- **Description** — Markdown description of your template
+- **Tags** — up to 10 tags for discoverability
+- **Preview URL** (optional) — a live demo link
+- **Repo URL** (optional) — GitHub link for open-source templates
+
+## 3. Test it
+
+Before publishing, test your template by selecting it from your dashboard and visiting your subdomain (`username.betaversion.io`). Make sure:
+
+- Portfolio data loads correctly
+- All pages render without errors
+- The layout is responsive on mobile
+- Images and assets load properly
+
+## 4. Publish
+
+Templates start as **Draft**. When you're ready, toggle the status to **Published** on the edit page.
+
+Published templates appear in the [Templates Marketplace](/templates) for all users to discover and use.
+
+<Callout type="tip">
+  Add a compelling preview image and description. Templates with good previews get significantly more installs.
+</Callout>

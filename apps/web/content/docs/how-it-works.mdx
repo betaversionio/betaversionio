@@ -1,0 +1,53 @@
+---
+title: How It Works
+description: Understand the subdomain proxy architecture behind BetaVersion.IO templates.
+---
+
+When a user selects your template, here's the full request flow from subdomain visit to rendered portfolio.
+
+---
+
+## The request flow
+
+### 1. User visits their subdomain
+
+A visitor navigates to `johndoe.betaversion.io`.
+
+### 2. Proxy resolves the template
+
+BetaVersion.IO's edge middleware looks up the subdomain (`johndoe`), finds the user's selected template, and retrieves the template's Base URL.
+
+### 3. Request is proxied
+
+The incoming request is reverse-proxied to your template's deployed URL (e.g. `https://my-template.vercel.app`). The proxy forwards an `x-portfolio-username` header with the username.
+
+### 4. SDK fetches user data
+
+The portfolio-sdk auto-detects the username from the Origin header (or `x-portfolio-username`) and fetches the portfolio data from the BetaVersion.IO API.
+
+### 5. Template renders
+
+Your template renders the user's portfolio with their projects, blog posts, resume, profile data, social links, and tech stack.
+
+---
+
+## Username detection
+
+The SDK resolves the username in this order:
+
+1. **Explicit `username` prop/parameter** — if you pass a username directly
+2. **`x-portfolio-username` header** — set by the subdomain proxy
+3. **Origin/Host header** — the SDK extracts the subdomain from the request origin
+4. **`fallbackUsername`** — your configured fallback (typically your own username for local dev)
+
+<Callout type="info">
+  In production behind the BetaVersion.IO proxy, step 2 or 3 will always resolve the username automatically. The `fallbackUsername` is only used during local development.
+</Callout>
+
+## Caching
+
+The API responses are designed to be cached. When using Next.js, pass `next: { revalidate: 300 }` in your fetch options to enable ISR with a 5-minute stale window. The React hooks use TanStack Query's built-in caching with a 5-minute stale time by default.
+
+## Custom domains
+
+Custom domain support is coming soon. Currently, only `username.betaversion.io` subdomains are supported.

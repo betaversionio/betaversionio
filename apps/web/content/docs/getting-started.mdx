@@ -1,0 +1,89 @@
+---
+title: Getting Started
+description: Build your first portfolio template in 5 minutes.
+---
+
+This guide uses Vite + React, but the SDK works with any framework.
+
+---
+
+## 1. Scaffold your project
+
+Start with any framework. Here's a Vite + React example:
+
+```bash
+npm create vite@latest my-template -- --template react-ts
+cd my-template
+```
+
+## 2. Install the SDK
+
+```bash
+npm install @betaversionio/portfolio-sdk
+```
+
+The SDK bundles TanStack Query — no extra dependencies needed.
+
+## 3. Wrap your app with the provider
+
+```tsx title="src/main.tsx"
+import { PortfolioProvider } from '@betaversionio/portfolio-sdk/hooks';
+
+createRoot(document.getElementById('root')!).render(
+  <PortfolioProvider
+    apiUrl="https://api.betaversion.io/v1"
+    fallbackUsername="your-username"
+  >
+    <App />
+  </PortfolioProvider>
+);
+```
+
+<Callout type="info">
+  The `fallbackUsername` is only used when the SDK can't auto-detect the username from the subdomain. In production, username detection is automatic.
+</Callout>
+
+## 4. Fetch and render portfolio data
+
+```tsx title="src/App.tsx"
+import { usePortfolio } from '@betaversionio/portfolio-sdk/hooks';
+
+function App() {
+  const { data, isPending, isError } = usePortfolio();
+
+  if (isPending) return <p>Loading...</p>;
+  if (isError || !data) return <p>Failed to load portfolio</p>;
+
+  const { user, projects, blogs, followCounts } = data;
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.profile.bio}</p>
+      <p>{followCounts.followersCount} followers</p>
+
+      <h2>Projects</h2>
+      {projects.map((p) => (
+        <div key={p.id}>
+          <h3>{p.title}</h3>
+          <p>{p.tagline}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## 5. Run locally
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:5173` — you should see the portfolio rendered with the fallback user's data.
+
+## 6. Deploy and publish
+
+Deploy to Vercel, Netlify, or any hosting provider. Then head to [My Templates](/my-templates) in your dashboard to register your template with its deployed URL.
+
+See the [Publishing](/docs/publishing) guide for the full walkthrough.

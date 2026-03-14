@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
+    "postinstall": "fumadocs-mdx",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint"
@@ -55,6 +56,8 @@
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.19",
     "embla-carousel-react": "^8.6.0",
+    "fumadocs-core": "^16.6.17",
+    "fumadocs-mdx": "^14.2.10",
     "iconsax-react": "^0.0.8",
     "katex": "^0.16.35",
     "lowlight": "^3.3.0",
@@ -76,9 +79,11 @@
     "react-social-icons": "^6.25.0",
     "react-use-measure": "^2.1.7",
     "rehype-katex": "^7.0.1",
+    "rehype-pretty-code": "^0.14.3",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
+    "shiki": "^4.0.2",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "tech-stack-icons": "^3.7.1",
@@ -87,11 +92,12 @@
   },
   "devDependencies": {
     "@betaversionio/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/mdx": "^2.0.13",
     "@types/node": "^25.3.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/turndown": "^5.0.6",
-    "@tailwindcss/postcss": "^4.2.1",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3"

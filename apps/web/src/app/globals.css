@@ -18,7 +18,7 @@
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-accent: hsl(var(--accent));
@@ -36,6 +36,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-invert: var(--invert);
   --color-invert-foreground: var(--invert-foreground);
+  --color-code: var(--code);
+  --color-code-foreground: var(--code-foreground);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -138,6 +140,8 @@
   --warning-foreground: var(--color-yellow-900);
   --invert: var(--color-zinc-900);
   --invert-foreground: var(--color-zinc-50);
+  --code: oklch(0.97 0 0);
+  --code-foreground: oklch(0.25 0 0);
 }
 
 .dark {
@@ -169,6 +173,40 @@
   --warning-foreground: var(--color-yellow-600);
   --invert: var(--color-zinc-700);
   --invert-foreground: var(--color-zinc-50);
+  --code: oklch(0.2 0 0);
+  --code-foreground: oklch(0.85 0 0);
+}
+
+/* Code block styles (rehype-pretty-code) */
+[data-rehype-pretty-code-figure] {
+  background-color: var(--color-code);
+  color: var(--color-code-foreground);
+  border-radius: var(--radius-lg);
+  margin-top: calc(var(--spacing) * 6);
+  overflow: hidden;
+  font-size: var(--text-sm);
+  position: relative;
+}
+
+[data-rehype-pretty-code-title] {
+  border-bottom: color-mix(in oklab, var(--border) 30%, transparent);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  padding-block: calc(var(--spacing) * 2.5);
+  padding-inline: calc(var(--spacing) * 4);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  color: var(--color-code-foreground);
+}
+
+[data-line] span {
+  color: var(--shiki-light);
+}
+
+@variant dark {
+  [data-line] span {
+    color: var(--shiki-dark) !important;
+  }
 }
 
 /* Base styles */

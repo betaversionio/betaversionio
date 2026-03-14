@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
@@ -21,15 +21,7 @@ import { siteConfig } from '@/config/site';
 import { GoogleIcon, GithubIcon } from '@/features/auth';
 import { Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
 import { useRegister } from '@/features/auth';
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
-}
+import { useDebounce } from '@/hooks/use-debounce';
 
 export default function RegisterPage() {
   const router = useRouter();

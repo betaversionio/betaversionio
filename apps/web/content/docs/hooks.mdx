@@ -1,0 +1,80 @@
+---
+title: React Hooks
+description: PortfolioProvider, usePortfolio, useProject, and useBlog hook reference.
+---
+
+For client-side React apps (Vite, CRA, etc.), import from `@betaversionio/portfolio-sdk/hooks`. TanStack Query is bundled — no extra dependencies needed.
+
+---
+
+## PortfolioProvider
+
+Wrap your app with the provider to enable data fetching hooks.
+
+```tsx
+import { PortfolioProvider } from '@betaversionio/portfolio-sdk/hooks';
+
+<PortfolioProvider
+  apiUrl="https://api.betaversion.io/v1"
+  username="johndoe"
+  fallbackUsername="johndoe"
+>
+  <App />
+</PortfolioProvider>
+```
+
+### Props
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `apiUrl` | `string` | Base API URL |
+| `username` | `string?` | Force a specific username |
+| `fallbackUsername` | `string?` | Fallback when auto-detection fails |
+
+**Username resolution order:** `username` prop → auto-detection from Origin/subdomain → `fallbackUsername`.
+
+## usePortfolio
+
+Returns the complete portfolio data for the resolved user.
+
+```tsx
+import { usePortfolio } from '@betaversionio/portfolio-sdk/hooks';
+
+const { data, isPending, isError, error } = usePortfolio({
+  enabled: true,
+  staleTime: 300000,
+});
+
+// data shape:
+// { user, projects, blogs, resume, followCounts } | undefined
+```
+
+The return value follows the standard TanStack Query pattern — `isPending`, `isError`, `error`, `data`, `refetch`, etc.
+
+## useProject
+
+Fetches a single project by its slug.
+
+```tsx
+import { useProject } from '@betaversionio/portfolio-sdk/hooks';
+
+const { data: project, isPending } = useProject('my-project');
+```
+
+Returns a [`PortfolioProject`](/docs/types) or `undefined` while loading.
+
+## useBlog
+
+Fetches a single blog post by its slug.
+
+```tsx
+import { useBlog } from '@betaversionio/portfolio-sdk/hooks';
+
+const { data: blog, isPending } = useBlog('hello-world');
+```
+
+Returns a [`PortfolioBlog`](/docs/types) or `undefined` while loading.
+
+<Callout type="info">
+  All hooks must be used inside a `PortfolioProvider`. Calling them outside the provider will throw an error.
+</Callout>

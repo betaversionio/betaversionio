@@ -83,7 +83,7 @@ function QuickActionButton({
       onClick={onClick}
     >
       <Icon size={22} color={color} variant="Bulk" />
-      {label}
+      <span className="hidden sm:inline">{label}</span>
     </Button>
   );
 }
@@ -366,7 +366,7 @@ export function PostComposer() {
                 >
                   What&apos;s on your mind?
                 </button>
-                <div className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-1">
                   {quickActions.map((action) => (
                     <QuickActionButton
                       key={action.label}
@@ -424,8 +424,8 @@ export function PostComposer() {
                 )}
 
                 {/* Toolbar */}
-                <div className="flex items-center justify-between border-t pt-3">
-                  <div className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+                  <div className="flex items-center gap-1 overflow-x-auto">
                     <Select
                       value={postType}
                       onValueChange={(v) => setValue('type', v as PostType)}
@@ -476,7 +476,7 @@ export function PostComposer() {
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Button
                       type="button"
                       variant="ghost"

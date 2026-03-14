@@ -11,7 +11,7 @@ interface SidebarNavGroupProps {
   group: NavGroup;
 }
 
-function SidebarNavGroup({ group }: SidebarNavGroupProps) {
+export function SidebarNavGroup({ group }: SidebarNavGroupProps) {
   const { collapsed: sidebarCollapsed } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

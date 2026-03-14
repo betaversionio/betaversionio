@@ -23,7 +23,7 @@ import {
   FieldGroup,
   FieldTitle,
 } from '@/components/ui/field';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, BookOpen } from 'lucide-react';
 
 export default function NewTemplatePage() {
   const router = useRouter();
@@ -95,6 +95,22 @@ export default function NewTemplatePage() {
         title="New Template"
         description="Create a new portfolio template."
       />
+
+      <a
+        href="/docs"
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center gap-3 rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <BookOpen className="size-5 shrink-0" />
+        <span>
+          New to template development? Read the{' '}
+          <span className="font-medium text-foreground underline underline-offset-4">
+            Template Docs
+          </span>{' '}
+          to learn how to build and publish templates with the portfolio-sdk.
+        </span>
+      </a>
 
       <Card>
         <CardContent className="p-6">
